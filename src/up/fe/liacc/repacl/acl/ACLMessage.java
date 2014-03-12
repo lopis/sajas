@@ -1,6 +1,6 @@
 package up.fe.liacc.repacl.acl;
 
-import up.fe.liacc.repacl.IRepACLAgent;
+import up.fe.liacc.repacl.IAgent;
 
 /**
  * This is the generic class for all types of messages.
@@ -38,14 +38,14 @@ public abstract class ACLMessage {
 	
 	private int performative = ACL_NO_PERFORMATIVE;
 	private Object content;
-	private IRepACLAgent sender;
-	private IRepACLAgent receiver;
+	private IAgent sender;
+	private IAgent receiver;
 	private String replyWith;
 	private String inReplyTo;
 	/**
 	 * Dealine for response. Facultative.
 	 */
-	private long when;
+	private long when = 0;
 	
 	/**
 	 * Creates a new ACL Message. The fields replyWith and inReplyTo are not
@@ -121,7 +121,7 @@ public abstract class ACLMessage {
 	/**
 	 * @return Reference to the issuer of this message.
 	 */
-	public IRepACLAgent getSender() {
+	public IAgent getSender() {
 		return sender;
 	}
 	
@@ -129,14 +129,14 @@ public abstract class ACLMessage {
 	 * Sets the issuer if this message.
 	 * @param sender
 	 */
-	public void setSender(IRepACLAgent sender) {
+	public void setSender(IAgent sender) {
 		this.sender = sender;
 	}
 	
 	/**
 	 * @return Reference to the receiver of this message.
 	 */
-	public IRepACLAgent getReceiver() {
+	public IAgent getReceiver() {
 		return receiver;
 	}
 	
@@ -144,30 +144,60 @@ public abstract class ACLMessage {
 	 * Sets the receiver of this message.
 	 * @param receiver
 	 */
-	public void setReceiver(IRepACLAgent receiver) {
+	public void setReceiver(IAgent receiver) {
 		this.receiver = receiver;
 	}
 
+	/**
+	 * @return An identifier for this communication.
+	 * If this field is set, the responder should use it
+	 * to set the value of "inReplyTo" in the response.
+	 */
 	public String getReplyWith() {
 		return replyWith;
 	}
 
+	/**
+	 * @param replyWith An identifier for this communication.
+	 * If this field is set, the responder should use it
+	 * to set the value of "inReplyTo" in the response.
+	 */
 	public void setReplyWith(String replyWith) {
 		this.replyWith = replyWith;
 	}
 
+	/**
+	 * @return An identifier for this communication.
+	 * The value of this field should be the value
+	 * received in the "replyWith" field in the request.
+	 */
 	public String getInReplyTo() {
 		return inReplyTo;
 	}
 
+	/**
+	 * @param inReplyTo An identifier for this communication.
+	 * The value of this field should be the value
+	 * received in the "replyWith" field in the request.
+	 */
 	public void setInReplyTo(String inReplyTo) {
 		this.inReplyTo = inReplyTo;
 	}
 
+	/**
+	 
+	 * @return Deadline for the response.
+	 * The time is formatted as unix time, in seconds. //FIXME: confirm if seconds or millis
+	 */
 	public long getWhen() {
 		return when;
 	}
 
+	/**
+	 * 
+	 * @param when Deadline for the response.
+	 * The time is formatted as unix time, in seconds. //FIXME: confirm if seconds or millis
+	 */
 	public void setWhen(long when) {
 		this.when = when;
 	}
