@@ -49,7 +49,7 @@ public class DF {
 	 * @param agent The agent to be registered
 	 * @return The AID generated for the agent.
 	 */
-	public int registerAgent(IAgent agent) {
+	public static int registerAgent(IAgent agent) {
 		// If this agent is already in the hashMap,
 		// just return its key.
 		if (getAgents().containsValue(agent)) {
@@ -75,7 +75,7 @@ public class DF {
 	 * @return The agent's AID if the agent was found
 	 * in the DF or -1 otherwise.
 	 */
-	public int unregisterAgent(IAgent agent) {
+	public static int unregisterAgent(IAgent agent) {
 		if (getAgents().containsKey(agent.getAID())) {
 			getAgents().remove(agent.getAID());
 			int aid = agent.getAID();
@@ -90,7 +90,7 @@ public class DF {
 	 * is contained in the message.
 	 * @param message
 	 */
-	public void send(ACLMessage message) {
+	public static void send(ACLMessage message) {
 		
 		message.getReceiver().send(message);
 	}
