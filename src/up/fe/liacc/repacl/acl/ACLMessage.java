@@ -4,48 +4,21 @@ import up.fe.liacc.repacl.IAgent;
 
 /**
  * This is the generic class for all types of messages.
+ * The type of protocol is set in the field "
  * 
  * @author joaolopes
  *
  */
-public abstract class ACLMessage {
+public class ACLMessage {
 	
-	final static public int ACL_ACCEPT_PROPOSAL = 1;
-	final static public int ACL_AGREE = 2;
-	final static public int ACL_CANCEL = 3;
-	final static public int ACL_CALL_FOR_PROPOSAL = 4;
-	final static public int ACL_CONFIRM = 5;
-	final static public int ACL_DISCONFIRM = 6;
-	final static public int ACL_FAILURE = 7;
-	final static public int ACL_INFORM = 8;
-	final static public int ACL_INFORM_IF = 9;
-	final static public int ACL_INFORM_REF = 10;
-	final static public int ACL_NOT_UNDERSTOOD = 11;
-	final static public int ACL_PROPAGATE = 12;
-	final static public int ACL_PROPOSE = 13;
-	final static public int ACL_PROXY = 14;
-	final static public int ACL_QUERY_IF = 15;
-	final static public int ACL_QUERY_REF = 16;
-	final static public int ACL_REFUSE = 17;
-	final static public int ACL_REJECT_PROPOSAL = 18;
-	final static public int ACL_REQUEST = 19;
-	final static public int ACL_REQUEST_WHEN = 20;
-	final static public int ACL_REQUEST_WHENEVER = 21;
-	final static public int ACL_SUBSCRIBE = 22;
-	
-	final static public int ACL_NO_PERFORMATIVE = -1;
-	
-	
-	private int performative = ACL_NO_PERFORMATIVE;
-	private Object content;
-	private IAgent sender;
+	private int performative = ACL.NO_PERFORMATIVE;	// The intent of the message
+	private int protocol = ACL.ACHIEVE_RE_INITIATOR;
+	private Object content; // Any object can be attached to the message
+	private IAgent sender; // The sender must be set so the receiver can reply
 	private IAgent receiver;
-	private String replyWith;
-	private String inReplyTo;
-	/**
-	 * Dealine for response. Facultative.
-	 */
-	private long when = 0;
+	private String replyWith; // Tag to identify a "thread" of communication
+	private String inReplyTo; // This value comes from "replyWith"
+	private long when = 0; // Deadline for the response.
 	
 	/**
 	 * Creates a new ACL Message. The fields replyWith and inReplyTo are not
@@ -96,9 +69,9 @@ public abstract class ACLMessage {
 	 */
 	public void setPerformative(int performative) {
 		this.performative = 
-				(performative > 0 && performative <= ACL_SUBSCRIBE)
+				(performative > 0 && performative <= ACL.SUBSCRIBE)
 				? performative
-				: ACL_NO_PERFORMATIVE;
+				: ACL.NO_PERFORMATIVE;
 	}
 	
 	/**
