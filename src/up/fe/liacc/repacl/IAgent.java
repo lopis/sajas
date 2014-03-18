@@ -11,15 +11,15 @@ import up.fe.liacc.repacl.acl.ACLMessage;
 public interface IAgent {
 
 	/**
-	 * Send message <b>to</b> this agent.
-	 * The message will be read and processed but a response
-	 * may only occur a few ticks later.
+	 * Add a message to this agent's mail box.
+	 * The message should be then scheduled for 
+	 * later processing.
 	 * 
 	 * To send messages to an agent, you should use the DF class 
 	 * through the method "initiateProtocol()".
 	 * @param message
 	 */
-	void send(ACLMessage message);
+	void addMail(ACLMessage message);
 	
 	/**
 	 * Sets the agent identifier. It is expected that agents know
@@ -38,18 +38,6 @@ public interface IAgent {
 	 * @return The agent identifier
 	 */
 	int getAID();
-	
-	/**
-	 * This method initiates the interaction protocol.
-	 * When the agent initiates new communication, 
-	 * the mailbox should be prepared to receive the responses.
-	 * @param message
-	 */
-	void initiateProtocol(ACLMessage message);
-	
-	/**
-	 * 
-	 * @return This agent's mail box.
-	 */
-	MailBox getMailBox();
+
+
 }
