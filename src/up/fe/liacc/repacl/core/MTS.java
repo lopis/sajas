@@ -1,4 +1,4 @@
-package up.fe.liacc.repacl.proto;
+package up.fe.liacc.repacl.core;
 
 import up.fe.liacc.repacl.acl.ACLMessage;
 

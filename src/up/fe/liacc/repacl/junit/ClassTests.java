@@ -7,11 +7,11 @@ import java.util.LinkedList;
 
 import org.junit.Test;
 
-import up.fe.liacc.repacl.DF;
 import up.fe.liacc.repacl.IAgent;
 import up.fe.liacc.repacl.MailBox;
 import up.fe.liacc.repacl.acl.ACL;
 import up.fe.liacc.repacl.acl.ACLMessage;
+import up.fe.liacc.repacl.core.DF;
 
 
 public class ClassTests {
@@ -29,7 +29,7 @@ public class ClassTests {
 		DF.registerAgent(agent1);
 		DF.registerAgent(agent2);
 		
-		DF.send(message);
+		
 	}
 	
 	class MyAgent implements IAgent {
@@ -55,7 +55,7 @@ public class ClassTests {
 		}
 		
 		@Override
-		public void send(ACLMessage message) {
+		public void addMail(ACLMessage message) {
 			System.out.println("Received: " + message.getPerformative());
 			getQueue(message.getClass()).add(message);
 		}
@@ -63,17 +63,6 @@ public class ClassTests {
 		@Override
 		public int getAID() {
 			return aid;
-		}
-
-		@Override
-		public void initiateProtocol(ACLMessage message) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public MailBox getMailBox() {
-			return mailBox;
 		}
 	};
 
