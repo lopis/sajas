@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import repast.simphony.context.Context;
 import up.fe.liacc.repacl.IAgent;
-import up.fe.liacc.repacl.acl.ACLMessage;
 
 
 /**
@@ -90,9 +89,9 @@ public class DF {
 	
 	/**
 	 * Deregisters an agent from the DF and resets the
-	 * agent's AID. 
+	 * agent's AID (sets its AID to -1). 
 	 * @param agent
-	 * @return The agent's AID if the agent was found
+	 * @return The old agent's AID if the agent was found
 	 * in the DF or -1 otherwise.
 	 */
 	public static int unregisterAgent(IAgent agent) {

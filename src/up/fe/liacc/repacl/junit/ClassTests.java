@@ -24,46 +24,19 @@ public class ClassTests {
 		
 		ACLMessage message = new ACLMessage(ACL.INFORM);
 		message.setSender(agent1);
-		message.setReceiver(agent2);
-		
+		message.addReceiver(agent2);
 		DF.registerAgent(agent1);
 		DF.registerAgent(agent2);
 		
-		
+		agent1.talk();
 	}
 	
-	class MyAgent implements IAgent {
-		
-		private int aid;
-		private MailBox mailBox;
-		HashMap<Class<?>, LinkedList<ACLMessage>> messages;
-		
-		public LinkedList<ACLMessage> getQueue(Class<?> c) {
-			if (messages == null) {
-				messages = new HashMap<Class<?>, LinkedList<ACLMessage>>();
-			}
-			if (!messages.containsKey(c)) {
-				messages.put(c, new LinkedList<ACLMessage>());
-			}
-			
-			return messages.get(c);
-		}
+	class MyAgent extends IAgent {
 
-		@Override
-		public void setAID(int aid) {
-			this.aid = aid;
+		public void talk() {
+			
 		}
 		
-		@Override
-		public void addMail(ACLMessage message) {
-			System.out.println("Received: " + message.getPerformative());
-			getQueue(message.getClass()).add(message);
-		}
-		
-		@Override
-		public int getAID() {
-			return aid;
-		}
 	};
 
 }

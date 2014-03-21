@@ -12,6 +12,20 @@ public abstract class Behavior {
 	 * agent initiating this behavior.
 	 */
 	public Behavior(IAgent agent) {
-		this.owner = agent;
+		this.setOwner(agent);
+	}
+	
+	/**
+	 * This is the body of the behavior and the
+	 * method that is executed when the behavior is executed.
+	 */
+	public abstract void action();
+
+	public IAgent getOwner() {
+		return owner;
+	}
+
+	public void setOwner(IAgent owner) {
+		this.owner = owner;
 	}
 }

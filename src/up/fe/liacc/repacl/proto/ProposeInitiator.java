@@ -8,4 +8,10 @@ public class ProposeInitiator extends Behavior {
 		super(agent);
 	}
 
+	@Override
+	public void action() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

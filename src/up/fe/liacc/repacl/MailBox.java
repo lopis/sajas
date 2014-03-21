@@ -1,51 +1,62 @@
 package up.fe.liacc.repacl;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 
 import up.fe.liacc.repacl.acl.ACLMessage;
 
 /**
- * This class allows agents to subscribe and unsubscribe
- * to different types of communication.
+ * This class stores all mail addressed to one agent.
  * @author joaolopes
  *
  */
 public class MailBox {
 	
-	HashMap<Integer, LinkedList<ACLMessage>> queues;
+	LinkedList<ACLMessage> mail;
 	
 	public MailBox() {
-		queues = new HashMap<Integer, LinkedList<ACLMessage>>();
-	}
-	
-	/**
-	 * Start accepting messages of a protocol.
-	 * Other messages are ignored.
-	 * @param protocol
-	 */
-	public void subscribe(int protocol) {
-		queues.put(protocol, new LinkedList<ACLMessage>());
+		mail = new LinkedList<ACLMessage>();
 	}
 
 	/**
-	 * Stop accepting messages of a protocol.
-	 * Further messages will be ignored.
-	 * @param protocol
+	 * Adds a new message to the mail box. 
+	 * @param message
 	 */
-	public void unsubscribe(int protocol) {
-		queues.remove(protocol);
+	public void addMail(ACLMessage message) {
+		mail.add(message);
 	}
 	
 	/**
-	 * Retrieves pending mail for one protocol.
-	 * The queue for this protocol will be emptied.
-	 * @param protocolo
+	 * 
+	 * @param template 
+	 * @return Returns the messages that match the template.
+	 */
+	public LinkedList<ACLMessage> getMail(ACLMessage template) {
+		LinkedList<ACLMessage> matchingMail = new LinkedList<ACLMessage>();
+		for (int i = 0; i < mail.size(); i++) {
+			if (mail.get(i).match(template)) {
+				matchingMail.add(mail.get(i));
+			}
+		}
+		
+		return matchingMail;
+	}
+	
+	/**
+	 * Returns all mail in this box
+	 * 
 	 * @return
 	 */
-	public LinkedList<ACLMessage> getMail(int protocolo) {
-		LinkedList<ACLMessage> mail = queues.get(protocolo);
-		queues.put(protocolo, new LinkedList<ACLMessage>());
+	public LinkedList<ACLMessage> getMail() {	
 		return mail;
 	}
+	
+	/**
+	 * Removes all mail from the mail box, including all
+	 * indexes.
+	 */
+	public void clearMailBox() {
+		mail.clear();
+	}
+	
+	
 }

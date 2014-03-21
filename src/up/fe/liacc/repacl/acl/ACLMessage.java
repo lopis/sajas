@@ -1,5 +1,7 @@
 package up.fe.liacc.repacl.acl;
 
+import java.util.ArrayList;
+
 import up.fe.liacc.repacl.IAgent;
 
 /**
@@ -12,13 +14,13 @@ import up.fe.liacc.repacl.IAgent;
 public class ACLMessage {
 	
 	private int performative = ACL.NO_PERFORMATIVE;	// The intent of the message
-	private int protocol = ACL.ACHIEVE_RE_INITIATOR;
 	private Object content; // Any object can be attached to the message
 	private IAgent sender; // The sender must be set so the receiver can reply
-	private IAgent receiver;
+	private ArrayList<IAgent> receivers;
 	private String replyWith; // Tag to identify a "thread" of communication
 	private String inReplyTo; // This value comes from "replyWith"
 	private long when = 0; // Deadline for the response.
+	public static final long NO_WHEN = 0;
 	
 	/**
 	 * Creates a new ACL Message. The fields replyWith and inReplyTo are not
@@ -109,16 +111,19 @@ public class ACLMessage {
 	/**
 	 * @return Reference to the receiver of this message.
 	 */
-	public IAgent getReceiver() {
-		return receiver;
+	public ArrayList<IAgent> getReceivers() {
+		if (receivers == null) {
+			receivers = new ArrayList<IAgent>();
+		}
+		return receivers;
 	}
 	
 	/**
 	 * Sets the receiver of this message.
 	 * @param receiver
 	 */
-	public void setReceiver(IAgent receiver) {
-		this.receiver = receiver;
+	public void addReceiver(IAgent receiver) {
+		getReceivers().add(receiver);
 	}
 
 	/**
@@ -173,6 +178,26 @@ public class ACLMessage {
 	 */
 	public void setWhen(long when) {
 		this.when = when;
+	}
+	
+	/**
+	 * This methods expects a "template", which is basically an ACLMessage
+	 * with part or all of its fields set. All template's fields are compared
+	 * to this message's. Null values on the template are ignored.
+	 * The performative "null" value, since it's an integer, is "-1" or 
+	 * ACL.NO_PERFORMATIVE.
+	 * @param template
+	 * @return True if all fields (expected those ignored) match the template's. 
+	 */
+	public boolean match(ACLMessage template) {
+		return
+			(template.getPerformative() == ACL.NO_PERFORMATIVE || template.getPerformative() == this.getPerformative())
+			&& template.getContent() == null || template.getContent() == this.getContent()
+			&& template.getInReplyTo() == null || template.getInReplyTo() == this.getInReplyTo()
+			&& template.getReplyWith() == null || template.getReplyWith() == this.getReplyWith()
+			&& template.getSender() == null    || template.getSender() == this.getSender()
+			&& template.getReceivers() == null || template.getReceivers() == this.getReceivers()
+			&& template.getWhen() == NO_WHEN || template.getWhen() == this.getWhen();
 	}
 
 }
