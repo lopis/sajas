@@ -26,8 +26,6 @@ public class ACLMessage {
 	 * Creates a new ACL Message. The fields replyWith and inReplyTo are not
 	 * needed, but all other should be not null.
 	 * @param performative A valid ACL_* value
-	 * @param sender Reference to the agent that sent this message
-	 * @param receiver Reference to the agent that will receive this message
 	 */
 	public ACLMessage(int performative) {
 		this.setPerformative(performative);
@@ -77,8 +75,7 @@ public class ACLMessage {
 	}
 	
 	/**
-	 * Returns the content of this message. This object can be null.
-	 * @return
+	 * @return Returns the content of this message. This object can be null.
 	 */
 	public Object getContent() {
 		return content;

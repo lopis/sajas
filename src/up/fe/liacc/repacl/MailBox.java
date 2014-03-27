@@ -42,9 +42,7 @@ public class MailBox {
 	}
 	
 	/**
-	 * Returns all mail in this box
-	 * 
-	 * @return
+	 * @return Returns all mail in this box
 	 */
 	public LinkedList<ACLMessage> getMail() {	
 		return mail;

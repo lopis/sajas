@@ -28,9 +28,8 @@ public class DF {
 	private static Context<Object> context;
 	
 	/**
-	 * Returns the map of agents. The field is initialized
+	 * @return Returns the map of agents. The field is initialized
 	 * if it wasn't before.
-	 * @return
 	 */
 	public static HashMap<Integer, Agent> getAgents() {
 		if (agents == null) {

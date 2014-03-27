@@ -71,7 +71,7 @@ public abstract class Agent {
 	 * their own AID. For instance, the DF class makes use of this
 	 * when the agents are registered. Without the AID, no
 	 * communication can occur.
-	 * @param AID The agent identifier
+	 * @param aid The agent identifier.
 	 */
 	public void setAID(int aid) {
 		this.aid = aid;
