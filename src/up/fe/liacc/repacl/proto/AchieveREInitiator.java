@@ -1,6 +1,6 @@
 package up.fe.liacc.repacl.proto;
 
-import up.fe.liacc.repacl.IAgent;
+import up.fe.liacc.repacl.Agent;
 import up.fe.liacc.repacl.acl.ACLMessage;
 
 /**
@@ -20,7 +20,7 @@ public class AchieveREInitiator extends Behavior {
 	 * as INFORM, FAILURE or NOT UNDERSTOOD.
 	 * @param agent The message to be sent by this behavior.
 	 */
-	public AchieveREInitiator(IAgent agent, ACLMessage message) {
+	public AchieveREInitiator(Agent agent, ACLMessage message) {
 		super(agent);
 		
 	}

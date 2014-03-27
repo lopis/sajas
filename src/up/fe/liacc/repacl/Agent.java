@@ -12,7 +12,7 @@ import up.fe.liacc.repacl.proto.Behavior;
  * @author joaolopes
  *
  */
-public abstract class IAgent {
+public abstract class Agent {
 
 	/**
 	 * Agent identifier

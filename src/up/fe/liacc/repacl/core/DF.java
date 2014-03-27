@@ -3,7 +3,7 @@ package up.fe.liacc.repacl.core;
 import java.util.HashMap;
 
 import repast.simphony.context.Context;
-import up.fe.liacc.repacl.IAgent;
+import up.fe.liacc.repacl.Agent;
 
 
 /**
@@ -19,7 +19,7 @@ import up.fe.liacc.repacl.IAgent;
 public class DF {
 
 	private static int lastAID = 0; // Just to help generate new identifiers
-	private static HashMap<Integer, IAgent> agents; // Contains all agents
+	private static HashMap<Integer, Agent> agents; // Contains all agents
 	
 	/**
 	 * The Repast context that contains all
@@ -32,9 +32,9 @@ public class DF {
 	 * if it wasn't before.
 	 * @return
 	 */
-	public static HashMap<Integer, IAgent> getAgents() {
+	public static HashMap<Integer, Agent> getAgents() {
 		if (agents == null) {
-			agents = new HashMap<Integer, IAgent>();
+			agents = new HashMap<Integer, Agent>();
 		}
 		return agents;
 	}
@@ -45,7 +45,7 @@ public class DF {
 	 * @return The agent mapped to this AID or null if
 	 * this AID is not registered to any agent in the DF.
 	 */
-	public static IAgent searchAgent(int aid) {
+	public static Agent searchAgent(int aid) {
 		return getAgents().get(aid);
 	}
 	
@@ -56,8 +56,8 @@ public class DF {
 	 * provide a service. Basically it means
 	 * the agent activated that behavior.
 	 */
-	public static IAgent[] searchService(int service) {
-		return new IAgent[0];
+	public static Agent[] searchService(int service) {
+		return new Agent[0];
 	}
 	
 	/**
@@ -67,7 +67,7 @@ public class DF {
 	 * @param agent The agent to be registered
 	 * @return The AID generated for the agent.
 	 */
-	public static int registerAgent(IAgent agent) {
+	public static int registerAgent(Agent agent) {
 		// If this agent is already in the hashMap,
 		// just return its key.
 		if (getAgents().containsValue(agent)) {
@@ -94,7 +94,7 @@ public class DF {
 	 * @return The old agent's AID if the agent was found
 	 * in the DF or -1 otherwise.
 	 */
-	public static int unregisterAgent(IAgent agent) {
+	public static int unregisterAgent(Agent agent) {
 		if (getAgents().containsKey(agent.getAID())) {
 			getAgents().remove(agent.getAID());
 			int aid = agent.getAID();

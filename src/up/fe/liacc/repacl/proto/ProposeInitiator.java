@@ -1,10 +1,10 @@
 package up.fe.liacc.repacl.proto;
 
-import up.fe.liacc.repacl.IAgent;
+import up.fe.liacc.repacl.Agent;
 
 public class ProposeInitiator extends Behavior {
 
-	public ProposeInitiator(IAgent agent) {
+	public ProposeInitiator(Agent agent) {
 		super(agent);
 	}
 

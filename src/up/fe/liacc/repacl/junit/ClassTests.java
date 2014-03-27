@@ -7,7 +7,7 @@ import java.util.LinkedList;
 
 import org.junit.Test;
 
-import up.fe.liacc.repacl.IAgent;
+import up.fe.liacc.repacl.Agent;
 import up.fe.liacc.repacl.MailBox;
 import up.fe.liacc.repacl.acl.ACL;
 import up.fe.liacc.repacl.acl.ACLMessage;
@@ -31,7 +31,7 @@ public class ClassTests {
 		agent1.talk();
 	}
 	
-	class MyAgent extends IAgent {
+	class MyAgent extends Agent {
 
 		public void talk() {
 			

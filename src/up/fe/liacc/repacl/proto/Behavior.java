@@ -1,17 +1,17 @@
 package up.fe.liacc.repacl.proto;
 
-import up.fe.liacc.repacl.IAgent;
+import up.fe.liacc.repacl.Agent;
 
 public abstract class Behavior {
 
-	private IAgent owner;
+	private Agent owner;
 
 	/**
 	 * Behavior creation
 	 * @param agent The owner, i.e. the
 	 * agent initiating this behavior.
 	 */
-	public Behavior(IAgent agent) {
+	public Behavior(Agent agent) {
 		this.setOwner(agent);
 	}
 	
@@ -21,11 +21,11 @@ public abstract class Behavior {
 	 */
 	public abstract void action();
 
-	public IAgent getOwner() {
+	public Agent getOwner() {
 		return owner;
 	}
 
-	public void setOwner(IAgent owner) {
+	public void setOwner(Agent owner) {
 		this.owner = owner;
 	}
 }

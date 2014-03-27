@@ -1,10 +1,10 @@
 package up.fe.liacc.repacl.proto;
 
-import up.fe.liacc.repacl.IAgent;
+import up.fe.liacc.repacl.Agent;
 
 public class AchieveREResponder extends Behavior {
 
-	public AchieveREResponder(IAgent agent) {
+	public AchieveREResponder(Agent agent) {
 		super(agent);
 	}
 

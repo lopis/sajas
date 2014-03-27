@@ -2,7 +2,7 @@ package up.fe.liacc.repacl.acl;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.IAgent;
+import up.fe.liacc.repacl.Agent;
 
 /**
  * This is the generic class for all types of messages.
@@ -15,8 +15,8 @@ public class ACLMessage {
 	
 	private int performative = ACL.NO_PERFORMATIVE;	// The intent of the message
 	private Object content; // Any object can be attached to the message
-	private IAgent sender; // The sender must be set so the receiver can reply
-	private ArrayList<IAgent> receivers;
+	private Agent sender; // The sender must be set so the receiver can reply
+	private ArrayList<Agent> receivers;
 	private String replyWith; // Tag to identify a "thread" of communication
 	private String inReplyTo; // This value comes from "replyWith"
 	private long when = 0; // Deadline for the response.
@@ -96,7 +96,7 @@ public class ACLMessage {
 	/**
 	 * @return Reference to the issuer of this message.
 	 */
-	public IAgent getSender() {
+	public Agent getSender() {
 		return sender;
 	}
 	
@@ -104,16 +104,16 @@ public class ACLMessage {
 	 * Sets the issuer if this message.
 	 * @param sender
 	 */
-	public void setSender(IAgent sender) {
+	public void setSender(Agent sender) {
 		this.sender = sender;
 	}
 	
 	/**
 	 * @return Reference to the receiver of this message.
 	 */
-	public ArrayList<IAgent> getReceivers() {
+	public ArrayList<Agent> getReceivers() {
 		if (receivers == null) {
-			receivers = new ArrayList<IAgent>();
+			receivers = new ArrayList<Agent>();
 		}
 		return receivers;
 	}
@@ -122,7 +122,7 @@ public class ACLMessage {
 	 * Sets the receiver of this message.
 	 * @param receiver
 	 */
-	public void addReceiver(IAgent receiver) {
+	public void addReceiver(Agent receiver) {
 		getReceivers().add(receiver);
 	}
 

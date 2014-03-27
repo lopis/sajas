@@ -2,7 +2,7 @@ package up.fe.liacc.repacl.core;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.IAgent;
+import up.fe.liacc.repacl.Agent;
 import up.fe.liacc.repacl.acl.ACLMessage;
 
 /**
@@ -21,8 +21,8 @@ public class MTS {
 	 * @param message
 	 */
 	public static void send(ACLMessage message) {
-		ArrayList<IAgent> receivers = message.getReceivers();
-		for (IAgent agent: receivers) {
+		ArrayList<Agent> receivers = message.getReceivers();
+		for (Agent agent: receivers) {
 			agent.addMail(message);
 		}
 	}
