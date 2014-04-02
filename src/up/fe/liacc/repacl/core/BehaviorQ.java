@@ -18,6 +18,13 @@ public class BehaviorQ {
 	private LinkedList<Behavior> behaviors;
 
 	public void addBehavior(Behavior b) {
-		behaviors.add(b);
+		getBehaviors().add(b);
+	}
+
+	private LinkedList<Behavior> getBehaviors() {
+		if (behaviors == null) {
+			behaviors = new LinkedList<Behavior>();
+		}
+		return behaviors;
 	}
 }

@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Class-Path: repast.simphony.bin_and_src.jar
+

@@ -2,8 +2,11 @@ package up.fe.liacc.repacl;
 
 import java.util.LinkedList;
 
+import repast.simphony.engine.schedule.ScheduledMethod;
+import repast.simphony.util.ContextUtils;
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.core.BehaviorQ;
+import up.fe.liacc.repacl.core.DF;
 import up.fe.liacc.repacl.proto.Behavior;
 
 /**
@@ -28,6 +31,18 @@ public abstract class Agent {
 	 * The behavior queue.
 	 */
 	private BehaviorQ behaviorQ;
+	
+	/**
+	 * Default constructor. Always call this constructor
+	 * when extending this class, as it registers the
+	 * agent in the DF and makes communication possible.
+	 * The setup() method is called in the end of this
+	 * constructor.
+	 */
+	public Agent() {
+		DF.registerAgent(this);
+		setup();
+	}
 
 	/**
 	 * Add a message to this agent's mail box.
@@ -92,8 +107,10 @@ public abstract class Agent {
 	 * Adds a behavior to this agent's execution.
 	 * @param behavior
 	 */
+	@SuppressWarnings("unchecked")
 	protected void addBehavior(Behavior behavior) {
 		getBehaviorQueue().addBehavior(behavior);
+		DF.getContext().add(behavior);
 	}
 
 	private BehaviorQ getBehaviorQueue() {
@@ -101,5 +118,15 @@ public abstract class Agent {
 			behaviorQ = new BehaviorQ();
 		}
 		return behaviorQ;
+	}
+	
+	/**
+	 * 
+	 */
+	public void setup(){}
+	
+	@ScheduledMethod(start=1, interval=50)
+	public void step(){
+		System.err.println("[A] Default step");
 	}
 }

@@ -1,8 +1,8 @@
 package up.fe.liacc.repacl.core;
 
+import java.util.Collection;
 import java.util.HashMap;
 
-import repast.simphony.context.Context;
 import up.fe.liacc.repacl.Agent;
 
 
@@ -13,6 +13,9 @@ import up.fe.liacc.repacl.Agent;
  * Agents use the static method send(ACLMessage) to send a message
  * to one or more agents. The ACLMessage object contains
  * the receiver agent and the sender (so the receiver can reply back).
+ * 
+ * This class needs to be setup initially before registering new agents.
+ * To do that, simply call setContext(...);
  * @author joaolopes
  *
  */
@@ -25,7 +28,8 @@ public class DF {
 	 * The Repast context that contains all
 	 * scheduled Repast objects.
 	 */
-	private static Context<Object> context;
+	private static Collection<Object> context = null;
+
 	
 	/**
 	 * @return Returns the map of agents. The field is initialized
@@ -82,6 +86,7 @@ public class DF {
 		// The agent must know their own ID.
 		agent.setAID(lastAID);
 		agents.put(lastAID, agent);
+		System.err.println("[DF] new agent: " + agent.getAID());
 		context.add(agent);
 		return lastAID;
 	}
@@ -103,5 +108,24 @@ public class DF {
 		return -1;
 	}
 	
+	/**
+	 * Set the context for the repast simulation.
+	 * @param c The type is the interface "Collection" to 
+	 * maintain the independancy from the Repast library.
+	 * @throws IllegalArgumentException The type of the parameter must
+	 * be "Context"
+	 */
+	public static void setContext(Collection<Object> c)
+			throws IllegalArgumentException {
+		if (c.getClass().getName() == "repast.simphony.context.Context<?>") {
+			throw new IllegalArgumentException("[DF]: Parameter of type Context was expected.");
+		}
+		
+		context = c;
+	}
+
+	public static Collection<Object> getContext() {
+		return context;
+	}
 
 }
