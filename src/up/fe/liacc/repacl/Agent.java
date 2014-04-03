@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.util.ContextUtils;
 import up.fe.liacc.repacl.acl.ACLMessage;
+import up.fe.liacc.repacl.acl.MessageTemplate;
 import up.fe.liacc.repacl.core.BehaviorQ;
 import up.fe.liacc.repacl.core.DF;
 import up.fe.liacc.repacl.proto.Behavior;
@@ -68,17 +69,14 @@ public abstract class Agent {
 	}
 	
 	/**
-	 * Returns this agent's mail box contents.
+	 * Returns this agent's mail box
 	 */
-	public LinkedList<ACLMessage> getMail() {
-		return getMailBox().getMail();
+	public MailBox getMail() {
+		return getMailBox();
 	}
 	
-	/**
-	 * Returns this agent's mail box contents.
-	 */
-	public LinkedList<ACLMessage> getMail(ACLMessage template) {
-		return getMailBox().getMail(template);
+	public ACLMessage getMatchingMessage(MessageTemplate template) {
+		return getMailBox().getMatchingMessage(template);
 	}
 
 	/**
