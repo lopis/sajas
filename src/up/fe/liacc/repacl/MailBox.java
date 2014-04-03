@@ -3,6 +3,7 @@ package up.fe.liacc.repacl;
 import java.util.LinkedList;
 
 import up.fe.liacc.repacl.acl.ACLMessage;
+import up.fe.liacc.repacl.acl.MessageTemplate;
 
 /**
  * This class stores all mail addressed to one agent.
@@ -24,22 +25,7 @@ public class MailBox {
 	public void addMail(ACLMessage message) {
 		mail.add(message);
 	}
-	
-	/**
-	 * 
-	 * @param template 
-	 * @return Returns the messages that match the template.
-	 */
-	public LinkedList<ACLMessage> getMail(ACLMessage template) {
-		LinkedList<ACLMessage> matchingMail = new LinkedList<ACLMessage>();
-		for (int i = 0; i < mail.size(); i++) {
-			if (mail.get(i).match(template)) {
-				matchingMail.add(mail.get(i));
-			}
-		}
-		
-		return matchingMail;
-	}
+
 	
 	/**
 	 * @return Returns all mail in this box
@@ -54,6 +40,20 @@ public class MailBox {
 	 */
 	public void clearMailBox() {
 		mail.clear();
+	}
+
+	/**
+	 * Returns the first matching mail the 
+	 * @param template
+	 * @return
+	 */
+	public ACLMessage getMatchingMessage(MessageTemplate template) {
+		//TODO: create mail hash table with templates.
+		// Then, see if the template already exists
+		// If yes, pop the first message in that list!
+		// If not, try searching the messages that don't belong to any template.
+		
+		return null;
 	}
 	
 	
