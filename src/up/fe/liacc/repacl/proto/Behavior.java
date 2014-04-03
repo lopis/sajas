@@ -3,6 +3,14 @@ package up.fe.liacc.repacl.proto;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import up.fe.liacc.repacl.Agent;
 
+/**
+ * This is the class that all behaviors extend. It doesn't contain any
+ * implementation of the behavior itself. Programmer that intend to 
+ * implement communication protocols should instead use the classes from
+ * the package "proto"
+ * @author joaolopes
+ *
+ */
 public abstract class Behavior {
 
 	private Agent owner;
