@@ -14,6 +14,7 @@ import up.fe.liacc.repacl.Agent;
 public class ACLMessage {
 	
 	private int performative = ACL.NO_PERFORMATIVE;	// The intent of the message
+	private int protocol = ACL.NO_PROTOCOL;	// The intent of the message
 	private Object content; // Any object can be attached to the message
 	private Agent sender; // The sender must be set so the receiver can reply
 	private ArrayList<Agent> receivers;
@@ -74,6 +75,18 @@ public class ACLMessage {
 				: ACL.NO_PERFORMATIVE;
 	}
 	
+	/**
+	 * Returns the protocol to which this message belongs.
+	 * @return The protocol is represented 
+	 */
+	public int getProtocol() {
+		return protocol;
+	}
+
+	public void setProtocol(int protocol) {
+		this.protocol = protocol;
+	}
+
 	/**
 	 * @return Returns the content of this message. This object can be null.
 	 */
@@ -186,15 +199,12 @@ public class ACLMessage {
 	 * @param template
 	 * @return True if all fields (expected those ignored) match the template's. 
 	 */
-	public boolean match(ACLMessage template) {
-		return
-			(template.getPerformative() == ACL.NO_PERFORMATIVE || template.getPerformative() == this.getPerformative())
-			&& template.getContent() == null || template.getContent() == this.getContent()
-			&& template.getInReplyTo() == null || template.getInReplyTo() == this.getInReplyTo()
-			&& template.getReplyWith() == null || template.getReplyWith() == this.getReplyWith()
-			&& template.getSender() == null    || template.getSender() == this.getSender()
-			&& template.getReceivers() == null || template.getReceivers() == this.getReceivers()
-			&& template.getWhen() == NO_WHEN || template.getWhen() == this.getWhen();
+	public boolean match(MessageTemplate template) {
+		return template.matchesPerformative(this.getPerformative()) 
+			&& template.matchesProtocol(this.getProtocol())
+			&& template.matchesInReplyTo(this.getInReplyTo())
+			&& template.matchesReplyWith(this.getReplyWith())
+			&& template.matchesContent(this.getContent());
 	}
 
 }

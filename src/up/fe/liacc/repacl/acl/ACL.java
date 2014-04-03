@@ -4,12 +4,10 @@ public class ACL {
 	
 	/* Protocols */
 	
-	final static public int ACHIEVE_RE_INITIATOR = 1;
-	final static public int ACHIEVE_RE_RESPONDER = 2;
-	final static public int CONTRACT_NET_INITIATOR = 3;
-	final static public int CONTRACT_NET_RESPONDER = 4;
-	final static public int PROPOSE_INITIATOR = 5;
-	final static public int PROPOSE_RESPONDER = 6;
+	final static public int FIPA_REQUEST = 1;
+	final static public int FIPA_CONTRACT_NET = 2;
+	final static public int FIPA_PROPOSE = 3;
+	final static public int NO_PROTOCOL = -1;
 
 	
 	/* Performatives */

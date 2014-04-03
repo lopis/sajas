@@ -1,16 +1,37 @@
 package up.fe.liacc.repacl.proto;
 
+import java.util.Vector;
+
+import repast.simphony.engine.schedule.ScheduledMethod;
 import up.fe.liacc.repacl.Agent;
 import up.fe.liacc.repacl.acl.ACLMessage;
+import up.fe.liacc.repacl.acl.MessageTemplate;
 
 /**
+ * Initiates a "FIPA-REQUEST"-like protocol. Programmers that which to use
+ * this protocol should extend this class and override the appropriate handler
+ * methods:
  * 
+ * <li>handleAllResponses(ACLMessage[] ms)</li>
+ * <li>handleAllResults(ACLMessage[] ms)</li>
+ * <li>handleAgree(ACLMessage m)</li>
+ * <li>handleReject(ACLMessage m)</li>
+ * <li>handleInform(ACLMessage m)</li>
+ * <li>handleFailure(ACLMessage m)</li>
+ * <li>handleNotUnderstood(ACLMessage m)</li>
+ *  
+ * The complement to this class is the AchieveREResponder which will respond
+ * to the request sent by the agent that initiates the protocol. So the agents
+ * that are supposed to respond to this reply should implement the handler
+ * methods in the AchieveREResponder class.
+ * 
+ * @see AchieveREResponder
  * @author joaolopes
  *
  */
 public class AchieveREInitiator extends Behavior {
 	
-	ACLMessage template;
+	MessageTemplate template;
 
 	/**
 	 * Initiates the protocol and sends the message using this protocol.
@@ -25,32 +46,60 @@ public class AchieveREInitiator extends Behavior {
 		
 	}
 	
-	protected void handleAllResponses() {}
+	/**
+	 * This method is called when all the responses have been collected or
+	 * when the timeout is expired.
+	 * TODO implement timeout
+	 */ 
+	protected void handleAllResponses(Vector<ACLMessage> responses) {}
 	
-	protected void handleAllResults() {}
+	/**
+	 * This method is called when all the result notification messages
+	 * have been collected.
+	 */
+	protected void handleAllResultNotifications(Vector<ACLMessage> notifications) {}
 	
-	protected void handleAgree() {}
+	/**
+	 * Handle 'agree' response from one of the receivers of the request.
+	 */
+	protected void handleAgree(ACLMessage agree) {}
 	
-	protected void handleReject() {}
+	/**
+	 * Handle 'refuse' response from one of the receivers of the request.
+	 */
+	protected void handleRefuse(ACLMessage agree) {}
 
-	protected void handleInform() {}
+	/**
+	 * Handle 'inform' result notification from one of
+	 * the receivers of the request.
+	 */
+	protected void handleInform(ACLMessage agree) {}
 	
-	protected void handleFailure() {}
+	/**
+	 * Handle 'failure' result notification from one of
+	 * the receivers of the request.
+	 */
+	protected void handleFailure(ACLMessage agree) {}
 	
+	/**
+	 * Handle 'no-understood' response from one of
+	 * the receivers of the request.
+	 */
 	protected void handleNotUnderstood() {}
 
 	@Override
+	@ScheduledMethod(start = 1, interval = 5)
 	public void action() {
-		 /* on each tick
-			for each behavior
-				1. get matching mail
-				2. use mail
-					If INFORM->handle inform, etc.
-				3. remove mail from box
-				4. if behavior finished, remove behavior
-					Behavior ends if all receivers sent a reply.
-		*/
-		getOwner().getMail(template);
+		/*
+		 * This method is scheduled in Repast.
+		 * On each tick, do:
+		 *  1 - Get one message matching the template
+		 *  2 - Read the performative in the message
+		 *  3 - Call the appropriate handler
+		 *  4 - Remove the responder from the wait list
+		 *  5 - If wait list is empty, run the appropriate "handle all"
+		 */
+		
 	}
 
 }
