@@ -13,8 +13,8 @@ import up.fe.liacc.repacl.Agent;
  */
 public class ACLMessage {
 	
-	private int performative = ACL.NO_PERFORMATIVE;	// The intent of the message
-	private int protocol = ACL.NO_PROTOCOL;	// The intent of the message
+	private int performative = Performative.NO_PERFORMATIVE;	// The intent of the message
+	private int protocol = Protocol.NO_PROTOCOL;	// The intent of the message
 	private Object content; // Any object can be attached to the message
 	private Agent sender; // The sender must be set so the receiver can reply
 	private ArrayList<Agent> receivers;
@@ -70,9 +70,9 @@ public class ACLMessage {
 	 */
 	public void setPerformative(int performative) {
 		this.performative = 
-				(performative > 0 && performative <= ACL.SUBSCRIBE)
+				(performative > 0 && performative <= Performative.SUBSCRIBE)
 				? performative
-				: ACL.NO_PERFORMATIVE;
+				: Performative.NO_PERFORMATIVE;
 	}
 	
 	/**
