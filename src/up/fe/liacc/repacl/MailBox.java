@@ -48,10 +48,17 @@ public class MailBox {
 	 * @return
 	 */
 	public ACLMessage getMatchingMessage(MessageTemplate template) {
-		//TODO: create mail hash table with templates.
+		//FIXME: create mail hash table with templates.
 		// Then, see if the template already exists
 		// If yes, pop the first message in that list!
 		// If not, try searching the messages that don't belong to any template.
+		
+		// Quick and dirty search:
+		for (ACLMessage message : mail) {
+			if (message.match(template)) {
+				return message;
+			}
+		}
 		
 		return null;
 	}

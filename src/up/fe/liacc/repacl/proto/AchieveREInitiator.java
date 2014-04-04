@@ -1,11 +1,13 @@
 package up.fe.liacc.repacl.proto;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import repast.simphony.engine.schedule.ScheduledMethod;
 import up.fe.liacc.repacl.Agent;
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
+import up.fe.liacc.repacl.acl.Performative;
 
 /**
  * Initiates a "FIPA-REQUEST"-like protocol. Programmers that which to use
@@ -30,8 +32,10 @@ import up.fe.liacc.repacl.acl.MessageTemplate;
  *
  */
 public class AchieveREInitiator extends Behavior {
-	
-	MessageTemplate template;
+
+	private MessageTemplate template;
+	private State protocolState;
+
 
 	/**
 	 * Initiates the protocol and sends the message using this protocol.
@@ -43,27 +47,27 @@ public class AchieveREInitiator extends Behavior {
 	 */
 	public AchieveREInitiator(Agent agent, ACLMessage message) {
 		super(agent);
-		
+
 	}
-	
+
 	/**
 	 * This method is called when all the responses have been collected or
 	 * when the timeout is expired.
 	 * TODO implement timeout
 	 */ 
 	protected void handleAllResponses(Vector<ACLMessage> responses) {}
-	
+
 	/**
 	 * This method is called when all the result notification messages
 	 * have been collected.
 	 */
 	protected void handleAllResultNotifications(Vector<ACLMessage> notifications) {}
-	
+
 	/**
 	 * Handle 'agree' response from one of the receivers of the request.
 	 */
 	protected void handleAgree(ACLMessage agree) {}
-	
+
 	/**
 	 * Handle 'refuse' response from one of the receivers of the request.
 	 */
@@ -74,13 +78,13 @@ public class AchieveREInitiator extends Behavior {
 	 * the receivers of the request.
 	 */
 	protected void handleInform(ACLMessage agree) {}
-	
+
 	/**
 	 * Handle 'failure' result notification from one of
 	 * the receivers of the request.
 	 */
 	protected void handleFailure(ACLMessage agree) {}
-	
+
 	/**
 	 * Handle 'no-understood' response from one of
 	 * the receivers of the request.
@@ -98,8 +102,113 @@ public class AchieveREInitiator extends Behavior {
 		 *  3 - Call the appropriate handler
 		 *  4 - Remove the responder from the wait list
 		 *  5 - If wait list is empty, run the appropriate "handle all"
+		 *  6 - Update the protocol state 
 		 */
+
+		// Retrieve one message from the mailbox
+		ACLMessage nextMessage = this.getOwner().getMatchingMessage(template);
+		if (nextMessage != null) {
+			// Update the state
+			protocolState = protocolState.nextState(nextMessage, this);
+			// Update the template
+			protocolState.setTemplate(template);
+		}
 		
+		
+	}
+	
+	/**
+	 * Verifies is all agents already responded with
+	 * AGREE/REJECT/NOT_UNDERSTOOD
+	 * @return
+	 */
+	protected boolean isAllResponded() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/**
+	 * Verifies if all agents sent the result message
+	 * with INFORM or FAILURE.
+	 * @return
+	 */
+	protected boolean isAllResulted() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	/**
+	 * The state machine for this protocol.
+	 * Each state implements "nextState(ACLMessage, AchieveREInitiator re)"
+	 * that returns the next state given the current state (in 're') and
+	 * the new message being processed. The AchieveREInitiator has three
+	 * states:
+	 * <li>ARI: expected Agree, Refuse and Inform and skips to
+	 * state "In" when all agents send their response.
+	 * <li>In: expects Inform and skips to state "Dead" after
+	 * all agents send their results.
+	 * <li>Dead: final state; triggers the disposal of the behavior.
+	 * 
+	 * @author joaolopes
+	 *
+	 */
+	public enum State {
+
+		/**
+		 * Initially, Agree/Refuse/Inform are expected
+		 */
+		ARI {
+			@Override
+			public State nextState(ACLMessage m, AchieveREInitiator re) {
+				if (re.isAllResponded()) {
+					return In;
+				} else if (re.isAllResulted()) {
+					return Dead;
+				}
+				else {
+					return ARI;
+				}
+			}
+		}, 
+		
+		/**
+		 * After receiving an Inform or all AGREEs/REFUSEs,
+		 * the protocol skips to this state;
+		 */
+		In {
+			@Override
+			public State nextState(ACLMessage m, AchieveREInitiator re) {
+				return null;
+			}
+		},
+		
+		/**
+		 * Final state. 
+		 */
+		Dead
+		;
+
+		/**
+		 * Returns the next state, given a message and the behavior
+		 * @param m
+		 * @param re
+		 * @return
+		 */
+	    public State nextState(ACLMessage m, AchieveREInitiator re) {
+	        return null;
+	    }
+	    
+	    /**
+	     * 
+	     * @param t
+	     */
+	    public void setTemplate(MessageTemplate t) {
+	    	ArrayList<Integer> performatives = new ArrayList<Integer>();
+			performatives.add(Performative.AGREE);
+			performatives.add(Performative.REFUSE);
+			performatives.add(Performative.INFORM);
+			t.setPerformatives(performatives);
+	    }
 	}
 
 }

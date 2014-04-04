@@ -1,9 +1,6 @@
 package up.fe.liacc.repacl;
 
-import java.util.LinkedList;
-
 import repast.simphony.engine.schedule.ScheduledMethod;
-import repast.simphony.util.ContextUtils;
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
 import up.fe.liacc.repacl.core.BehaviorQ;
@@ -67,14 +64,14 @@ public abstract class Agent {
 		}
 		return mailBox;
 	}
+
 	
 	/**
-	 * Returns this agent's mail box
+	 * 
+	 * @param template The template to filter messages.
+	 * @return The first matching message in the Mail box, or
+	 * Null if no message in the Mail Box matches the template.
 	 */
-	public MailBox getMail() {
-		return getMailBox();
-	}
-	
 	public ACLMessage getMatchingMessage(MessageTemplate template) {
 		return getMailBox().getMatchingMessage(template);
 	}
@@ -105,12 +102,15 @@ public abstract class Agent {
 	 * Adds a behavior to this agent's execution.
 	 * @param behavior
 	 */
-	@SuppressWarnings("unchecked")
 	protected void addBehavior(Behavior behavior) {
 		getBehaviorQueue().addBehavior(behavior);
 		DF.getContext().add(behavior);
 	}
 
+	/**
+	 * 
+	 * @return The behavior queue
+	 */
 	private BehaviorQ getBehaviorQueue() {
 		if (behaviorQ == null) {
 			behaviorQ = new BehaviorQ();
@@ -119,7 +119,7 @@ public abstract class Agent {
 	}
 	
 	/**
-	 * 
+	 * Method executed after the agent is created. 
 	 */
 	public void setup(){}
 	
