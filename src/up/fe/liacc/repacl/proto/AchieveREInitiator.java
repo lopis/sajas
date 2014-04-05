@@ -3,11 +3,12 @@ package up.fe.liacc.repacl.proto;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import repast.simphony.engine.schedule.ScheduledMethod;
 import up.fe.liacc.repacl.Agent;
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
 import up.fe.liacc.repacl.acl.Performative;
+import up.fe.liacc.repacl.acl.Protocol;
+import up.fe.liacc.repacl.core.MTS;
 
 /**
  * Initiates a "FIPA-REQUEST"-like protocol. Programmers that which to use
@@ -35,6 +36,13 @@ public class AchieveREInitiator extends Behavior {
 
 	private MessageTemplate template;
 	private State protocolState;
+	private Integer protocol;
+	
+	/**
+	 * List of agents that didn't send the result
+	 * of the request yet. 
+	 */
+	ArrayList<Integer> waitingList;
 
 
 	/**
@@ -47,13 +55,33 @@ public class AchieveREInitiator extends Behavior {
 	 */
 	public AchieveREInitiator(Agent agent, ACLMessage message) {
 		super(agent);
+		
+		// Set the template that will filter the responses
+		template = new MessageTemplate();
+		protocol = Protocol.FIPA_REQUEST; //FIXME this shouldn't be fixed
+		protocolState = State.ARI;
+		protocolState.setTemplate(template);
+		
+		waitingList = new ArrayList<Integer>();
+		for (int i = 0; i < message.getReceivers().size(); i++) {
+			waitingList.add(message.getReceivers().get(i).getAID());
+		}
 
+		send(message);
+	}
+
+	public Integer getProtocol() {
+		return protocol;
+	}
+
+	public void setProtocol(Integer protocol) {
+		this.protocol = protocol;
 	}
 
 	/**
 	 * This method is called when all the responses have been collected or
 	 * when the timeout is expired.
-	 * TODO implement timeout
+	 * TODO implement timeout for result
 	 */ 
 	protected void handleAllResponses(Vector<ACLMessage> responses) {}
 
@@ -92,7 +120,6 @@ public class AchieveREInitiator extends Behavior {
 	protected void handleNotUnderstood() {}
 
 	@Override
-	@ScheduledMethod(start = 1, interval = 5)
 	public void action() {
 		/*
 		 * This method is scheduled in Repast.
@@ -100,7 +127,7 @@ public class AchieveREInitiator extends Behavior {
 		 *  1 - Get one message matching the template
 		 *  2 - Read the performative in the message
 		 *  3 - Call the appropriate handler
-		 *  4 - Remove the responder from the wait list
+		 *  4 - Remove the responding agent from the wait list TODO: implement wait list
 		 *  5 - If wait list is empty, run the appropriate "handle all"
 		 *  6 - Update the protocol state 
 		 */
@@ -108,6 +135,10 @@ public class AchieveREInitiator extends Behavior {
 		// Retrieve one message from the mailbox
 		ACLMessage nextMessage = this.getOwner().getMatchingMessage(template);
 		if (nextMessage != null) {
+			if (nextMessage.getPerformative() == Performative.INFORM
+				|| nextMessage.getPerformative() == Performative.FAILURE) {
+				
+			}
 			// Update the state
 			protocolState = protocolState.nextState(nextMessage, this);
 			// Update the template
@@ -123,8 +154,8 @@ public class AchieveREInitiator extends Behavior {
 	 * @return
 	 */
 	protected boolean isAllResponded() {
-		// TODO Auto-generated method stub
-		return false;
+		// TODO implement wait list for AGREE/REFUSE
+		return true;
 	}
 
 	/**
@@ -133,8 +164,15 @@ public class AchieveREInitiator extends Behavior {
 	 * @return
 	 */
 	protected boolean isAllResulted() {
-		// TODO Auto-generated method stub
-		return false;
+		return waitingList.isEmpty();
+	}
+	
+	/**
+	 * 
+	 * @param message
+	 */
+	public void send(ACLMessage message) {
+		MTS.send(message);
 	}
 	
 	/**
@@ -152,7 +190,7 @@ public class AchieveREInitiator extends Behavior {
 	 * @author joaolopes
 	 *
 	 */
-	public enum State {
+	private enum State {
 
 		/**
 		 * Initially, Agree/Refuse/Inform are expected
@@ -169,6 +207,15 @@ public class AchieveREInitiator extends Behavior {
 					return ARI;
 				}
 			}
+			
+			@Override
+			public void setTemplate(MessageTemplate t) {
+				ArrayList<Integer> performatives = new ArrayList<Integer>();
+				performatives.add(Performative.AGREE);
+				performatives.add(Performative.REFUSE);
+				performatives.add(Performative.INFORM);
+				t.setPerformatives(performatives);
+			}
 		}, 
 		
 		/**
@@ -178,7 +225,19 @@ public class AchieveREInitiator extends Behavior {
 		In {
 			@Override
 			public State nextState(ACLMessage m, AchieveREInitiator re) {
-				return null;
+				if (re.isAllResulted()) {
+					return Dead;
+				}
+				else {
+					return In;
+				}
+			}
+			
+			@Override
+			public void setTemplate(MessageTemplate t) {
+				ArrayList<Integer> performatives = new ArrayList<Integer>();
+				performatives.add(Performative.INFORM);
+				t.setPerformatives(performatives);
 			}
 		},
 		
@@ -202,13 +261,7 @@ public class AchieveREInitiator extends Behavior {
 	     * 
 	     * @param t
 	     */
-	    public void setTemplate(MessageTemplate t) {
-	    	ArrayList<Integer> performatives = new ArrayList<Integer>();
-			performatives.add(Performative.AGREE);
-			performatives.add(Performative.REFUSE);
-			performatives.add(Performative.INFORM);
-			t.setPerformatives(performatives);
-	    }
+	    public void setTemplate(MessageTemplate t) {}
 	}
 
 }

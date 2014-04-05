@@ -2,6 +2,7 @@ package up.fe.liacc.repacl.proto;
 
 import java.util.ArrayList;
 
+import repast.simphony.engine.schedule.ScheduledMethod;
 import up.fe.liacc.repacl.Agent;
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
@@ -9,7 +10,7 @@ import up.fe.liacc.repacl.acl.Protocol;
 
 public class AchieveREResponder extends Behavior {
 
-	private MessageTemplate template;
+	protected MessageTemplate template;
 
 	public AchieveREResponder(Agent agent) {
 		super(agent);
@@ -22,6 +23,7 @@ public class AchieveREResponder extends Behavior {
 	}
 
 	@Override
+	@ScheduledMethod(start = 1, interval = 500)
 	public void action() {
 		/*
 		 * This method is scheduled in Repast.
@@ -43,7 +45,7 @@ public class AchieveREResponder extends Behavior {
 	 * This default implementation does nothing and should be overridden.
 	 * @param nextMessage
 	 */
-	private void handleRequest(ACLMessage nextMessage) {}
+	public void handleRequest(ACLMessage nextMessage) {}
 	
 	
 

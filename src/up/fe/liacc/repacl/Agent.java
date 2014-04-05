@@ -1,6 +1,7 @@
 package up.fe.liacc.repacl;
 
 import repast.simphony.engine.schedule.ScheduledMethod;
+import repast.simphony.relogo.schedule.Setup;
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
 import up.fe.liacc.repacl.core.BehaviorQ;
@@ -121,10 +122,14 @@ public abstract class Agent {
 	/**
 	 * Method executed after the agent is created. 
 	 */
+	@Setup
 	public void setup(){}
 	
-	@ScheduledMethod(start=1, interval=50)
-	public void step(){
-		System.err.println("[A] Default step");
+	@ScheduledMethod(start=1, interval=500)
+	public void step(){}
+	
+	@Override
+	public String toString() {
+		return "[Agent#" + getAID() + "]";
 	}
 }
