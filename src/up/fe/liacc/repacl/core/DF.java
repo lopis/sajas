@@ -115,11 +115,13 @@ public class DF {
 	 * @throws IllegalArgumentException The type of the parameter must
 	 * be "Context"
 	 */
-	public static void setContext(Collection<Object> c)
-			throws IllegalArgumentException {
-		if (c.getClass().getName() == "repast.simphony.context.Context<?>") {
-			throw new IllegalArgumentException("[DF]: Parameter of type Context was expected.");
-		}
+	public static void setContext(Collection<Object> c) {
+		// This doesn't work because Context is not the type of the object...		
+//		if (c.getClass().getName() != "repast.simphony.context.Context") {
+//			System.err.println("[DF]: unexpected parameter. Was expecting."
+//					+ "repast.simphony.context.Context, "
+//					+ " but got " + c.getClass().getName());
+//		}
 		
 		context = c;
 	}
