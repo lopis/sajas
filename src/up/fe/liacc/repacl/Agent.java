@@ -1,7 +1,5 @@
 package up.fe.liacc.repacl;
 
-import repast.simphony.engine.schedule.ScheduledMethod;
-import repast.simphony.relogo.schedule.Setup;
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
 import up.fe.liacc.repacl.core.BehaviorQ;
@@ -120,12 +118,17 @@ public abstract class Agent {
 	}
 	
 	/**
-	 * Method executed after the agent is created. 
+	 * Method executed after the agent is created.
+	 * This default implementation is empty and should be extended
+	 * if needed.
 	 */
-	@Setup
 	public void setup(){}
 	
-	@ScheduledMethod(start=1, interval=500)
+	/**
+	 * This default implementation is empty and should be extended 
+	 * if needed.
+	 * @ScheduledMethod
+	 */
 	public void step(){}
 	
 	@Override

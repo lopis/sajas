@@ -2,7 +2,6 @@ package up.fe.liacc.repacl.proto;
 
 import java.util.ArrayList;
 
-import repast.simphony.engine.schedule.ScheduledMethod;
 import up.fe.liacc.repacl.Agent;
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
@@ -23,7 +22,10 @@ public class AchieveREResponder extends Behavior {
 	}
 
 	@Override
-	@ScheduledMethod(start = 1, interval = 500)
+	/**
+	 * Schedule this method and call super(). This method
+	 * must be overridden.
+	 */
 	public void action() {
 		/*
 		 * This method is scheduled in Repast.
