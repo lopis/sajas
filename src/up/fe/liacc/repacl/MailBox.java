@@ -30,8 +30,10 @@ public class MailBox {
 	/**
 	 * @return Returns all mail in this box
 	 */
-	public LinkedList<ACLMessage> getMail() {	
-		return mail;
+	public LinkedList<ACLMessage> getMail() {
+		LinkedList<ACLMessage> messages = (LinkedList<ACLMessage>) mail.clone();
+		mail.clear();
+		return messages;
 	}
 	
 	/**

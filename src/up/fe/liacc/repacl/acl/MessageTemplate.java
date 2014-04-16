@@ -2,8 +2,6 @@ package up.fe.liacc.repacl.acl;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.Agent;
-
 /**
  * A template for matching incoming messages.
  * To use create a template, simply use the constructor to provide the
@@ -42,6 +40,9 @@ public class MessageTemplate {
 	}
 
 	public ArrayList<Integer> getProtocols() {
+		if (protocols == null) {
+			protocols = new ArrayList<Integer>();
+		}
 		return protocols;
 	}
 
@@ -96,6 +97,10 @@ public class MessageTemplate {
 	public boolean matchesContent(Object content) {
 		return getContents() == null
 		|| getContents().contains(content);
+	}
+
+	public void addProtocol(Integer protocol) {
+		getProtocols().add(protocol);
 	}
 
 }
