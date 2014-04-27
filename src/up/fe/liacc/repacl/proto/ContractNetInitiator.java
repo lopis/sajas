@@ -66,7 +66,7 @@ public class ContractNetInitiator extends Behavior {
 		 */
 
 		// Retrieve one message from the mailbox
-		ACLMessage nextMessage = this.getOwner().getMatchingMessage(template);
+		ACLMessage nextMessage = this.getAgent().getMatchingMessage(template);
 		if (nextMessage != null) {
 			
 			// Update the state
@@ -90,7 +90,7 @@ public class ContractNetInitiator extends Behavior {
 	 * @return True if all agents responded.
 	 */
 	protected boolean isAllResponded() {
-		return false;
+		return responders.size() == 1; //TODO HACk. Fix the DF search method
 	}
 
 	/**

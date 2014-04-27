@@ -86,7 +86,6 @@ public class DF {
 		// The agent must know their own ID.
 		agent.setAID(lastAID);
 		agents.put(lastAID, agent);
-		System.err.println("[DF] new agent: " + agent.getAID());
 		context.add(agent);
 		return lastAID;
 	}

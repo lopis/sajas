@@ -36,7 +36,7 @@ public class AchieveREResponder extends Behavior {
 		 *  5 - If wait list is empty, run the appropriate "handle all"
 		 *  6 - Update the protocol state 
 		 */
-		ACLMessage nextMessage = this.getOwner().getMatchingMessage(template);
+		ACLMessage nextMessage = this.getAgent().getMatchingMessage(template);
 		if (nextMessage != null) {
 			handleRequest(nextMessage);
 		}

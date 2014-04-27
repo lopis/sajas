@@ -28,7 +28,7 @@ public abstract class Behavior {
 	 */
 	public abstract void action();
 
-	public Agent getOwner() {
+	public Agent getAgent() {
 		return owner;
 	}
 

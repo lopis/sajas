@@ -30,7 +30,7 @@ public class ContractNetResponder extends Behavior {
 	@Override
 	public void action() {
 		// Retrieve one message from the mailbox
-		ACLMessage nextMessage = this.getOwner().getMatchingMessage(template);
+		ACLMessage nextMessage = this.getAgent().getMatchingMessage(template);
 		if (nextMessage != null) {
 
 			// Update the state

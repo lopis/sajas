@@ -23,7 +23,9 @@ public class MTS {
 	public static void send(ACLMessage message) {
 		ArrayList<Agent> receivers = message.getReceivers();
 		for (Agent agent: receivers) {
-			agent.addMail(message);
+			if (agent != null) {
+				agent.addMail(message);
+			}
 		}
 	}
 }

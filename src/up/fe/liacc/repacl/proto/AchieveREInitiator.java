@@ -133,7 +133,7 @@ public class AchieveREInitiator extends Behavior {
 		 */
 
 		// Retrieve one message from the mailbox
-		ACLMessage nextMessage = this.getOwner().getMatchingMessage(template);
+		ACLMessage nextMessage = this.getAgent().getMatchingMessage(template);
 		if (nextMessage != null) {
 			if (nextMessage.getPerformative() == Performative.INFORM
 				|| nextMessage.getPerformative() == Performative.FAILURE) {
