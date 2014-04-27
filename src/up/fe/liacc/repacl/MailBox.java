@@ -28,12 +28,11 @@ public class MailBox {
 
 	
 	/**
-	 * @return Returns all mail in this box
+	 * @return Returns all mail in this box. The mail
+	 * box is NOT cleared when accessed this way.
 	 */
 	public LinkedList<ACLMessage> getMail() {
-		LinkedList<ACLMessage> messages = (LinkedList<ACLMessage>) mail.clone();
-		mail.clear();
-		return messages;
+		return mail;
 	}
 	
 	/**
@@ -45,7 +44,9 @@ public class MailBox {
 	}
 
 	/**
-	 * Returns the first matching mail the 
+	 * Uses a template to retrieve a matching message from
+	 * the mail box. This message will be then removed from
+	 * the box.
 	 * @param template
 	 * @return
 	 */
@@ -58,6 +59,7 @@ public class MailBox {
 		// Quick and dirty search:
 		for (ACLMessage message : mail) {
 			if (message.match(template)) {
+				mail.remove(message);
 				return message;
 			}
 		}
