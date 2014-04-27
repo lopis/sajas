@@ -15,12 +15,13 @@ public class ACLMessage {
 	
 	private int performative = Performative.NO_PERFORMATIVE;	// The intent of the message
 	private int protocol = Protocol.NO_PROTOCOL;	// The intent of the message
-	private Object content; // Any object can be attached to the message
+	private Object contentObject; // Any object can be attached to the message
 	private Agent sender; // The sender must be set so the receiver can reply
 	private ArrayList<Agent> receivers;
 	private String replyWith; // Tag to identify a "thread" of communication
 	private String inReplyTo; // This value comes from "replyWith"
 	private long when = 0; // Deadline for the response.
+	private StringBuffer contentString;
 	public static final long NO_WHEN = 0;
 	
 	/**
@@ -86,12 +87,25 @@ public class ACLMessage {
 	public void setProtocol(int protocol) {
 		this.protocol = protocol;
 	}
+	
+	/**
+	 * Returns the content of this Message in the form of a string.
+	 * This string may be null.
+	 * @return
+	 */
+	public String getContent() {
+		if(contentString != null) {
+			return new String(contentString);
+		} else { 
+			return null;
+		}
+	}
 
 	/**
 	 * @return Returns the content of this message. This object can be null.
 	 */
-	public Object getContent() {
-		return content;
+	public Object getContentObject() {
+		return contentObject;
 	}
 	
 	/**
@@ -99,8 +113,8 @@ public class ACLMessage {
 	 * can be left null.
 	 * @param content
 	 */
-	public void setContent(Object content) {
-		this.content = content;
+	public void setContentObject(Object content) {
+		this.contentObject = content;
 	}
 	
 	/**
@@ -204,7 +218,7 @@ public class ACLMessage {
 			&& template.matchesProtocol(this.getProtocol())
 			&& template.matchesInReplyTo(this.getInReplyTo())
 			&& template.matchesReplyWith(this.getReplyWith())
-			&& template.matchesContent(this.getContent());
+			&& template.matchesContent(this.getContentObject());
 	}
 
 }
