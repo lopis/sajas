@@ -4,7 +4,6 @@ public class Performative {
 	
 	/* Performatives */
 	
-	final static public int ACCEPT_PROPOSAL = 1;
 	final static public int AGREE = 2;
 	final static public int CANCEL = 3;
 	final static public int CALL_FOR_PROPOSAL = 4;

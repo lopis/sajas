@@ -2,16 +2,17 @@ package up.fe.liacc.repacl.proto;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.Agent;
+import up.fe.liacc.repacl.AbstractAgent;
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
 import up.fe.liacc.repacl.acl.Protocol;
+import up.fe.liacc.repacl.behaviour.Behaviour;
 
-public class AchieveREResponder extends Behavior {
+public class AchieveREResponder extends Behaviour {
 
 	protected MessageTemplate template;
 
-	public AchieveREResponder(Agent agent) {
+	public AchieveREResponder(AbstractAgent agent) {
 		super(agent);
 
 		// Set the template that will filter the responses

@@ -1,9 +1,9 @@
 package up.fe.liacc.repacl.core;
 
-import java.util.Collection;
 import java.util.HashMap;
 
-import up.fe.liacc.repacl.Agent;
+import up.fe.liacc.repacl.AbstractAgent;
+import up.fe.liacc.repacl.Context;
 
 
 /**
@@ -19,25 +19,19 @@ import up.fe.liacc.repacl.Agent;
  * @author joaolopes
  *
  */
-public class DF {
+public class DFService {
 
 	private static int lastAID = 0; // Just to help generate new identifiers
-	private static HashMap<Integer, Agent> agents; // Contains all agents
-	
-	/**
-	 * The Repast context that contains all
-	 * scheduled Repast objects.
-	 */
-	private static Collection<Object> context = null;
+	private static HashMap<Integer, AbstractAgent> agents; // Contains all agents
 
 	
 	/**
 	 * @return Returns the map of agents. The field is initialized
 	 * if it wasn't before.
 	 */
-	public static HashMap<Integer, Agent> getAgents() {
+	public static HashMap<Integer, AbstractAgent> getAgents() {
 		if (agents == null) {
-			agents = new HashMap<Integer, Agent>();
+			agents = new HashMap<Integer, AbstractAgent>();
 		}
 		return agents;
 	}
@@ -48,7 +42,7 @@ public class DF {
 	 * @return The agent mapped to this AID or null if
 	 * this AID is not registered to any agent in the DF.
 	 */
-	public static Agent searchAgent(int aid) {
+	public static AbstractAgent searchAgent(int aid) {
 		return getAgents().get(aid);
 	}
 	
@@ -59,8 +53,8 @@ public class DF {
 	 * provide a service. Basically it means
 	 * the agent activated that behavior.
 	 */
-	public static Agent[] searchService(int service) {
-		return new Agent[0];
+	public static AbstractAgent[] searchService(int service) {
+		return new AbstractAgent[0];
 	}
 	
 	/**
@@ -70,7 +64,7 @@ public class DF {
 	 * @param agent The agent to be registered
 	 * @return The AID generated for the agent.
 	 */
-	public static int registerAgent(Agent agent) {
+	public static int registerAgent(AbstractAgent agent) {
 		// If this agent is already in the hashMap,
 		// just return its key.
 		if (getAgents().containsValue(agent)) {
@@ -86,7 +80,6 @@ public class DF {
 		// The agent must know their own ID.
 		agent.setAID(lastAID);
 		agents.put(lastAID, agent);
-		context.add(agent);
 		return lastAID;
 	}
 	
@@ -97,7 +90,7 @@ public class DF {
 	 * @return The old agent's AID if the agent was found
 	 * in the DF or -1 otherwise.
 	 */
-	public static int unregisterAgent(Agent agent) {
+	public static int unregisterAgent(AbstractAgent agent) {
 		if (getAgents().containsKey(agent.getAID())) {
 			getAgents().remove(agent.getAID());
 			int aid = agent.getAID();
@@ -105,28 +98,6 @@ public class DF {
 			return aid;
 		}
 		return -1;
-	}
-	
-	/**
-	 * Set the context for the repast simulation.
-	 * @param c The type is the interface "Collection" to 
-	 * maintain the independancy from the Repast library.
-	 * @throws IllegalArgumentException The type of the parameter must
-	 * be "Context"
-	 */
-	public static void setContext(Collection<Object> c) {
-		// This doesn't work because Context is not the type of the object...		
-//		if (c.getClass().getName() != "repast.simphony.context.Context") {
-//			System.err.println("[DF]: unexpected parameter. Was expecting."
-//					+ "repast.simphony.context.Context, "
-//					+ " but got " + c.getClass().getName());
-//		}
-		
-		context = c;
-	}
-
-	public static Collection<Object> getContext() {
-		return context;
 	}
 
 }

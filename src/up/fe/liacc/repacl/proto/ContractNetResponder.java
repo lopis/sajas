@@ -2,14 +2,15 @@ package up.fe.liacc.repacl.proto;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.Agent;
+import up.fe.liacc.repacl.AbstractAgent;
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
 import up.fe.liacc.repacl.acl.Performative;
 import up.fe.liacc.repacl.acl.Protocol;
+import up.fe.liacc.repacl.behaviour.Behaviour;
 import up.fe.liacc.repacl.core.MTS;
 
-public class ContractNetResponder extends Behavior {
+public class ContractNetResponder extends Behaviour {
 	
 	private MessageTemplate template;
 	private State protocolState;
@@ -18,7 +19,7 @@ public class ContractNetResponder extends Behavior {
 	private ACLMessage cfp; // The last received Call for Proposals
 	private ACLMessage proposal; // The proposal sent to this.cfp
 
-	public ContractNetResponder(Agent agent) {
+	public ContractNetResponder(AbstractAgent agent) {
 		super(agent);
 		
 		template = new MessageTemplate();
@@ -93,7 +94,7 @@ public class ContractNetResponder extends Behavior {
 				if (m.getPerformative() == Performative.REJECT_PROPOSAL) {
 					cn.handleRejectProposal(cn.cfp, cn.proposal, m);
 					return CFP;
-				} else if (m.getPerformative() == Performative.ACCEPT_PROPOSAL) {
+				} else if (m.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
 					cn.handleAcceptProposal(cn.cfp, cn.proposal, m);
 					return Busy;
 				}

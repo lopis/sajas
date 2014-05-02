@@ -1,21 +1,23 @@
 package up.fe.liacc.repacl.proto;
 
 import java.util.ArrayList;
-import up.fe.liacc.repacl.Agent;
+
+import up.fe.liacc.repacl.AbstractAgent;
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
 import up.fe.liacc.repacl.acl.Performative;
 import up.fe.liacc.repacl.acl.Protocol;
+import up.fe.liacc.repacl.behaviour.Behaviour;
 import up.fe.liacc.repacl.core.MTS;
 
-public class ContractNetInitiator extends Behavior {
+public class ContractNetInitiator extends Behaviour {
 
 	private MessageTemplate template;
 	private State protocolState;
 	private Integer protocol = Protocol.FIPA_CONTRACT_NET;
 	
 	// This vector contains the agents who received the CFP
-	private ArrayList<Agent> responders;
+	private ArrayList<AbstractAgent> responders;
 	protected ArrayList<ACLMessage> responses;
 	protected ArrayList<ACLMessage> acceptances;
 
@@ -25,7 +27,7 @@ public class ContractNetInitiator extends Behavior {
 	 * @param agent
 	 * @param message
 	 */
-	public ContractNetInitiator(Agent agent, ACLMessage cfp) {
+	public ContractNetInitiator(AbstractAgent agent, ACLMessage cfp) {
 		super(agent);
 		template = new MessageTemplate();
 		template.addProtocol(protocol);

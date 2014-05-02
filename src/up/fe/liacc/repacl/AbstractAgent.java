@@ -2,9 +2,8 @@ package up.fe.liacc.repacl;
 
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
-import up.fe.liacc.repacl.core.BehaviorQ;
-import up.fe.liacc.repacl.core.DF;
-import up.fe.liacc.repacl.proto.Behavior;
+import up.fe.liacc.repacl.behaviour.Behaviour;
+import up.fe.liacc.repacl.core.DFService;
 
 /**
  * Agents that implement this interface are able to use RepACL to communicate
@@ -12,7 +11,7 @@ import up.fe.liacc.repacl.proto.Behavior;
  * @author joaolopes
  *
  */
-public abstract class Agent {
+public abstract class AbstractAgent {
 
 	/**
 	 * Agent identifier
@@ -24,10 +23,11 @@ public abstract class Agent {
 	 */
 	private MailBox mailBox;
 	
-	/**
-	 * The behavior queue.
-	 */
-	private BehaviorQ behaviorQ;
+//	/**
+//	 * Queue of behaviors for this agent.
+//	 */
+//	private LinkedList<Behaviour> behaviours;
+//	private ContextScheduler contextScheduler = new ContextScheduler();
 	
 	/**
 	 * Default constructor. Always call this constructor
@@ -36,8 +36,8 @@ public abstract class Agent {
 	 * The setup() method is called in the end of this
 	 * constructor.
 	 */
-	public Agent() {
-		DF.registerAgent(this);
+	public AbstractAgent() {
+		DFService.registerAgent(this); //TODO: not mandatory
 		setup();
 	}
 
@@ -101,21 +101,10 @@ public abstract class Agent {
 	 * Adds a behavior to this agent's execution.
 	 * @param behavior
 	 */
-	protected void addBehavior(Behavior behavior) {
-		getBehaviorQueue().addBehavior(behavior);
-		DF.getContext().add(behavior);
-	}
-
-	/**
-	 * 
-	 * @return The behavior queue
-	 */
-	private BehaviorQ getBehaviorQueue() {
-		if (behaviorQ == null) {
-			behaviorQ = new BehaviorQ();
-		}
-		return behaviorQ;
-	}
+	protected abstract void addBehavior(Behaviour behaviour);
+//	{
+//		//contextScheduler.add(behaviour);
+//	}
 	
 	/**
 	 * Method executed after the agent is created.

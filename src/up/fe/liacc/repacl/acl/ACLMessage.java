@@ -2,7 +2,7 @@ package up.fe.liacc.repacl.acl;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.Agent;
+import up.fe.liacc.repacl.AbstractAgent;
 
 /**
  * This is the generic class for all types of messages.
@@ -16,12 +16,13 @@ public class ACLMessage {
 	private int performative = Performative.NO_PERFORMATIVE;	// The intent of the message
 	private int protocol = Protocol.NO_PROTOCOL;	// The intent of the message
 	private Object contentObject; // Any object can be attached to the message
-	private Agent sender; // The sender must be set so the receiver can reply
-	private ArrayList<Agent> receivers;
+	private AbstractAgent sender; // The sender must be set so the receiver can reply
+	private ArrayList<AbstractAgent> receivers;
 	private String replyWith; // Tag to identify a "thread" of communication
 	private String inReplyTo; // This value comes from "replyWith"
 	private long when = 0; // Deadline for the response.
 	private StringBuffer contentString;
+	final static public int ACCEPT_PROPOSAL = 1;
 	public static final long NO_WHEN = 0;
 	
 	/**
@@ -120,7 +121,7 @@ public class ACLMessage {
 	/**
 	 * @return Reference to the issuer of this message.
 	 */
-	public Agent getSender() {
+	public AbstractAgent getSender() {
 		return sender;
 	}
 	
@@ -128,16 +129,16 @@ public class ACLMessage {
 	 * Sets the issuer if this message.
 	 * @param sender
 	 */
-	public void setSender(Agent sender) {
+	public void setSender(AbstractAgent sender) {
 		this.sender = sender;
 	}
 	
 	/**
 	 * @return Reference to the receiver of this message.
 	 */
-	public ArrayList<Agent> getReceivers() {
+	public ArrayList<AbstractAgent> getReceivers() {
 		if (receivers == null) {
-			receivers = new ArrayList<Agent>();
+			receivers = new ArrayList<AbstractAgent>();
 		}
 		return receivers;
 	}
@@ -146,7 +147,7 @@ public class ACLMessage {
 	 * Sets the receiver of this message.
 	 * @param receiver
 	 */
-	public void addReceiver(Agent receiver) {
+	public void addReceiver(AbstractAgent receiver) {
 		getReceivers().add(receiver);
 	}
 

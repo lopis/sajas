@@ -3,11 +3,12 @@ package up.fe.liacc.repacl.proto;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import up.fe.liacc.repacl.Agent;
+import up.fe.liacc.repacl.AbstractAgent;
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
 import up.fe.liacc.repacl.acl.Performative;
 import up.fe.liacc.repacl.acl.Protocol;
+import up.fe.liacc.repacl.behaviour.Behaviour;
 import up.fe.liacc.repacl.core.MTS;
 
 /**
@@ -32,7 +33,7 @@ import up.fe.liacc.repacl.core.MTS;
  * @author joaolopes
  *
  */
-public class AchieveREInitiator extends Behavior {
+public class AchieveREInitiator extends Behaviour {
 
 	private MessageTemplate template;
 	private State protocolState;
@@ -53,7 +54,7 @@ public class AchieveREInitiator extends Behavior {
 	 * as INFORM, FAILURE or NOT UNDERSTOOD.
 	 * @param agent The message to be sent by this behavior.
 	 */
-	public AchieveREInitiator(Agent agent, ACLMessage message) {
+	public AchieveREInitiator(AbstractAgent agent, ACLMessage message) {
 		super(agent);
 		
 		// Set the template that will filter the responses
