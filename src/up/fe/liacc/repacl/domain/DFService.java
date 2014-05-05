@@ -1,8 +1,8 @@
-package up.fe.liacc.repacl.core;
+package up.fe.liacc.repacl.domain;
 
 import java.util.HashMap;
 
-import up.fe.liacc.repacl.AbstractAgent;
+import up.fe.liacc.repacl.Agent;
 import up.fe.liacc.repacl.Context;
 
 
@@ -22,16 +22,16 @@ import up.fe.liacc.repacl.Context;
 public class DFService {
 
 	private static int lastAID = 0; // Just to help generate new identifiers
-	private static HashMap<Integer, AbstractAgent> agents; // Contains all agents
+	private static HashMap<Integer, Agent> agents; // Contains all agents
 
 	
 	/**
 	 * @return Returns the map of agents. The field is initialized
 	 * if it wasn't before.
 	 */
-	public static HashMap<Integer, AbstractAgent> getAgents() {
+	public static HashMap<Integer, Agent> getAgents() {
 		if (agents == null) {
-			agents = new HashMap<Integer, AbstractAgent>();
+			agents = new HashMap<Integer, Agent>();
 		}
 		return agents;
 	}
@@ -42,7 +42,7 @@ public class DFService {
 	 * @return The agent mapped to this AID or null if
 	 * this AID is not registered to any agent in the DF.
 	 */
-	public static AbstractAgent searchAgent(int aid) {
+	public static Agent searchAgent(int aid) {
 		return getAgents().get(aid);
 	}
 	
@@ -53,8 +53,8 @@ public class DFService {
 	 * provide a service. Basically it means
 	 * the agent activated that behavior.
 	 */
-	public static AbstractAgent[] searchService(int service) {
-		return new AbstractAgent[0];
+	public static Agent[] searchService(int service) {
+		return new Agent[0];
 	}
 	
 	/**
@@ -64,7 +64,7 @@ public class DFService {
 	 * @param agent The agent to be registered
 	 * @return The AID generated for the agent.
 	 */
-	public static int registerAgent(AbstractAgent agent) {
+	public static int registerAgent(Agent agent) {
 		// If this agent is already in the hashMap,
 		// just return its key.
 		if (getAgents().containsValue(agent)) {
@@ -90,7 +90,7 @@ public class DFService {
 	 * @return The old agent's AID if the agent was found
 	 * in the DF or -1 otherwise.
 	 */
-	public static int unregisterAgent(AbstractAgent agent) {
+	public static int unregisterAgent(Agent agent) {
 		if (getAgents().containsKey(agent.getAID())) {
 			getAgents().remove(agent.getAID());
 			int aid = agent.getAID();

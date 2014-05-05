@@ -2,11 +2,11 @@ package repast;
 
 import repast.simphony.engine.schedule.Schedule;
 import repast.simphony.engine.schedule.ScheduleParameters;
-import up.fe.liacc.repacl.AbstractAgent;
+import up.fe.liacc.repacl.Agent;
 import up.fe.liacc.repacl.Context;
-import up.fe.liacc.repacl.behaviour.Behaviour;
+import up.fe.liacc.repacl.core.behaviours.Behaviour;
 
-public class RepastAgent extends AbstractAgent {
+public class RepastAgent extends Agent {
 	
 	@Override
 	protected void addBehavior(Behaviour behaviour) {

@@ -3,13 +3,12 @@ package up.fe.liacc.repacl.proto;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import up.fe.liacc.repacl.AbstractAgent;
+import up.fe.liacc.repacl.Agent;
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
-import up.fe.liacc.repacl.acl.Performative;
 import up.fe.liacc.repacl.acl.Protocol;
-import up.fe.liacc.repacl.behaviour.Behaviour;
-import up.fe.liacc.repacl.core.MTS;
+import up.fe.liacc.repacl.core.behaviours.Behaviour;
+import up.fe.liacc.repacl.domain.MTS;
 
 /**
  * Initiates a "FIPA-REQUEST"-like protocol. Programmers that which to use
@@ -54,7 +53,7 @@ public class AchieveREInitiator extends Behaviour {
 	 * as INFORM, FAILURE or NOT UNDERSTOOD.
 	 * @param agent The message to be sent by this behavior.
 	 */
-	public AchieveREInitiator(AbstractAgent agent, ACLMessage message) {
+	public AchieveREInitiator(Agent agent, ACLMessage message) {
 		super(agent);
 		
 		// Set the template that will filter the responses
@@ -136,8 +135,8 @@ public class AchieveREInitiator extends Behaviour {
 		// Retrieve one message from the mailbox
 		ACLMessage nextMessage = this.getAgent().getMatchingMessage(template);
 		if (nextMessage != null) {
-			if (nextMessage.getPerformative() == Performative.INFORM
-				|| nextMessage.getPerformative() == Performative.FAILURE) {
+			if (nextMessage.getPerformative() == ACLMessage.INFORM
+				|| nextMessage.getPerformative() == ACLMessage.FAILURE) {
 				
 			}
 			// Update the state
@@ -212,9 +211,9 @@ public class AchieveREInitiator extends Behaviour {
 			@Override
 			public void setTemplate(MessageTemplate t) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(Performative.AGREE);
-				performatives.add(Performative.REFUSE);
-				performatives.add(Performative.INFORM);
+				performatives.add(ACLMessage.AGREE);
+				performatives.add(ACLMessage.REFUSE);
+				performatives.add(ACLMessage.INFORM);
 				t.setPerformatives(performatives);
 			}
 		}, 
@@ -237,7 +236,7 @@ public class AchieveREInitiator extends Behaviour {
 			@Override
 			public void setTemplate(MessageTemplate t) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(Performative.INFORM);
+				performatives.add(ACLMessage.INFORM);
 				t.setPerformatives(performatives);
 			}
 		},

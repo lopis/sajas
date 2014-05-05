@@ -1,6 +1,6 @@
-package up.fe.liacc.repacl.behaviour;
+package up.fe.liacc.repacl.core.behaviours;
 
-import up.fe.liacc.repacl.AbstractAgent;
+import up.fe.liacc.repacl.Agent;
 
 /**
  * This is the class that all behaviors extend. It doesn't contain any
@@ -12,13 +12,13 @@ import up.fe.liacc.repacl.AbstractAgent;
  */
 public abstract class Behaviour {
 
-	protected AbstractAgent myAgent;
+	protected Agent myAgent;
 
 	/**
 	 * Behavior default constructor. Always call this constructor.
 	 * @param agent The owner, i.e. the agent initiating this behavior.
 	 */
-	public Behaviour(AbstractAgent agent) {
+	public Behaviour(Agent agent) {
 		this.setAgent(agent);
 	}
 	
@@ -28,11 +28,11 @@ public abstract class Behaviour {
 	 */
 	public abstract void action();
 
-	public AbstractAgent getAgent() {
+	public Agent getAgent() {
 		return myAgent;
 	}
 
-	public void setAgent(AbstractAgent owner) {
+	public void setAgent(Agent owner) {
 		this.myAgent = owner;
 	}
 }

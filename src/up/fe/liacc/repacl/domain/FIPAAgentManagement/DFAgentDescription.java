@@ -1,4 +1,4 @@
-package up.fe.liacc.repacl.core;
+package up.fe.liacc.repacl.domain.FIPAAgentManagement;
 
 import java.util.ArrayList;
 

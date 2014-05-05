@@ -2,7 +2,7 @@ package up.fe.liacc.repacl.acl;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.AbstractAgent;
+import up.fe.liacc.repacl.Agent;
 
 /**
  * This is the generic class for all types of messages.
@@ -13,16 +13,39 @@ import up.fe.liacc.repacl.AbstractAgent;
  */
 public class ACLMessage {
 	
-	private int performative = Performative.NO_PERFORMATIVE;	// The intent of the message
+	final static public int ACCEPT_PROPOSAL = 1;
+	final static public int AGREE = 2;
+	final static public int CANCEL = 3;
+	final static public int CALL_FOR_PROPOSAL = 4;
+	final static public int CONFIRM = 5;
+	final static public int DISCONFIRM = 6;
+	final static public int FAILURE = 7;
+	final static public int INFORM = 8;
+	final static public int INFORM_IF = 9;
+	final static public int INFORM_REF = 10;
+	final static public int NOT_UNDERSTOOD = 11;
+	final static public int PROPAGATE = 12;
+	final static public int PROPOSE = 13;
+	final static public int PROXY = 14;
+	final static public int QUERY_IF = 15;
+	final static public int QUERY_REF = 16;
+	final static public int REFUSE = 17;
+	final static public int REJECT_PROPOSAL = 18;
+	final static public int REQUEST = 19;
+	final static public int REQUEST_WHEN = 20;
+	final static public int REQUEST_WHENEVER = 21;
+	final static public int SUBSCRIBE = 22;
+	final static public int NO_PERFORMATIVE = -1;
+	
+	private int performative = NO_PERFORMATIVE;	// The intent of the message
 	private int protocol = Protocol.NO_PROTOCOL;	// The intent of the message
 	private Object contentObject; // Any object can be attached to the message
-	private AbstractAgent sender; // The sender must be set so the receiver can reply
-	private ArrayList<AbstractAgent> receivers;
+	private Agent sender; // The sender must be set so the receiver can reply
+	private ArrayList<Agent> receivers;
 	private String replyWith; // Tag to identify a "thread" of communication
 	private String inReplyTo; // This value comes from "replyWith"
 	private long when = 0; // Deadline for the response.
 	private StringBuffer contentString;
-	final static public int ACCEPT_PROPOSAL = 1;
 	public static final long NO_WHEN = 0;
 	
 	/**
@@ -72,9 +95,9 @@ public class ACLMessage {
 	 */
 	public void setPerformative(int performative) {
 		this.performative = 
-				(performative > 0 && performative <= Performative.SUBSCRIBE)
+				(performative > 0 && performative <= SUBSCRIBE)
 				? performative
-				: Performative.NO_PERFORMATIVE;
+				: NO_PERFORMATIVE;
 	}
 	
 	/**
@@ -121,7 +144,7 @@ public class ACLMessage {
 	/**
 	 * @return Reference to the issuer of this message.
 	 */
-	public AbstractAgent getSender() {
+	public Agent getSender() {
 		return sender;
 	}
 	
@@ -129,16 +152,16 @@ public class ACLMessage {
 	 * Sets the issuer if this message.
 	 * @param sender
 	 */
-	public void setSender(AbstractAgent sender) {
+	public void setSender(Agent sender) {
 		this.sender = sender;
 	}
 	
 	/**
 	 * @return Reference to the receiver of this message.
 	 */
-	public ArrayList<AbstractAgent> getReceivers() {
+	public ArrayList<Agent> getReceivers() {
 		if (receivers == null) {
-			receivers = new ArrayList<AbstractAgent>();
+			receivers = new ArrayList<Agent>();
 		}
 		return receivers;
 	}
@@ -147,7 +170,7 @@ public class ACLMessage {
 	 * Sets the receiver of this message.
 	 * @param receiver
 	 */
-	public void addReceiver(AbstractAgent receiver) {
+	public void addReceiver(Agent receiver) {
 		getReceivers().add(receiver);
 	}
 

@@ -2,8 +2,8 @@ package up.fe.liacc.repacl;
 
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
-import up.fe.liacc.repacl.behaviour.Behaviour;
-import up.fe.liacc.repacl.core.DFService;
+import up.fe.liacc.repacl.core.behaviours.Behaviour;
+import up.fe.liacc.repacl.domain.DFService;
 
 /**
  * Agents that implement this interface are able to use RepACL to communicate
@@ -11,7 +11,7 @@ import up.fe.liacc.repacl.core.DFService;
  * @author joaolopes
  *
  */
-public abstract class AbstractAgent {
+public abstract class Agent {
 
 	/**
 	 * Agent identifier
@@ -36,7 +36,7 @@ public abstract class AbstractAgent {
 	 * The setup() method is called in the end of this
 	 * constructor.
 	 */
-	public AbstractAgent() {
+	public Agent() {
 		DFService.registerAgent(this); //TODO: not mandatory
 		setup();
 	}

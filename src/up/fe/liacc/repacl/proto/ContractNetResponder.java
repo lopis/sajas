@@ -2,13 +2,12 @@ package up.fe.liacc.repacl.proto;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.AbstractAgent;
+import up.fe.liacc.repacl.Agent;
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
-import up.fe.liacc.repacl.acl.Performative;
 import up.fe.liacc.repacl.acl.Protocol;
-import up.fe.liacc.repacl.behaviour.Behaviour;
-import up.fe.liacc.repacl.core.MTS;
+import up.fe.liacc.repacl.core.behaviours.Behaviour;
+import up.fe.liacc.repacl.domain.MTS;
 
 public class ContractNetResponder extends Behaviour {
 	
@@ -19,7 +18,7 @@ public class ContractNetResponder extends Behaviour {
 	private ACLMessage cfp; // The last received Call for Proposals
 	private ACLMessage proposal; // The proposal sent to this.cfp
 
-	public ContractNetResponder(AbstractAgent agent) {
+	public ContractNetResponder(Agent agent) {
 		super(agent);
 		
 		template = new MessageTemplate();
@@ -78,7 +77,7 @@ public class ContractNetResponder extends Behaviour {
 			@Override
 			public void setTemplate(MessageTemplate t) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(Performative.CALL_FOR_PROPOSAL);
+				performatives.add(ACLMessage.CALL_FOR_PROPOSAL);
 				t.setPerformatives(performatives);
 			}
 		}, 
@@ -91,7 +90,7 @@ public class ContractNetResponder extends Behaviour {
 		ACRJ {
 			@Override
 			public State nextState(ACLMessage m, ContractNetResponder cn) {
-				if (m.getPerformative() == Performative.REJECT_PROPOSAL) {
+				if (m.getPerformative() == ACLMessage.REJECT_PROPOSAL) {
 					cn.handleRejectProposal(cn.cfp, cn.proposal, m);
 					return CFP;
 				} else if (m.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
@@ -105,7 +104,7 @@ public class ContractNetResponder extends Behaviour {
 			@Override
 			public void setTemplate(MessageTemplate t) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(Performative.INFORM);
+				performatives.add(ACLMessage.INFORM);
 				t.setPerformatives(performatives);
 			}
 		},
@@ -124,7 +123,7 @@ public class ContractNetResponder extends Behaviour {
 			@Override
 			public void setTemplate(MessageTemplate t) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(Performative.INFORM);
+				performatives.add(ACLMessage.INFORM);
 				t.setPerformatives(performatives);
 			}
 		};

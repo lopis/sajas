@@ -2,13 +2,12 @@ package up.fe.liacc.repacl.proto;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.AbstractAgent;
+import up.fe.liacc.repacl.Agent;
 import up.fe.liacc.repacl.acl.ACLMessage;
 import up.fe.liacc.repacl.acl.MessageTemplate;
-import up.fe.liacc.repacl.acl.Performative;
 import up.fe.liacc.repacl.acl.Protocol;
-import up.fe.liacc.repacl.behaviour.Behaviour;
-import up.fe.liacc.repacl.core.MTS;
+import up.fe.liacc.repacl.core.behaviours.Behaviour;
+import up.fe.liacc.repacl.domain.MTS;
 
 public class ContractNetInitiator extends Behaviour {
 
@@ -17,7 +16,7 @@ public class ContractNetInitiator extends Behaviour {
 	private Integer protocol = Protocol.FIPA_CONTRACT_NET;
 	
 	// This vector contains the agents who received the CFP
-	private ArrayList<AbstractAgent> responders;
+	private ArrayList<Agent> responders;
 	protected ArrayList<ACLMessage> responses;
 	protected ArrayList<ACLMessage> acceptances;
 
@@ -27,7 +26,7 @@ public class ContractNetInitiator extends Behaviour {
 	 * @param agent
 	 * @param message
 	 */
-	public ContractNetInitiator(AbstractAgent agent, ACLMessage cfp) {
+	public ContractNetInitiator(Agent agent, ACLMessage cfp) {
 		super(agent);
 		template = new MessageTemplate();
 		template.addProtocol(protocol);
@@ -142,9 +141,9 @@ public class ContractNetInitiator extends Behaviour {
 				// 		 Or should further "proposals" from this agent be ignored?
 				cn.responders.remove(m.getSender());		
 				
-				if (m.getPerformative() == Performative.REFUSE) {
+				if (m.getPerformative() == ACLMessage.REFUSE) {
 					cn.handleRefuse(m);
-				} else if (m.getPerformative() == Performative.PROPOSE) {
+				} else if (m.getPerformative() == ACLMessage.PROPOSE) {
 					cn.handlePropose(m);
 				}
 				
@@ -168,8 +167,8 @@ public class ContractNetInitiator extends Behaviour {
 			@Override
 			public void setTemplate(MessageTemplate t) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(Performative.PROPOSE);
-				performatives.add(Performative.REFUSE);
+				performatives.add(ACLMessage.PROPOSE);
+				performatives.add(ACLMessage.REFUSE);
 				t.setPerformatives(performatives);
 			}
 		}, 

@@ -2,7 +2,7 @@ package up.fe.liacc.repacl;
 
 import java.util.Collection;
 
-import up.fe.liacc.repacl.behaviour.Behaviour;
+import up.fe.liacc.repacl.core.behaviours.Behaviour;
 
 public class Context{
 	
