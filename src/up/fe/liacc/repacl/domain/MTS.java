@@ -2,8 +2,8 @@ package up.fe.liacc.repacl.domain;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.Agent;
-import up.fe.liacc.repacl.acl.ACLMessage;
+import up.fe.liacc.repacl.core.Agent;
+import up.fe.liacc.repacl.lang.acl.ACLMessage;
 
 /**
  * The MTS, or  Message Transport Service, handles

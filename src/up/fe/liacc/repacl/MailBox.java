@@ -2,8 +2,8 @@ package up.fe.liacc.repacl;
 
 import java.util.LinkedList;
 
-import up.fe.liacc.repacl.acl.ACLMessage;
-import up.fe.liacc.repacl.acl.MessageTemplate;
+import up.fe.liacc.repacl.lang.acl.ACLMessage;
+import up.fe.liacc.repacl.lang.acl.MessageTemplate;
 
 /**
  * This class stores all mail addressed to one agent.

@@ -3,12 +3,12 @@ package up.fe.liacc.repacl.proto;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import up.fe.liacc.repacl.Agent;
-import up.fe.liacc.repacl.acl.ACLMessage;
-import up.fe.liacc.repacl.acl.MessageTemplate;
-import up.fe.liacc.repacl.acl.Protocol;
+import up.fe.liacc.repacl.core.Agent;
 import up.fe.liacc.repacl.core.behaviours.Behaviour;
+import up.fe.liacc.repacl.domain.FIPANames;
 import up.fe.liacc.repacl.domain.MTS;
+import up.fe.liacc.repacl.lang.acl.ACLMessage;
+import up.fe.liacc.repacl.lang.acl.MessageTemplate;
 
 /**
  * Initiates a "FIPA-REQUEST"-like protocol. Programmers that which to use
@@ -36,7 +36,7 @@ public class AchieveREInitiator extends Behaviour {
 
 	private MessageTemplate template;
 	private State protocolState;
-	private Integer protocol;
+	private String protocol;
 	
 	/**
 	 * List of agents that didn't send the result
@@ -58,7 +58,7 @@ public class AchieveREInitiator extends Behaviour {
 		
 		// Set the template that will filter the responses
 		template = new MessageTemplate();
-		protocol = Protocol.FIPA_REQUEST; //FIXME this shouldn't be fixed
+		protocol = FIPANames.InteractionProtocol.FIPA_REQUEST; //FIXME this shouldn't be fixed
 		protocolState = State.ARI;
 		protocolState.setTemplate(template);
 		
@@ -70,11 +70,11 @@ public class AchieveREInitiator extends Behaviour {
 		send(message);
 	}
 
-	public Integer getProtocol() {
+	public String getProtocol() {
 		return protocol;
 	}
 
-	public void setProtocol(Integer protocol) {
+	public void setProtocol(String protocol) {
 		this.protocol = protocol;
 	}
 

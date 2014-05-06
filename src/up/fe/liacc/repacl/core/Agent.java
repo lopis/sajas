@@ -1,9 +1,10 @@
-package up.fe.liacc.repacl;
+package up.fe.liacc.repacl.core;
 
-import up.fe.liacc.repacl.acl.ACLMessage;
-import up.fe.liacc.repacl.acl.MessageTemplate;
+import up.fe.liacc.repacl.MailBox;
 import up.fe.liacc.repacl.core.behaviours.Behaviour;
 import up.fe.liacc.repacl.domain.DFService;
+import up.fe.liacc.repacl.lang.acl.ACLMessage;
+import up.fe.liacc.repacl.lang.acl.MessageTemplate;
 
 /**
  * Agents that implement this interface are able to use RepACL to communicate

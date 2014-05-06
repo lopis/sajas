@@ -1,6 +1,6 @@
 package up.fe.liacc.repacl.core.behaviours;
 
-import up.fe.liacc.repacl.Agent;
+import up.fe.liacc.repacl.core.Agent;
 
 /**
  * This is the class that all behaviors extend. It doesn't contain any

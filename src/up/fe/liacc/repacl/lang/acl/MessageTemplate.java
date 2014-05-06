@@ -1,4 +1,4 @@
-package up.fe.liacc.repacl.acl;
+package up.fe.liacc.repacl.lang.acl;
 
 import java.util.ArrayList;
 
@@ -26,7 +26,7 @@ public class MessageTemplate {
 	 * one possible value.
 	 */
 	private ArrayList<Integer> performatives;
-	private ArrayList<Integer> protocols;
+	private ArrayList<String> protocols;
 	private ArrayList<Object> contents;
 	private ArrayList<String> replyWiths;
 	private ArrayList<String> inReplyTos;
@@ -39,14 +39,14 @@ public class MessageTemplate {
 		this.performatives = performatives;
 	}
 
-	public ArrayList<Integer> getProtocols() {
+	public ArrayList<String> getProtocols() {
 		if (protocols == null) {
-			protocols = new ArrayList<Integer>();
+			protocols = new ArrayList<String>();
 		}
 		return protocols;
 	}
 
-	public void setProtocols(ArrayList<Integer> protocols) {
+	public void setProtocols(ArrayList<String> protocols) {
 		this.protocols = protocols;
 	}
 
@@ -79,7 +79,7 @@ public class MessageTemplate {
 		|| getPerformatives().contains(performative);
 	}
 
-	public boolean matchesProtocol(int protocol) {
+	public boolean matchesProtocol(String protocol) {
 		return getProtocols() == null
 		|| getProtocols().contains(protocol);
 	}
@@ -99,7 +99,7 @@ public class MessageTemplate {
 		|| getContents().contains(content);
 	}
 
-	public void addProtocol(Integer protocol) {
+	public void addProtocol(String protocol) {
 		getProtocols().add(protocol);
 	}
 

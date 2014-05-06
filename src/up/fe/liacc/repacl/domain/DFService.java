@@ -2,8 +2,8 @@ package up.fe.liacc.repacl.domain;
 
 import java.util.HashMap;
 
-import up.fe.liacc.repacl.Agent;
-import up.fe.liacc.repacl.Context;
+import up.fe.liacc.repacl.ContextWrapper;
+import up.fe.liacc.repacl.core.Agent;
 
 
 /**

@@ -2,18 +2,18 @@ package up.fe.liacc.repacl.proto;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.Agent;
-import up.fe.liacc.repacl.acl.ACLMessage;
-import up.fe.liacc.repacl.acl.MessageTemplate;
-import up.fe.liacc.repacl.acl.Protocol;
+import up.fe.liacc.repacl.core.Agent;
 import up.fe.liacc.repacl.core.behaviours.Behaviour;
+import up.fe.liacc.repacl.domain.FIPANames;
 import up.fe.liacc.repacl.domain.MTS;
+import up.fe.liacc.repacl.lang.acl.ACLMessage;
+import up.fe.liacc.repacl.lang.acl.MessageTemplate;
 
 public class ContractNetInitiator extends Behaviour {
 
 	private MessageTemplate template;
 	private State protocolState;
-	private Integer protocol = Protocol.FIPA_CONTRACT_NET;
+	private String protocol = FIPANames.InteractionProtocol.FIPA_CONTRACT_NET;
 	
 	// This vector contains the agents who received the CFP
 	private ArrayList<Agent> responders;

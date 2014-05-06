@@ -2,8 +2,8 @@ package repast;
 
 import repast.simphony.engine.schedule.Schedule;
 import repast.simphony.engine.schedule.ScheduleParameters;
-import up.fe.liacc.repacl.Agent;
-import up.fe.liacc.repacl.Context;
+import up.fe.liacc.repacl.ContextWrapper;
+import up.fe.liacc.repacl.core.Agent;
 import up.fe.liacc.repacl.core.behaviours.Behaviour;
 
 public class RepastAgent extends Agent {
@@ -14,7 +14,7 @@ public class RepastAgent extends Agent {
 		Schedule schedule = new Schedule();
 		schedule.schedule(params, behaviour, "action");
 		
-		Context.getContext().add(behaviour);
+		ContextWrapper.getContext().add(behaviour);
 	}
 
 }

@@ -1,8 +1,9 @@
-package up.fe.liacc.repacl.acl;
+package up.fe.liacc.repacl.lang.acl;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.Agent;
+import up.fe.liacc.repacl.core.Agent;
+import up.fe.liacc.repacl.domain.FIPANames;
 
 /**
  * This is the generic class for all types of messages.
@@ -38,7 +39,7 @@ public class ACLMessage {
 	final static public int NO_PERFORMATIVE = -1;
 	
 	private int performative = NO_PERFORMATIVE;	// The intent of the message
-	private int protocol = Protocol.NO_PROTOCOL;	// The intent of the message
+	private String protocol = FIPANames.InteractionProtocol.FIPA_REQUEST;	// The intent of the message defaults to REQUEST
 	private Object contentObject; // Any object can be attached to the message
 	private Agent sender; // The sender must be set so the receiver can reply
 	private ArrayList<Agent> receivers;
@@ -104,11 +105,11 @@ public class ACLMessage {
 	 * Returns the protocol to which this message belongs.
 	 * @return The protocol is represented 
 	 */
-	public int getProtocol() {
+	public String getProtocol() {
 		return protocol;
 	}
 
-	public void setProtocol(int protocol) {
+	public void setProtocol(String protocol) {
 		this.protocol = protocol;
 	}
 	

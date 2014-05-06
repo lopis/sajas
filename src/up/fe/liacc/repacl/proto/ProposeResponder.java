@@ -1,6 +1,6 @@
 package up.fe.liacc.repacl.proto;
 
-import up.fe.liacc.repacl.Agent;
+import up.fe.liacc.repacl.core.Agent;
 import up.fe.liacc.repacl.core.behaviours.Behaviour;
 
 public class ProposeResponder extends Behaviour {

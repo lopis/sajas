@@ -2,11 +2,11 @@ package up.fe.liacc.repacl.proto;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.Agent;
-import up.fe.liacc.repacl.acl.ACLMessage;
-import up.fe.liacc.repacl.acl.MessageTemplate;
-import up.fe.liacc.repacl.acl.Protocol;
+import up.fe.liacc.repacl.core.Agent;
 import up.fe.liacc.repacl.core.behaviours.Behaviour;
+import up.fe.liacc.repacl.domain.FIPANames;
+import up.fe.liacc.repacl.lang.acl.ACLMessage;
+import up.fe.liacc.repacl.lang.acl.MessageTemplate;
 
 public class AchieveREResponder extends Behaviour {
 
@@ -17,8 +17,11 @@ public class AchieveREResponder extends Behaviour {
 
 		// Set the template that will filter the responses
 		template = new MessageTemplate();
-		ArrayList<Integer> protocols = new ArrayList<Integer>();
-		protocols.add(Protocol.FIPA_REQUEST); //FIXME this shouldn't be a fixed value
+		ArrayList<String> protocols = new ArrayList<String>();
+		
+		//FIXME this shouldn't be a fixed value. This behaviour
+		// supports more than one protocol.
+		protocols.add(FIPANames.InteractionProtocol.FIPA_REQUEST);
 		template.setProtocols(protocols );
 	}
 

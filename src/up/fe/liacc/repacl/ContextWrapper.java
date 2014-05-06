@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import up.fe.liacc.repacl.core.behaviours.Behaviour;
 
-public class Context{
+public class ContextWrapper{
 	
 	/**
 	 * The Repast context that contains all
