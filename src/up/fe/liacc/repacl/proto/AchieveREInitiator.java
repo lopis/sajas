@@ -3,11 +3,12 @@ package up.fe.liacc.repacl.proto;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import up.fe.liacc.repacl.MTS;
 import up.fe.liacc.repacl.core.Agent;
 import up.fe.liacc.repacl.core.behaviours.Behaviour;
 import up.fe.liacc.repacl.domain.FIPANames;
-import up.fe.liacc.repacl.domain.MTS;
 import up.fe.liacc.repacl.lang.acl.ACLMessage;
+import up.fe.liacc.repacl.lang.acl.AID;
 import up.fe.liacc.repacl.lang.acl.MessageTemplate;
 
 /**
@@ -42,7 +43,7 @@ public class AchieveREInitiator extends Behaviour {
 	 * List of agents that didn't send the result
 	 * of the request yet. 
 	 */
-	ArrayList<Integer> waitingList;
+	ArrayList<AID> waitingList;
 
 
 	/**
@@ -62,9 +63,9 @@ public class AchieveREInitiator extends Behaviour {
 		protocolState = State.ARI;
 		protocolState.setTemplate(template);
 		
-		waitingList = new ArrayList<Integer>();
+		waitingList = new ArrayList<AID>();
 		for (int i = 0; i < message.getReceivers().size(); i++) {
-			waitingList.add(message.getReceivers().get(i).getAID());
+			waitingList.add(message.getReceivers().get(i));
 		}
 
 		send(message);

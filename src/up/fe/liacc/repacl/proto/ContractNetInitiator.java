@@ -2,11 +2,12 @@ package up.fe.liacc.repacl.proto;
 
 import java.util.ArrayList;
 
+import up.fe.liacc.repacl.MTS;
 import up.fe.liacc.repacl.core.Agent;
 import up.fe.liacc.repacl.core.behaviours.Behaviour;
 import up.fe.liacc.repacl.domain.FIPANames;
-import up.fe.liacc.repacl.domain.MTS;
 import up.fe.liacc.repacl.lang.acl.ACLMessage;
+import up.fe.liacc.repacl.lang.acl.AID;
 import up.fe.liacc.repacl.lang.acl.MessageTemplate;
 
 public class ContractNetInitiator extends Behaviour {
@@ -16,7 +17,7 @@ public class ContractNetInitiator extends Behaviour {
 	private String protocol = FIPANames.InteractionProtocol.FIPA_CONTRACT_NET;
 	
 	// This vector contains the agents who received the CFP
-	private ArrayList<Agent> responders;
+	private ArrayList<AID> responders;
 	protected ArrayList<ACLMessage> responses;
 	protected ArrayList<ACLMessage> acceptances;
 

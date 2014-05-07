@@ -2,9 +2,11 @@ package up.fe.liacc.repacl.domain.FIPAAgentManagement;
 
 import java.util.ArrayList;
 
+import up.fe.liacc.repacl.lang.acl.AID;
+
 public class DFAgentDescription {
 	
-	private String name;
+	private AID name;
 	private ArrayList<String> services;
 	private ArrayList<String> protocols;
 	private ArrayList<String> ontologies;
@@ -14,51 +16,72 @@ public class DFAgentDescription {
 	public DFAgentDescription() {
 	}
 	
-	public String getName() {
+	public AID getName() {
 		return name;
 	}
-	public void setName(String name) {
+	public void setName(AID name) {
 		this.name = name;
 	}
 
 	public ArrayList<String> getServices() {
+		if (services == null) {
+			services = new ArrayList<String>();
+		}
 		return services;
 	}
 	public void addService(String service) {
-		this.services.add(service);
+		getServices().add(service);
 	}
 	public void removeService(String service) {
-		this.services.remove(service);
+		getServices().remove(service);
 	}
 
 	public ArrayList<String> getProtocols() {
+		if (protocols == null) {
+			protocols = new ArrayList<String>();
+		}
 		return protocols;
 	}
 	public void addProtocol(String protocol) {
-		this.protocols.add(protocol);
+		getProtocols().add(protocol);
 	}
 	public void removeProtocol(String protocol) {
-		this.protocols.remove(protocol);
+		getProtocols().remove(protocol);
 	}
 
 	public ArrayList<String> getOntologies() {
+		if (ontologies == null) {
+			ontologies = new ArrayList<String>();
+		}
 		return ontologies;
 	}
 	public void addOntology(String ontology) {
-		this.ontologies.add(ontology);
+		getOntologies().add(ontology);
 	}
 	public void removeOntology(String ontology) {
-		this.ontologies.remove(ontology);
+		getOntologies().remove(ontology);
 	}
 
 	public ArrayList<String> getLanguages() {
+		if (languages == null) {
+			languages = new ArrayList<String>();
+		}
 		return languages;
 	}
 	public void addLanguage(String language) {
-		this.languages.add(language);
+		getLanguages().add(language);
 	}
 	public void removeLanguage(String language) {
-		this.languages.remove(language);
+		getLanguages().remove(language);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof DFAgentDescription) &&
+			((DFAgentDescription) obj).getLanguages().equals(this.getLanguages()) &&
+			((DFAgentDescription) obj).getName().equals(this.getName()) &&
+			((DFAgentDescription) obj).getOntologies().equals(this.getProtocols()) &&
+			((DFAgentDescription) obj).getServices().equals(this.getServices());
 	}
 	
 }

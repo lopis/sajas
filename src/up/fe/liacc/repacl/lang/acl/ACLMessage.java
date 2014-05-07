@@ -2,7 +2,6 @@ package up.fe.liacc.repacl.lang.acl;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.core.Agent;
 import up.fe.liacc.repacl.domain.FIPANames;
 
 /**
@@ -41,8 +40,8 @@ public class ACLMessage {
 	private int performative = NO_PERFORMATIVE;	// The intent of the message
 	private String protocol = FIPANames.InteractionProtocol.FIPA_REQUEST;	// The intent of the message defaults to REQUEST
 	private Object contentObject; // Any object can be attached to the message
-	private Agent sender; // The sender must be set so the receiver can reply
-	private ArrayList<Agent> receivers;
+	private AID sender; // The sender must be set so the receiver can reply
+	private ArrayList<AID> receivers;
 	private String replyWith; // Tag to identify a "thread" of communication
 	private String inReplyTo; // This value comes from "replyWith"
 	private long when = 0; // Deadline for the response.
@@ -145,7 +144,7 @@ public class ACLMessage {
 	/**
 	 * @return Reference to the issuer of this message.
 	 */
-	public Agent getSender() {
+	public AID getSender() {
 		return sender;
 	}
 	
@@ -153,25 +152,29 @@ public class ACLMessage {
 	 * Sets the issuer if this message.
 	 * @param sender
 	 */
-	public void setSender(Agent sender) {
+	public void setSender(AID sender) {
 		this.sender = sender;
 	}
 	
 	/**
 	 * @return Reference to the receiver of this message.
 	 */
-	public ArrayList<Agent> getReceivers() {
+	public ArrayList<AID> getReceivers() {
 		if (receivers == null) {
-			receivers = new ArrayList<Agent>();
+			receivers = new ArrayList<AID>();
 		}
 		return receivers;
+	}
+
+	protected void setReceivers(ArrayList<AID> receivers) {
+		this.receivers = receivers;
 	}
 	
 	/**
 	 * Sets the receiver of this message.
 	 * @param receiver
 	 */
-	public void addReceiver(Agent receiver) {
+	public void addReceiver(AID receiver) {
 		getReceivers().add(receiver);
 	}
 
@@ -244,6 +247,22 @@ public class ACLMessage {
 			&& template.matchesInReplyTo(this.getInReplyTo())
 			&& template.matchesReplyWith(this.getReplyWith())
 			&& template.matchesContent(this.getContentObject());
+	}
+	
+	public ACLMessage clone() {
+		ACLMessage newMessage = new ACLMessage(this.performative);
+		newMessage.setContentObject(this.contentObject);
+		newMessage.setInReplyTo(this.inReplyTo);
+		newMessage.setPerformative(this.performative);
+		newMessage.setProtocol(this.protocol);
+		newMessage.setReplyWith(this.replyWith);
+		newMessage.setSender(this.sender);
+		newMessage.setWhen(this.when);
+		
+		newMessage.setReceivers(this.receivers);
+		newMessage.setSender(this.sender);
+		
+		return newMessage;
 	}
 
 }

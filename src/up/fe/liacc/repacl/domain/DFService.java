@@ -1,8 +1,12 @@
 package up.fe.liacc.repacl.domain;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import up.fe.liacc.repacl.core.Agent;
+import up.fe.liacc.repacl.domain.FIPAAgentManagement.DFAgentDescription;
+import up.fe.liacc.repacl.lang.acl.AID;
 
 
 /**
@@ -20,42 +24,88 @@ import up.fe.liacc.repacl.core.Agent;
  */
 public class DFService {
 
-	private static int lastAID = 0; // Just to help generate new identifiers
-	private static HashMap<Integer, Agent> agents; // Contains all agents
+	private static ArrayList<AID> agents = new ArrayList<AID>(); // Contains all agents
+	private static HashMap<String, ArrayList<AID>> services = new HashMap<String, ArrayList<AID>>();
+	private static HashMap<String, ArrayList<AID>> protocols = new HashMap<String, ArrayList<AID>>();
+	private static HashMap<String, ArrayList<AID>> ontologies = new HashMap<String, ArrayList<AID>>();
+	private static HashMap<String, ArrayList<AID>> languages = new HashMap<String, ArrayList<AID>>();
 
-	
-	/**
-	 * @return Returns the map of agents. The field is initialized
-	 * if it wasn't before.
-	 */
-	public static HashMap<Integer, Agent> getAgents() {
-		if (agents == null) {
-			agents = new HashMap<Integer, Agent>();
-		}
-		return agents;
-	}
-	
+
+	//	/**
+	//	 * @return Returns the map of agents. The field is initialized
+	//	 * if it wasn't before.
+	//	 */
+	//	public static HashMap<Integer, Agent> getAgents() {
+	//		if (agents == null) {
+	//			agents = new HashMap<Integer, Agent>();
+	//		}
+	//		return agents;
+	//	}
+
 	/**
 	 * Search an agent with this AID.
 	 * @param aid 
 	 * @return The agent mapped to this AID or null if
 	 * this AID is not registered to any agent in the DF.
 	 */
-	public static Agent searchAgent(int aid) {
-		return getAgents().get(aid);
+	public static DFAgentDescription[] search(Agent agent, DFAgentDescription dfd) {
+		// FIXME: SearchConstraints are not implemented
+		ArrayList<AID> results = new ArrayList<AID>();
+
+		// For each non null field in 'dfd', get a list of agents from each map
+		// and then intersect those lists.
+
+		if (dfd.getName() != null) {
+			if (!agents.contains(dfd.getName())) {
+				return new DFAgentDescription[0];
+			} 
+			results.add(dfd.getName());
+		} else {
+			results = agents;
+		}
+
+		if (!dfd.getLanguages().isEmpty()) 
+			results = filterAgents(languages, dfd.getLanguages(), results);
+
+		if (!dfd.getProtocols().isEmpty())
+			results = filterAgents(protocols, dfd.getProtocols(), results);
+
+		if (!dfd.getServices().isEmpty())
+			results = filterAgents(services, dfd.getServices(), results);
+
+		if (!dfd.getOntologies().isEmpty())
+			results = filterAgents(ontologies, dfd.getOntologies(), results);
+
+		DFAgentDescription[] dfdArray = new DFAgentDescription[results.size()];
+		for (int i = 0; i < dfdArray.length; i++) {
+			dfdArray[i] = new DFAgentDescription();
+			dfdArray[i].setName(results.get(i));
+		}
+		
+		return dfdArray;
 	}
-	
+
 	/**
-	 * 
-	 * @param service
-	 * @return Returns the group of agents that 
-	 * provide a service. Basically it means
-	 * the agent activated that behavior.
+	 * For each key in 'list', gets all agents in map with the keys.
+	 * Retains only the agents contained in 'previousResults'. 
+	 * @param map
+	 * @param list
+	 * @param previousResults
+	 * @return
 	 */
-	public static Agent[] searchService(int service) {
-		return new Agent[0];
+	private static ArrayList<AID> filterAgents(HashMap<String, ArrayList<AID>> map,
+			ArrayList<String> list, ArrayList<AID> previousResults) {
+		
+		ArrayList<AID> listAgents = new ArrayList<AID>();
+		for (String key : list) {
+			if (map.containsKey(key)) {
+				listAgents.addAll(map.get(key));
+			}
+		}
+		listAgents.retainAll(previousResults);
+		return listAgents;
 	}
-	
+
 	/**
 	 * Registers the agent in the directory and returns its
 	 * AID (freshly generated for it). If the agent is already
@@ -63,25 +113,44 @@ public class DFService {
 	 * @param agent The agent to be registered
 	 * @return The AID generated for the agent.
 	 */
-	public static int registerAgent(Agent agent) {
-		// If this agent is already in the hashMap,
-		// just return its key.
-		if (getAgents().containsValue(agent)) {
-			return agent.getAID();
-		}
-		
-		// Quick way to find a new ID for this agent
-		// that is not in use at the moment.
-		while (getAgents().containsKey(lastAID)) {
-			lastAID++;
-		}
-		
-		// The agent must know their own ID.
-		agent.setAID(lastAID);
-		agents.put(lastAID, agent);
-		return lastAID;
+	public static DFAgentDescription registerAgent(Agent agent, DFAgentDescription dfd) {
+		AID aid = agent.getAID();
+		if (dfd.getName() != null)
+			agents.add(aid);
+
+		if (dfd.getLanguages() != null)
+			addAll(languages, dfd.getLanguages(), aid);
+
+		if (dfd.getProtocols() != null)
+			addAll(protocols, dfd.getProtocols(), aid);
+
+		if (dfd.getServices() != null)
+			addAll(services, dfd.getServices(), aid);
+
+		if (dfd.getOntologies() != null)
+			addAll(ontologies, dfd.getOntologies(), aid);
+
+		return dfd;
 	}
-	
+
+	/**
+	 * Adds to 'map' the pairs aid->list[i] for all members of 'list'.
+	 * Allows duplicated values to be added. All repeated values will
+	 * be removed when unregistered.
+	 * @param map
+	 * @param list
+	 * @param aid
+	 */
+	private static void addAll(HashMap<String, ArrayList<AID>> map, ArrayList<String> list, AID aid) {
+		for (Iterator<String> iterator = list.iterator(); iterator.hasNext();) {
+			String key = (String) iterator.next();
+			if (!map.containsKey(key)) {
+				map.put(key, new ArrayList<AID>());
+			}
+			map.get(key).add(aid); 
+		}
+	}
+
 	/**
 	 * Deregisters an agent from the DF and resets the
 	 * agent's AID (sets its AID to -1). 
@@ -89,14 +158,37 @@ public class DFService {
 	 * @return The old agent's AID if the agent was found
 	 * in the DF or -1 otherwise.
 	 */
-	public static int unregisterAgent(Agent agent) {
-		if (getAgents().containsKey(agent.getAID())) {
-			getAgents().remove(agent.getAID());
-			int aid = agent.getAID();
-			agent.setAID(-1);
-			return aid;
+	public static void unregisterAgent(Agent agent, DFAgentDescription dfd) {
+		AID aid = agent.getAID();
+		if (dfd.getName() != null)
+			agents.remove(aid);
+
+		if (dfd.getLanguages() != null)
+			removeAll(languages, dfd.getLanguages(), aid);
+
+		if (dfd.getProtocols() != null)
+			removeAll(protocols, dfd.getProtocols(), aid);
+
+		if (dfd.getServices() != null)
+			removeAll(services, dfd.getServices(), aid);
+
+		if (dfd.getOntologies() != null)
+			removeAll(ontologies, dfd.getOntologies(), aid);
+	}
+
+	/**
+	 * Removes the references of this AID from the map.
+	 * @param map The map where to remove from
+	 * @param list The keys that point to the lists inside the map
+	 * @param aid The value to search for and remove
+	 */
+	private static void removeAll(HashMap<String, ArrayList<AID>> map, ArrayList<String> list, AID aid) {
+		for (Iterator<String> iterator = list.iterator(); iterator.hasNext();) {
+			String key = (String) iterator.next();
+			if (map.containsKey(key)) {
+				map.get(key).remove(aid);
+			}
 		}
-		return -1;
 	}
 
 }

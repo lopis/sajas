@@ -1,9 +1,9 @@
 package up.fe.liacc.repacl.core;
 
-import up.fe.liacc.repacl.MailBox;
+import up.fe.liacc.repacl.MTS;
 import up.fe.liacc.repacl.core.behaviours.Behaviour;
-import up.fe.liacc.repacl.domain.DFService;
 import up.fe.liacc.repacl.lang.acl.ACLMessage;
+import up.fe.liacc.repacl.lang.acl.AID;
 import up.fe.liacc.repacl.lang.acl.MessageTemplate;
 
 /**
@@ -17,12 +17,12 @@ public abstract class Agent {
 	/**
 	 * Agent identifier
 	 */
-	private int aid;
+	private AID aid;
 	/**
 	 * This agent's mail box can contain ACLMessages from different protocols.
 	 * Template matching will be then applied.
 	 */
-	private MailBox mailBox;
+	private MessageQueue mailBox;
 	
 //	/**
 //	 * Queue of behaviors for this agent.
@@ -38,7 +38,9 @@ public abstract class Agent {
 	 * constructor.
 	 */
 	public Agent() {
-		DFService.registerAgent(this); //TODO: not mandatory
+		//DFService.registerAgent(this); // Not mandatory for agents to register
+		aid = new AID("");
+		MTS.addAddress(this);
 		setup();
 	}
 
@@ -52,15 +54,15 @@ public abstract class Agent {
 	 * @param message
 	 */
 	public void addMail(ACLMessage message) {
-		getMailBox().addMail(message);
+		getMailBox().addFirst(message);
 	}
 	
 	/**
 	 * @return The mail box
 	 */
-	private MailBox getMailBox() {
+	private MessageQueue getMailBox() {
 		if (mailBox == null) {
-			mailBox = new MailBox();
+			mailBox = new MessageQueue();
 		}
 		return mailBox;
 	}
@@ -73,7 +75,7 @@ public abstract class Agent {
 	 * Null if no message in the Mail Box matches the template.
 	 */
 	public ACLMessage getMatchingMessage(MessageTemplate template) {
-		return getMailBox().getMatchingMessage(template);
+		return getMailBox().receive(template);
 	}
 
 	/**
@@ -83,7 +85,7 @@ public abstract class Agent {
 	 * communication can occur.
 	 * @param aid The agent identifier.
 	 */
-	public void setAID(int aid) {
+	public void setAID(AID aid) {
 		this.aid = aid;
 	}
 	
@@ -94,7 +96,7 @@ public abstract class Agent {
 	 * communication can occur.
 	 * @return The agent identifier
 	 */
-	public int getAID() {
+	public AID getAID() {
 		return aid;
 	}
 
