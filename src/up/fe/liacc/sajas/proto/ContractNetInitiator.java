@@ -1,14 +1,14 @@
-package up.fe.liacc.repacl.proto;
+package up.fe.liacc.sajas.proto;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.MTS;
-import up.fe.liacc.repacl.core.Agent;
-import up.fe.liacc.repacl.core.behaviours.Behaviour;
-import up.fe.liacc.repacl.domain.FIPANames;
-import up.fe.liacc.repacl.lang.acl.ACLMessage;
-import up.fe.liacc.repacl.lang.acl.AID;
-import up.fe.liacc.repacl.lang.acl.MessageTemplate;
+import up.fe.liacc.sajas.MTS;
+import up.fe.liacc.sajas.core.Agent;
+import up.fe.liacc.sajas.core.behaviours.Behaviour;
+import up.fe.liacc.sajas.domain.FIPANames;
+import up.fe.liacc.sajas.lang.acl.ACLMessage;
+import up.fe.liacc.sajas.lang.acl.AID;
+import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 
 public class ContractNetInitiator extends Behaviour {
 

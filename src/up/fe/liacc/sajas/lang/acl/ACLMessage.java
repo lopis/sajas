@@ -1,8 +1,9 @@
-package up.fe.liacc.repacl.lang.acl;
+package up.fe.liacc.sajas.lang.acl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.domain.FIPANames;
+import up.fe.liacc.sajas.domain.FIPANames;
 
 /**
  * This is the generic class for all types of messages.
@@ -39,7 +40,7 @@ public class ACLMessage {
 	
 	private int performative = NO_PERFORMATIVE;	// The intent of the message
 	private String protocol = FIPANames.InteractionProtocol.FIPA_REQUEST;	// The intent of the message defaults to REQUEST
-	private Object contentObject; // Any object can be attached to the message
+	private Serializable contentObject; // Any object can be attached to the message
 	private AID sender; // The sender must be set so the receiver can reply
 	private ArrayList<AID> receivers;
 	private String replyWith; // Tag to identify a "thread" of communication
@@ -137,7 +138,7 @@ public class ACLMessage {
 	 * can be left null.
 	 * @param content
 	 */
-	public void setContentObject(Object content) {
+	public void setContentObject(Serializable content) {
 		this.contentObject = content;
 	}
 	

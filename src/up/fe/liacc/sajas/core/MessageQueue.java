@@ -1,11 +1,11 @@
-package up.fe.liacc.repacl.core;
+package up.fe.liacc.sajas.core;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import up.fe.liacc.repacl.lang.acl.ACLMessage;
-import up.fe.liacc.repacl.lang.acl.MessageTemplate;
+import up.fe.liacc.sajas.lang.acl.ACLMessage;
+import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 
 /**
  * This class stores all mail addressed to one agent.

@@ -1,7 +1,7 @@
-package up.fe.liacc.repacl.proto;
+package up.fe.liacc.sajas.proto;
 
-import up.fe.liacc.repacl.core.Agent;
-import up.fe.liacc.repacl.core.behaviours.Behaviour;
+import up.fe.liacc.sajas.core.Agent;
+import up.fe.liacc.sajas.core.behaviours.Behaviour;
 
 public class ProposeInitiator extends Behaviour {
 

@@ -1,10 +1,11 @@
-package up.fe.liacc.repacl.core;
+package up.fe.liacc.sajas.core;
 
-import up.fe.liacc.repacl.MTS;
-import up.fe.liacc.repacl.core.behaviours.Behaviour;
-import up.fe.liacc.repacl.lang.acl.ACLMessage;
-import up.fe.liacc.repacl.lang.acl.AID;
-import up.fe.liacc.repacl.lang.acl.MessageTemplate;
+import java.util.ArrayList;
+
+import up.fe.liacc.sajas.core.behaviours.Behaviour;
+import up.fe.liacc.sajas.lang.acl.ACLMessage;
+import up.fe.liacc.sajas.lang.acl.AID;
+import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 
 /**
  * Agents that implement this interface are able to use RepACL to communicate
@@ -24,25 +25,8 @@ public abstract class Agent {
 	 */
 	private MessageQueue mailBox;
 	
-//	/**
-//	 * Queue of behaviors for this agent.
-//	 */
-//	private LinkedList<Behaviour> behaviours;
-//	private ContextScheduler contextScheduler = new ContextScheduler();
-	
-	/**
-	 * Default constructor. Always call this constructor
-	 * when extending this class, as it registers the
-	 * agent in the DF and makes communication possible.
-	 * The setup() method is called in the end of this
-	 * constructor.
-	 */
-	public Agent() {
-		//DFService.registerAgent(this); // Not mandatory for agents to register
-		aid = new AID("");
-		MTS.addAddress(this);
-		setup();
-	}
+	private ArrayList<Behaviour> behaviours = new ArrayList<Behaviour>();
+
 
 	/**
 	 * Add a message to this agent's mail box.
@@ -104,10 +88,9 @@ public abstract class Agent {
 	 * Adds a behavior to this agent's execution.
 	 * @param behavior
 	 */
-	protected abstract void addBehavior(Behaviour behaviour);
-//	{
-//		//contextScheduler.add(behaviour);
-//	}
+	protected abstract void addBehaviour(Behaviour behaviour);
+
+	protected abstract void removeBehaviour(Behaviour behaviour);
 	
 	/**
 	 * Method executed after the agent is created.
@@ -115,16 +98,27 @@ public abstract class Agent {
 	 * if needed.
 	 */
 	public void setup(){}
+
+	public void doDelete() {
+		for (Behaviour behaviour : behaviours) {
+			removeBehaviour(behaviour);
+		}
+		takeDown();
+	}
 	
-	/**
-	 * This default implementation is empty and should be extended 
-	 * if needed.
-	 * @ScheduledMethod
-	 */
-	public void step(){}
+	
+	protected void takeDown() {}
 	
 	@Override
 	public String toString() {
 		return "[Agent#" + getAID() + "]";
+	}
+
+	public ArrayList<Behaviour> getBehaviours() {
+		return behaviours;
+	}
+
+	public void setBehaviours(ArrayList<Behaviour> behaviours) {
+		this.behaviours = behaviours;
 	}
 }

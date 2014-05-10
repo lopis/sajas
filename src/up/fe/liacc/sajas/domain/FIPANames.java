@@ -21,7 +21,7 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA  02111-1307, USA.
 *****************************************************************/
 
-package up.fe.liacc.repacl.domain;
+package up.fe.liacc.sajas.domain;
 
 /**
  * This class provides a single access point for the

@@ -1,12 +1,12 @@
-package up.fe.liacc.repacl.domain;
+package up.fe.liacc.sajas.domain;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import up.fe.liacc.repacl.core.Agent;
-import up.fe.liacc.repacl.domain.FIPAAgentManagement.DFAgentDescription;
-import up.fe.liacc.repacl.lang.acl.AID;
+import up.fe.liacc.sajas.core.Agent;
+import up.fe.liacc.sajas.domain.FIPAAgentManagement.DFAgentDescription;
+import up.fe.liacc.sajas.lang.acl.AID;
 
 
 /**
@@ -113,7 +113,7 @@ public class DFService {
 	 * @param agent The agent to be registered
 	 * @return The AID generated for the agent.
 	 */
-	public static DFAgentDescription registerAgent(Agent agent, DFAgentDescription dfd) {
+	public static DFAgentDescription register(Agent agent, DFAgentDescription dfd) {
 		AID aid = agent.getAID();
 		if (dfd.getName() != null)
 			agents.add(aid);
@@ -158,7 +158,7 @@ public class DFService {
 	 * @return The old agent's AID if the agent was found
 	 * in the DF or -1 otherwise.
 	 */
-	public static void unregisterAgent(Agent agent, DFAgentDescription dfd) {
+	public static void deregisterAgent(Agent agent, DFAgentDescription dfd) {
 		AID aid = agent.getAID();
 		if (dfd.getName() != null)
 			agents.remove(aid);
@@ -189,6 +189,12 @@ public class DFService {
 				map.get(key).remove(aid);
 			}
 		}
+	}
+
+	public static void deregisterAgent(Agent agent) {
+		AID aid = agent.getAID();
+		agents.remove(aid);
+		//TODO remove from other maps
 	}
 
 }

@@ -1,8 +1,8 @@
-package up.fe.liacc.repacl.domain.FIPAAgentManagement;
+package up.fe.liacc.sajas.domain.FIPAAgentManagement;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.repacl.lang.acl.AID;
+import up.fe.liacc.sajas.lang.acl.AID;
 
 public class DFAgentDescription {
 	

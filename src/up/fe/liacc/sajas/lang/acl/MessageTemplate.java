@@ -1,4 +1,4 @@
-package up.fe.liacc.repacl.lang.acl;
+package up.fe.liacc.sajas.lang.acl;
 
 import java.util.ArrayList;
 
@@ -30,6 +30,7 @@ public class MessageTemplate {
 	private ArrayList<Object> contents;
 	private ArrayList<String> replyWiths;
 	private ArrayList<String> inReplyTos;
+	private ArrayList<String> conversationIds;
 
 	public ArrayList<Integer> getPerformatives() {
 		return performatives;
@@ -68,6 +69,14 @@ public class MessageTemplate {
 
 	public ArrayList<String> getInReplyTos() {
 		return inReplyTos;
+	}
+
+	public ArrayList<String> getConversationIds() {
+		return conversationIds;
+	}
+
+	public void setConversationIds(ArrayList<String> conversationIds) {
+		this.conversationIds = conversationIds;
 	}
 
 	public void setInReplyTos(ArrayList<String> inReplyTos) {
