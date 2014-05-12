@@ -2,12 +2,13 @@ package up.fe.liacc.sajas.domain.FIPAAgentManagement;
 
 import java.util.ArrayList;
 
+
 import up.fe.liacc.sajas.lang.acl.AID;
 
 public class DFAgentDescription {
 	
 	private AID name;
-	private ArrayList<String> services;
+	private ArrayList<ServiceDescription> services;
 	private ArrayList<String> protocols;
 	private ArrayList<String> ontologies;
 	private ArrayList<String> languages;
@@ -23,16 +24,16 @@ public class DFAgentDescription {
 		this.name = name;
 	}
 
-	public ArrayList<String> getServices() {
+	public ArrayList<ServiceDescription> getServices() {
 		if (services == null) {
-			services = new ArrayList<String>();
+			services = new ArrayList<ServiceDescription>();
 		}
 		return services;
 	}
-	public void addService(String service) {
+	public void addServices(ServiceDescription service) {
 		getServices().add(service);
 	}
-	public void removeService(String service) {
+	public void removeServices(ServiceDescription service) {
 		getServices().remove(service);
 	}
 
@@ -42,10 +43,10 @@ public class DFAgentDescription {
 		}
 		return protocols;
 	}
-	public void addProtocol(String protocol) {
+	public void addProtocols(String protocol) {
 		getProtocols().add(protocol);
 	}
-	public void removeProtocol(String protocol) {
+	public void removeProtocols(String protocol) {
 		getProtocols().remove(protocol);
 	}
 
@@ -55,10 +56,10 @@ public class DFAgentDescription {
 		}
 		return ontologies;
 	}
-	public void addOntology(String ontology) {
+	public void addOntologies(String ontology) {
 		getOntologies().add(ontology);
 	}
-	public void removeOntology(String ontology) {
+	public void removeOntologies(String ontology) {
 		getOntologies().remove(ontology);
 	}
 
@@ -68,10 +69,10 @@ public class DFAgentDescription {
 		}
 		return languages;
 	}
-	public void addLanguage(String language) {
+	public void addLanguages(String language) {
 		getLanguages().add(language);
 	}
-	public void removeLanguage(String language) {
+	public void removeLanguages(String language) {
 		getLanguages().remove(language);
 	}
 	

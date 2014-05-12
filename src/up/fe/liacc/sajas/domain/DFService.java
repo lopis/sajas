@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import up.fe.liacc.sajas.core.Agent;
 import up.fe.liacc.sajas.domain.FIPAAgentManagement.DFAgentDescription;
+import up.fe.liacc.sajas.domain.FIPAAgentManagement.ServiceDescription;
 import up.fe.liacc.sajas.lang.acl.AID;
 
 
@@ -25,7 +26,7 @@ import up.fe.liacc.sajas.lang.acl.AID;
 public class DFService {
 
 	private static ArrayList<AID> agents = new ArrayList<AID>(); // Contains all agents
-	private static HashMap<String, ArrayList<AID>> services = new HashMap<String, ArrayList<AID>>();
+	private static HashMap<ServiceDescription, ArrayList<AID>> services = new HashMap<ServiceDescription, ArrayList<AID>>();
 	private static HashMap<String, ArrayList<AID>> protocols = new HashMap<String, ArrayList<AID>>();
 	private static HashMap<String, ArrayList<AID>> ontologies = new HashMap<String, ArrayList<AID>>();
 	private static HashMap<String, ArrayList<AID>> languages = new HashMap<String, ArrayList<AID>>();
@@ -70,8 +71,16 @@ public class DFService {
 		if (!dfd.getProtocols().isEmpty())
 			results = filterAgents(protocols, dfd.getProtocols(), results);
 
-		if (!dfd.getServices().isEmpty())
-			results = filterAgents(services, dfd.getServices(), results);
+		if (!dfd.getServices().isEmpty()) {
+			ArrayList<AID> listAgents = new ArrayList<AID>();
+			for (ServiceDescription key : dfd.getServices()) {
+				if (services.containsKey(key)) {
+					listAgents.addAll(services.get(key));
+				}
+			}
+			listAgents.retainAll(results);
+			results = listAgents;
+		}
 
 		if (!dfd.getOntologies().isEmpty())
 			results = filterAgents(ontologies, dfd.getOntologies(), results);
@@ -124,8 +133,15 @@ public class DFService {
 		if (dfd.getProtocols() != null)
 			addAll(protocols, dfd.getProtocols(), aid);
 
-		if (dfd.getServices() != null)
-			addAll(services, dfd.getServices(), aid);
+		if (dfd.getServices() != null) {
+			for (Iterator<ServiceDescription> iterator = dfd.getServices().iterator(); iterator.hasNext();) {
+				ServiceDescription key = iterator.next();
+				if (!services.containsKey(key)) {
+					services.put(key, new ArrayList<AID>());
+				}
+				services.get(key).add(aid); 
+			}
+		}
 
 		if (dfd.getOntologies() != null)
 			addAll(ontologies, dfd.getOntologies(), aid);
@@ -169,8 +185,14 @@ public class DFService {
 		if (dfd.getProtocols() != null)
 			removeAll(protocols, dfd.getProtocols(), aid);
 
-		if (dfd.getServices() != null)
-			removeAll(services, dfd.getServices(), aid);
+		if (dfd.getServices() != null) {
+			for (Iterator<ServiceDescription> iterator = dfd.getServices().iterator(); iterator.hasNext();) {
+				ServiceDescription key = iterator.next();
+				if (services.containsKey(key)) {
+					services.get(key).remove(aid);
+				}
+			}
+		}
 
 		if (dfd.getOntologies() != null)
 			removeAll(ontologies, dfd.getOntologies(), aid);
