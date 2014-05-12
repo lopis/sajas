@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import up.fe.liacc.sajas.MTS;
+import up.fe.liacc.sajas.core.AID;
 import up.fe.liacc.sajas.core.Agent;
 import up.fe.liacc.sajas.core.behaviours.Behaviour;
 import up.fe.liacc.sajas.domain.FIPANames;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
-import up.fe.liacc.sajas.lang.acl.AID;
 import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 
 /**
@@ -33,6 +33,7 @@ import up.fe.liacc.sajas.lang.acl.MessageTemplate;
  * @author joaolopes
  *
  */
+@SuppressWarnings({ "rawtypes" })
 public class AchieveREInitiator extends Behaviour {
 
 	private MessageTemplate template;
@@ -84,13 +85,13 @@ public class AchieveREInitiator extends Behaviour {
 	 * when the timeout is expired.
 	 * TODO implement timeout for result
 	 */ 
-	protected void handleAllResponses(Vector<ACLMessage> responses) {}
+	protected void handleAllResponses(Vector responses) {}
 
 	/**
 	 * This method is called when all the result notification messages
 	 * have been collected.
 	 */
-	protected void handleAllResultNotifications(Vector<ACLMessage> notifications) {}
+	protected void handleAllResultNotifications(Vector notifications) {}
 
 	/**
 	 * Handle 'agree' response from one of the receivers of the request.

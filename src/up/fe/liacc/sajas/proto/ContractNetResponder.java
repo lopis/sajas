@@ -18,10 +18,9 @@ public class ContractNetResponder extends Behaviour {
 	private ACLMessage cfp; // The last received Call for Proposals
 	private ACLMessage proposal; // The proposal sent to this.cfp
 
-	public ContractNetResponder(Agent agent) {
+	public ContractNetResponder(Agent agent, MessageTemplate template) {
 		super(agent);
 		
-		template = new MessageTemplate();
 		template.addProtocol(protocol);
 		protocolState = State.CFP;
 		protocolState.setTemplate(template);
@@ -55,6 +54,14 @@ public class ContractNetResponder extends Behaviour {
 
 	protected void handleRejectProposal(ACLMessage cfp,
 			ACLMessage propose, ACLMessage accept) {}
+	
+	public MessageTemplate createMessageTemplate(String protocol) {
+		State s = State.CFP;
+		MessageTemplate newMessageTemplate = new MessageTemplate();
+		newMessageTemplate.addProtocol(protocol);
+		s.setTemplate(newMessageTemplate);
+		return newMessageTemplate;
+	}
 
 	/**
 	 * TODO: this javadocs

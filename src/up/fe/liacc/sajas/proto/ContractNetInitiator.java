@@ -1,15 +1,18 @@
 package up.fe.liacc.sajas.proto;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 import up.fe.liacc.sajas.MTS;
+import up.fe.liacc.sajas.core.AID;
 import up.fe.liacc.sajas.core.Agent;
 import up.fe.liacc.sajas.core.behaviours.Behaviour;
 import up.fe.liacc.sajas.domain.FIPANames;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
-import up.fe.liacc.sajas.lang.acl.AID;
 import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 
+
+@SuppressWarnings({ "rawtypes", "unchecked" }) // For compatibility with JADE. I'm so sorry.
 public class ContractNetInitiator extends Behaviour {
 
 	private MessageTemplate template;
@@ -18,8 +21,8 @@ public class ContractNetInitiator extends Behaviour {
 	
 	// This vector contains the agents who received the CFP
 	private ArrayList<AID> responders;
-	protected ArrayList<ACLMessage> responses;
-	protected ArrayList<ACLMessage> acceptances;
+	protected Vector responses;
+	protected Vector acceptances;
 
 	/**
 	 * Default super constructor.
@@ -33,8 +36,6 @@ public class ContractNetInitiator extends Behaviour {
 		template.addProtocol(protocol);
 		protocolState = State.PROPOSAL;
 		protocolState.setTemplate(template);
-		acceptances = new ArrayList<ACLMessage>();
-		responses = new ArrayList<ACLMessage>();
 		responders = cfp.getReceivers();
 		MTS.send(prepareCfps(cfp).get(0)); // Send the CFP
 	}
@@ -78,12 +79,20 @@ public class ContractNetInitiator extends Behaviour {
 		}
 	}
 	
-	protected ArrayList<ACLMessage> getResponses() {
+	protected Vector getResponses() {
 		if (responses == null) {
-			responses = new ArrayList<ACLMessage>();
+			responses = new Vector();
 		}
 		return responses;
 	}
+	
+	protected Vector getAcceptances() {
+		if (acceptances == null) {
+			acceptances = new Vector();
+		}
+		return acceptances;
+	}
+	
 	
 
 	/**
@@ -111,7 +120,7 @@ public class ContractNetInitiator extends Behaviour {
 	 * @param acceptances This method should populate this vector with messages to deliver to the agents
 	 * that replied to the CFP. This vector is a list of ACCEPT/REJECT PROPOSAL.
 	 */
-	protected void handleAllResponses(ArrayList<ACLMessage> responses, ArrayList<ACLMessage> acceptances) {}
+	protected void handleAllResponses(Vector responses, Vector acceptances) {}
 	
 
 
@@ -152,10 +161,10 @@ public class ContractNetInitiator extends Behaviour {
 					
 					// This vector will be populated by the "handle all" method
 					
-					cn.handleAllResponses(cn.getResponses(), cn.acceptances);
-					for (ACLMessage aclMessage : cn.acceptances) {
+					cn.handleAllResponses(cn.getResponses(), cn.getAcceptances());
+					for (Object aclMessage : cn.acceptances) {
 						// Send all "ACCEPT PROPOSE" or "REJECT PROPOSE"
-						MTS.send(aclMessage);
+						MTS.send((ACLMessage) aclMessage);
 					}
 					
 					return INFORM;

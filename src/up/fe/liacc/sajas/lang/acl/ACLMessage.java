@@ -3,6 +3,7 @@ package up.fe.liacc.sajas.lang.acl;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import up.fe.liacc.sajas.core.AID;
 import up.fe.liacc.sajas.domain.FIPANames;
 
 /**
@@ -129,7 +130,7 @@ public class ACLMessage {
 	/**
 	 * @return Returns the content of this message. This object can be null.
 	 */
-	public Object getContentObject() {
+	public Serializable getContentObject() {
 		return contentObject;
 	}
 	

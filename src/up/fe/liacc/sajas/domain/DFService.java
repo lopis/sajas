@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import up.fe.liacc.sajas.core.AID;
 import up.fe.liacc.sajas.core.Agent;
 import up.fe.liacc.sajas.domain.FIPAAgentManagement.DFAgentDescription;
 import up.fe.liacc.sajas.domain.FIPAAgentManagement.ServiceDescription;
-import up.fe.liacc.sajas.lang.acl.AID;
 
 
 /**

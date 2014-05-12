@@ -2,8 +2,8 @@ package up.fe.liacc.sajas.domain;
 
 import java.util.HashMap;
 
+import up.fe.liacc.sajas.core.AID;
 import up.fe.liacc.sajas.core.Agent;
-import up.fe.liacc.sajas.lang.acl.AID;
 
 public class AMSService {
 

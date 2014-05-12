@@ -2,10 +2,10 @@ package up.fe.liacc.sajas;
 
 import java.util.ArrayList;
 
+import up.fe.liacc.sajas.core.AID;
 import up.fe.liacc.sajas.core.Agent;
 import up.fe.liacc.sajas.domain.AMSService;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
-import up.fe.liacc.sajas.lang.acl.AID;
 
 /**
  * The MTS, or  Message Transport Service, handles

@@ -2,8 +2,7 @@ package up.fe.liacc.sajas.domain.FIPAAgentManagement;
 
 import java.util.ArrayList;
 
-
-import up.fe.liacc.sajas.lang.acl.AID;
+import up.fe.liacc.sajas.core.AID;
 
 public class DFAgentDescription {
 	
