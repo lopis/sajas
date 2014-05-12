@@ -174,7 +174,7 @@ public class DFService {
 	 * @return The old agent's AID if the agent was found
 	 * in the DF or -1 otherwise.
 	 */
-	public static void deregisterAgent(Agent agent, DFAgentDescription dfd) {
+	public static void deregister(Agent agent, DFAgentDescription dfd) {
 		AID aid = agent.getAID();
 		if (dfd.getName() != null)
 			agents.remove(aid);
