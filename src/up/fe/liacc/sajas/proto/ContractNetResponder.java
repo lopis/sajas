@@ -77,7 +77,7 @@ public class ContractNetResponder extends Behaviour {
 			@Override
 			public void setTemplate(MessageTemplate t) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(ACLMessage.CALL_FOR_PROPOSAL);
+				performatives.add(ACLMessage.CFP);
 				t.setPerformatives(performatives);
 			}
 		}, 

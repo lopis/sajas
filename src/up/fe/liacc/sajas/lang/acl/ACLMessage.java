@@ -17,7 +17,7 @@ public class ACLMessage {
 	final static public int ACCEPT_PROPOSAL = 1;
 	final static public int AGREE = 2;
 	final static public int CANCEL = 3;
-	final static public int CALL_FOR_PROPOSAL = 4;
+	final static public int CFP = 4;
 	final static public int CONFIRM = 5;
 	final static public int DISCONFIRM = 6;
 	final static public int FAILURE = 7;
