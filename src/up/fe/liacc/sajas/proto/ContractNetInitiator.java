@@ -126,7 +126,7 @@ public class ContractNetInitiator extends Behaviour {
 
 	protected void handleRefuse(ACLMessage m) {}
 	
-	protected void handlePropose(ACLMessage m) {}
+	protected void handlePropose(ACLMessage m, Vector acceptances) {}
 	
 	/**
 	 * TODO: this javadocs
@@ -154,7 +154,7 @@ public class ContractNetInitiator extends Behaviour {
 				if (m.getPerformative() == ACLMessage.REFUSE) {
 					cn.handleRefuse(m);
 				} else if (m.getPerformative() == ACLMessage.PROPOSE) {
-					cn.handlePropose(m);
+					cn.handlePropose(m, cn.acceptances);
 				}
 				
 				if (cn.isAllResponded()) {

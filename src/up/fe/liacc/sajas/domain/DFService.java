@@ -128,22 +128,13 @@ public class DFService {
 	public static DFAgentDescription register(Agent agent, DFAgentDescription dfd) 
 			throws FIPAException {
 		
-		if (dfd.getName() == null || dfd.getName().getLocalName().length() == 0) {
-			throw new FIPAException("[DF] Register: Field 'name' in DFAgentDescription is not set.");
-		}
+		checkDfd(dfd); // throws FIPAException
 		
 		AID aid = agent.getAID();
+		agents.add(aid);
 		
 		if (dfd.getServices() != null) {
-			// Search for null services
-			for (Iterator<ServiceDescription> iterator = dfd.getServices().iterator(); iterator.hasNext();) {
-				ServiceDescription service = iterator.next();
-				if (service.getName() == null || service.getName().length() == 0 ||
-					service.getType() == null || service.getType().length() == 0) {
-					
-				}
-			}
-			
+			// The addAll is just for Strings.
 			for (Iterator<ServiceDescription> iterator = dfd.getServices().iterator(); iterator.hasNext();) {
 				ServiceDescription key = iterator.next();
 				if (!services.containsKey(key)) {
@@ -152,8 +143,6 @@ public class DFService {
 				services.get(key).add(aid); 
 			}
 		}
-
-		agents.add(aid);
 
 		if (dfd.getLanguages() != null)
 			addAll(languages, dfd.getLanguages(), aid);
@@ -165,6 +154,30 @@ public class DFService {
 			addAll(ontologies, dfd.getOntologies(), aid);
 
 		return dfd;
+	}
+
+	/**
+	 * Checks the validity of the DFAgentDescription.
+	 * The name is mandatory. In each service description, 
+	 * name and type are mandatory.
+	 * @param dfd
+	 * @throws FIPAException
+	 */
+	private static void checkDfd(DFAgentDescription dfd) throws FIPAException {
+		if (dfd.getName() == null || dfd.getName().getLocalName().length() == 0) {
+			throw new FIPAException("[DF] Register: Field 'name' in DFAgentDescription is not set.");
+		}
+		
+		if (dfd.getServices() != null) {
+			// Search for null services (name and type are mandatory)
+			for (Iterator<ServiceDescription> iterator = dfd.getServices().iterator(); iterator.hasNext();) {
+				ServiceDescription service = iterator.next();
+				if (service.getName() == null || service.getName().length() == 0 ||
+					service.getType() == null || service.getType().length() == 0) {
+					
+				}
+			}
+		}
 	}
 
 	/**
@@ -186,13 +199,13 @@ public class DFService {
 	}
 
 	/**
-	 * Deregisters an agent from the DF and resets the
-	 * agent's AID (sets its AID to -1). 
+	 * Deregisters a DFAgentDescription from the DF.
 	 * @param agent
-	 * @return The old agent's AID if the agent was found
-	 * in the DF or -1 otherwise.
+	 * @param dfd A DFAgentDescription that describes this agent and its services.
+	 * @throws FIPAException 
 	 */
-	public static void deregister(Agent agent, DFAgentDescription dfd) {
+	public static void deregister(Agent agent, DFAgentDescription dfd)
+			throws FIPAException {
 		AID aid = agent.getAID();
 		if (dfd.getName() != null)
 			agents.remove(aid);
@@ -231,10 +244,16 @@ public class DFService {
 		}
 	}
 
-	public static void deregisterAgent(Agent agent) {
-		AID aid = agent.getAID();
-		agents.remove(aid);
-		//TODO remove from other maps
+	/**
+	 * Deregisters a DFAgentDescription from the DF.
+	 * A default DF-Description is used which contains only the AID of this agent.
+	 * @param agent
+	 * @throws FIPAException
+	 */
+	public static void deregister(Agent agent) throws FIPAException {
+		DFAgentDescription dfd = new DFAgentDescription();
+		dfd.setName(agent.getAID());
+		deregister(agent, dfd );
 	}
 
 }

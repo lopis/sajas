@@ -119,7 +119,7 @@ public class ACLMessage {
 	/**
 	 * @return Returns the content of this message. This object can be null.
 	 */
-	public Serializable getContentObject() {
+	public Serializable getContentObject() throws UnreadableException {
 		return contentObject;
 	}
 	
@@ -251,11 +251,15 @@ public class ACLMessage {
 	 * @return True if all fields (expected those ignored) match the template's. 
 	 */
 	public boolean match(MessageTemplate template) {
-		return template.matchesPerformative(this.getPerformative()) 
-			&& template.matchesProtocol(this.getProtocol())
-			&& template.matchesInReplyTo(this.getInReplyTo())
-			&& template.matchesReplyWith(this.getReplyWith())
-			&& template.matchesContent(this.getContentObject());
+		try {
+			return template.matchesPerformative(this.getPerformative()) 
+				&& template.matchesProtocol(this.getProtocol())
+				&& template.matchesInReplyTo(this.getInReplyTo())
+				&& template.matchesReplyWith(this.getReplyWith())
+				&& template.matchesContent(this.getContentObject());
+		} catch (UnreadableException e) {
+			return false;
+		}
 	}
 	
 	public ACLMessage clone() {
