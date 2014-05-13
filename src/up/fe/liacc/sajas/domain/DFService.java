@@ -48,9 +48,12 @@ public class DFService {
 	 * @param aid 
 	 * @return The agent mapped to this AID or null if
 	 * this AID is not registered to any agent in the DF.
+	 * @throws FIPAException Not implemented.
 	 */
-	public static DFAgentDescription[] search(Agent agent, DFAgentDescription dfd) {
-		// FIXME: SearchConstraints are not implemented
+	public static DFAgentDescription[] search(Agent agent, DFAgentDescription dfd) 
+			throws FIPAException {
+		
+		// FIXME: SearchConstraints are not implemented. only the DF
 		ArrayList<AID> results = new ArrayList<AID>();
 
 		// For each non null field in 'dfd', get a list of agents from each map
@@ -122,18 +125,25 @@ public class DFService {
 	 * @param agent The agent to be registered
 	 * @return The AID generated for the agent.
 	 */
-	public static DFAgentDescription register(Agent agent, DFAgentDescription dfd) {
+	public static DFAgentDescription register(Agent agent, DFAgentDescription dfd) 
+			throws FIPAException {
+		
+		if (dfd.getName() == null || dfd.getName().getLocalName().length() == 0) {
+			throw new FIPAException("[DF] Register: Field 'name' in DFAgentDescription is not set.");
+		}
+		
 		AID aid = agent.getAID();
-		if (dfd.getName() != null)
-			agents.add(aid);
-
-		if (dfd.getLanguages() != null)
-			addAll(languages, dfd.getLanguages(), aid);
-
-		if (dfd.getProtocols() != null)
-			addAll(protocols, dfd.getProtocols(), aid);
-
+		
 		if (dfd.getServices() != null) {
+			// Search for null services
+			for (Iterator<ServiceDescription> iterator = dfd.getServices().iterator(); iterator.hasNext();) {
+				ServiceDescription service = iterator.next();
+				if (service.getName() == null || service.getName().length() == 0 ||
+					service.getType() == null || service.getType().length() == 0) {
+					
+				}
+			}
+			
 			for (Iterator<ServiceDescription> iterator = dfd.getServices().iterator(); iterator.hasNext();) {
 				ServiceDescription key = iterator.next();
 				if (!services.containsKey(key)) {
@@ -142,6 +152,14 @@ public class DFService {
 				services.get(key).add(aid); 
 			}
 		}
+
+		agents.add(aid);
+
+		if (dfd.getLanguages() != null)
+			addAll(languages, dfd.getLanguages(), aid);
+
+		if (dfd.getProtocols() != null)
+			addAll(protocols, dfd.getProtocols(), aid);
 
 		if (dfd.getOntologies() != null)
 			addAll(ontologies, dfd.getOntologies(), aid);

@@ -55,7 +55,7 @@ public class ContractNetResponder extends Behaviour {
 	protected void handleRejectProposal(ACLMessage cfp,
 			ACLMessage propose, ACLMessage accept) {}
 	
-	public MessageTemplate createMessageTemplate(String protocol) {
+	public static MessageTemplate createMessageTemplate(String protocol) {
 		State s = State.CFP;
 		MessageTemplate newMessageTemplate = new MessageTemplate();
 		newMessageTemplate.addProtocol(protocol);

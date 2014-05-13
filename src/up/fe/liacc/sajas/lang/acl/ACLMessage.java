@@ -1,5 +1,6 @@
 package up.fe.liacc.sajas.lang.acl;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -114,18 +115,6 @@ public class ACLMessage {
 		this.protocol = protocol;
 	}
 	
-	/**
-	 * Returns the content of this Message in the form of a string.
-	 * This string may be null.
-	 * @return
-	 */
-	public String getContent() {
-		if(contentString != null) {
-			return new String(contentString);
-		} else { 
-			return null;
-		}
-	}
 
 	/**
 	 * @return Returns the content of this message. This object can be null.
@@ -138,9 +127,27 @@ public class ACLMessage {
 	 * Attaches an object to this message. This message's content
 	 * can be left null.
 	 * @param content
+	 * @throws IOException - Not implemented. For compatibility only.
 	 */
-	public void setContentObject(Serializable content) {
+	public void setContentObject(Serializable content) throws IOException {
 		this.contentObject = content;
+	}
+	
+	public void setContent(String message) {
+		contentString = new StringBuffer(message);
+	}
+
+	/**
+	 * Returns the content of this Message in the form of a string.
+	 * This string may be null.
+	 * @return
+	 */
+	public String getContent() {
+		if(contentString != null) {
+			return new String(contentString);
+		} else { 
+			return null;
+		}
 	}
 	
 	/**
@@ -253,7 +260,9 @@ public class ACLMessage {
 	
 	public ACLMessage clone() {
 		ACLMessage newMessage = new ACLMessage(this.performative);
-		newMessage.setContentObject(this.contentObject);
+		try {
+			newMessage.setContentObject(this.contentObject);
+		} catch (IOException e) { /*Never fails*/ }
 		newMessage.setInReplyTo(this.inReplyTo);
 		newMessage.setPerformative(this.performative);
 		newMessage.setProtocol(this.protocol);
