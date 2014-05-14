@@ -21,8 +21,8 @@ public class ContractNetInitiator extends Behaviour {
 	
 	// This vector contains the agents who received the CFP
 	private ArrayList<AID> responders;
-	protected Vector responses;
-	protected Vector acceptances;
+	protected Vector responses = new Vector();
+	protected Vector acceptances = new Vector();
 
 	/**
 	 * Default super constructor.
@@ -69,7 +69,7 @@ public class ContractNetInitiator extends Behaviour {
 		 */
 
 		// Retrieve one message from the mailbox
-		ACLMessage nextMessage = this.getAgent().getMatchingMessage(template);
+		ACLMessage nextMessage = this.getAgent().receive(template);
 		if (nextMessage != null) {
 			
 			// Update the state
@@ -77,20 +77,6 @@ public class ContractNetInitiator extends Behaviour {
 			// Update the template
 			protocolState.setTemplate(template);
 		}
-	}
-	
-	protected Vector getResponses() {
-		if (responses == null) {
-			responses = new Vector();
-		}
-		return responses;
-	}
-	
-	protected Vector getAcceptances() {
-		if (acceptances == null) {
-			acceptances = new Vector();
-		}
-		return acceptances;
 	}
 	
 	
@@ -161,7 +147,7 @@ public class ContractNetInitiator extends Behaviour {
 					
 					// This vector will be populated by the "handle all" method
 					
-					cn.handleAllResponses(cn.getResponses(), cn.getAcceptances());
+					cn.handleAllResponses(cn.responses, cn.acceptances);
 					for (Object aclMessage : cn.acceptances) {
 						// Send all "ACCEPT PROPOSE" or "REJECT PROPOSE"
 						MTS.send((ACLMessage) aclMessage);
@@ -200,6 +186,7 @@ public class ContractNetInitiator extends Behaviour {
 			@Override
 			public void setTemplate(MessageTemplate t) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
+				performatives.add(ACLMessage.INFORM);
 				t.setPerformatives(performatives);
 			}
 		},

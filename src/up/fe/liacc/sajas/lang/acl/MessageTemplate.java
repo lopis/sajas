@@ -109,7 +109,9 @@ public class MessageTemplate {
 	}
 
 	public void addProtocol(String protocol) {
-		getProtocols().add(protocol);
+		if (!getProtocols().contains(protocol)) {
+			getProtocols().add(protocol);
+		}
 	}
 
 }

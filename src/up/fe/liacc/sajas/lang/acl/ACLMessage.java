@@ -258,6 +258,7 @@ public class ACLMessage {
 				&& template.matchesReplyWith(this.getReplyWith())
 				&& template.matchesContent(this.getContentObject());
 		} catch (UnreadableException e) {
+			System.err.println(e.getMessage());
 			return false;
 		}
 	}

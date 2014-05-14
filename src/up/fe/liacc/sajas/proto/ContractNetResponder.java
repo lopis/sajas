@@ -24,12 +24,18 @@ public class ContractNetResponder extends Behaviour {
 		template.addProtocol(protocol);
 		protocolState = State.CFP;
 		protocolState.setTemplate(template);
+		this.template = template;
 	}
 
 	@Override
 	public void action() {
 		// Retrieve one message from the mailbox
-		ACLMessage nextMessage = this.getAgent().getMatchingMessage(template);
+		if (template == null) {
+			template = new MessageTemplate();
+		}
+		
+		ACLMessage nextMessage = this.getAgent().receive(template);
+		
 		if (nextMessage != null) {
 
 			// Update the state

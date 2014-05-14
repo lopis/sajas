@@ -57,7 +57,7 @@ public abstract class Agent {
 	 * @return The first matching message in the Mail box, or
 	 * Null if no message in the Mail Box matches the template.
 	 */
-	public ACLMessage getMatchingMessage(MessageTemplate template) {
+	public ACLMessage receive(MessageTemplate template) {
 		return getMailBox().receive(template);
 	}
 
