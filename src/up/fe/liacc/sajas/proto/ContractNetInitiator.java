@@ -16,7 +16,7 @@ import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 public class ContractNetInitiator extends Behaviour {
 
 	private MessageTemplate template;
-	private State protocolState;
+	private FSMBehaviour.State protocolState;
 	private String protocol = FIPANames.InteractionProtocol.FIPA_CONTRACT_NET;
 	
 	// This vector contains the agents who received the CFP
@@ -115,11 +115,23 @@ public class ContractNetInitiator extends Behaviour {
 	protected void handlePropose(ACLMessage m, Vector acceptances) {}
 	
 	/**
-	 * TODO: this javadocs
+	 * This enum implements the FSMBehaviour.State interface and
+	 * represents the state machine of the Contract Net Initiator.
+	 * This protocol has three different states: PROPOSAL, INFORM,
+	 * and FINISHED.
+	 * <li> PROPOSAL: the CFP was sent and the initiator is waiting
+	 * for proposals. When a propose arrives, the initiator calls
+	 * the appropriate handler for REFUSE or PROPOSE. That responder
+	 * is removed from the repsonders list. Is there are no responders
+	 * left, change to INFORM state; otherwise, stay in PROPOSAL.</li>
+	 * <li> INFORM: all proposals were sent and the initiator expects
+	 * to receive "informs" from the other agents. Stay in this state
+	 * until all informs were received. Change state to the FINISHED
+	 * when that happens.
 	 * @author joaolopes
 	 *
 	 */
-	private enum State {
+	private enum State implements FSMBehaviour.State {
 
 		/**
 		 * After sending a call for proposals, expect PROPOSAL
@@ -127,12 +139,14 @@ public class ContractNetInitiator extends Behaviour {
 		 */
 		PROPOSAL {
 			@Override
-			public State nextState(ACLMessage m, ContractNetInitiator cn) {
+			public State nextState(ACLMessage m, Behaviour b) {
+				ContractNetInitiator cn = (ContractNetInitiator) b;
+				
 				// Since we know the message matches the template,
 				// we can assume it's a valid propose or refuse.
 				cn.responses.add(m);
 				
-				// Remove one sender from the list	
+				// Remove the sender from the list	
 				// TODO: Should the protocol accept more messages from this sender?
 				// 		 Or should further "proposals" from this agent be ignored?
 				cn.responders.remove(m.getSender());		
@@ -175,9 +189,9 @@ public class ContractNetInitiator extends Behaviour {
 		 */
 		INFORM {
 			@Override
-			public State nextState(ACLMessage m, ContractNetInitiator re) {
-				if (re.isInformed()) {
-					return Dead;
+			public State nextState(ACLMessage m, Behaviour b) {
+				if (((ContractNetInitiator) b).isInformed()) {
+					return FINISHED;
 				} else {
 					return INFORM;
 				}
@@ -194,24 +208,17 @@ public class ContractNetInitiator extends Behaviour {
 		/**
 		 * Final state. 
 		 */
-		Dead
-		;
+		FINISHED {
+			@Override
+			public State nextState(ACLMessage m, Behaviour b) {
+				return FINISHED;
+			}
 
-		/**
-		 * Returns the next state, given a message and the behavior
-		 * @param m
-		 * @param re
-		 * @return
-		 */
-	    public State nextState(ACLMessage m, ContractNetInitiator re) {
-	        return null;
-	    }
-	    
-	    /**
-	     * Update the current ACL Message Template.
-	     * @param t
-	     */
-	    public void setTemplate(MessageTemplate t) {}
+			@Override
+			public void setTemplate(MessageTemplate t) {}
+		};
+
+
 	}
 
 

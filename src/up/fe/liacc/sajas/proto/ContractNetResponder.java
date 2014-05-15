@@ -9,14 +9,18 @@ import up.fe.liacc.sajas.domain.FIPANames;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
 import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 
-public class ContractNetResponder extends Behaviour {
+public class ContractNetResponder extends FSMBehaviour {
 	
-	private MessageTemplate template;
-	private State protocolState;
 	private String protocol = FIPANames.InteractionProtocol.FIPA_CONTRACT_NET;
 	
+	/**
+	 * The last CFP received. The protocol only handles one CFP at a time.
+	 */
 	private ACLMessage cfp; // The last received Call for Proposals
-	private ACLMessage proposal; // The proposal sent to this.cfp
+	/**
+	 *  The response to the CFP. Should contain a PROPOSE, REFUSE or NOT_UNDERSTAND message.
+	 */
+	private ACLMessage proposal;
 
 	public ContractNetResponder(Agent agent, MessageTemplate template) {
 		super(agent);
@@ -70,21 +74,36 @@ public class ContractNetResponder extends Behaviour {
 	}
 
 	/**
-	 * TODO: this javadocs
+	 * This enum implements the FSMBehaviour.State interface and
+	 * represents the state machine of the Contract Net Responder.
+	 * This protocol has three different states: CFP, NOTIFICATION
+	 * and BUSY.
+	 * <li> CFP: The responder is waiting for a CFP. When one arrives,
+	 * the responder prepares a proposal (which may contain a REFUSE,
+	 * ACCEPT or NOT_UNDERSTOOD), sends it back to the initiator and
+	 * the state changes to NOTIFICATION.</li>
+	 * <li> NOTIFICATION: The responder is waiting for the notification
+	 * of the initiator, containing ACCEPT or REJECT PROPOSAL. When it
+	 * arrives, the responder handles the message and the state changes
+	 * to BUSY </li>
+	 * <li> BUSY: The responder is performing some task requested by the
+	 * initiator and ignores further incoming mail. When it finishes, the
+	 * handle  </li>
 	 * @author joaolopes
 	 *
 	 */
-	private enum State {
+	private enum State implements FSMBehaviour.State {
 
 		/**
 		 * Initially, Call for Proposals (CFP) is expected
 		 */
 		CFP {
 			@Override
-			public State nextState(ACLMessage m, ContractNetResponder cn) {
-				cn.proposal = cn.handleCfp(m);
-				MTS.send(cn.proposal); // Sends Proposal to CFP
-				return ACRJ;
+			public State nextState(ACLMessage m, Behaviour b) {
+				ACLMessage prop = ((ContractNetResponder)b).proposal;
+				prop = ((ContractNetResponder)b).handleCfp(m);
+				MTS.send(prop); // Sends Proposal to CFP
+				return NOTIFICATION;
 			}
 
 			@Override
@@ -100,18 +119,19 @@ public class ContractNetResponder extends Behaviour {
 		 * with reject. If the agent sent a proposal, the following state 
 		 * is to keep waiting for  an ACCEPT_ or REJECT_PROPOSAL
 		 */
-		ACRJ {
+		NOTIFICATION {
 			@Override
-			public State nextState(ACLMessage m, ContractNetResponder cn) {
+			public State nextState(ACLMessage m, Behaviour b) {
+				ContractNetResponder cn = (ContractNetResponder)b;
 				if (m.getPerformative() == ACLMessage.REJECT_PROPOSAL) {
-					cn.handleRejectProposal(cn.cfp, cn.proposal, m);
+					cn .handleRejectProposal(cn.cfp, cn.proposal, m);
 					return CFP;
 				} else if (m.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
 					cn.handleAcceptProposal(cn.cfp, cn.proposal, m);
-					return Busy;
+					return BUSY;
 				}
 				
-				return ACRJ;
+				return NOTIFICATION;
 			}
 
 			@Override
@@ -127,10 +147,10 @@ public class ContractNetResponder extends Behaviour {
 		 * and get back to the CFP issuer later and send an INFORM when
 		 * that task is DONE. In this state, messages are ignored.
 		 */
-		Busy {
+		BUSY {
 			@Override
-			public State nextState(ACLMessage m, ContractNetResponder cn) {
-				return Busy;
+			public State nextState(ACLMessage m, Behaviour b) {
+				return BUSY;
 			}
 
 			@Override
@@ -140,22 +160,6 @@ public class ContractNetResponder extends Behaviour {
 				t.setPerformatives(performatives);
 			}
 		};
-
-		/**
-		 * Returns the next state, given a message and the behavior
-		 * @param m
-		 * @param re
-		 * @return
-		 */
-		public State nextState(ACLMessage m, ContractNetResponder cn) {
-			return null;
-		}
-
-		/**
-		 * 
-		 * @param t
-		 */
-		public void setTemplate(MessageTemplate t) {}
 	}
 
 
