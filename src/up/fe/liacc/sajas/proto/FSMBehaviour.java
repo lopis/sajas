@@ -14,7 +14,7 @@ import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 public abstract class FSMBehaviour extends Behaviour {
 
 	protected State protocolState;
-	protected MessageTemplate template;
+	protected MessageTemplate template = new MessageTemplate();
 
 	/**
 	 * Default constructor for the FSMBehaviour. Sets the owner agent.
@@ -25,6 +25,12 @@ public abstract class FSMBehaviour extends Behaviour {
 	}
 
 	@Override
+	/**
+	 * This method handles the execution of the state-machine-based behaviours.
+	 * It shouldn't be needed to override this method. Each subclass of
+	 * FSMBehaviour contains the proper handlers that should be
+	 * overridden for each state.
+	 */
 	public void action() {
 		ACLMessage nextMessage = this.getAgent().receive(template);
 		if (nextMessage != null) {
@@ -37,7 +43,9 @@ public abstract class FSMBehaviour extends Behaviour {
 	}
 
 	/**
-	 * Basic interface for 
+	 * Basic interface for the State Machine enums in the classes
+	 * that extend the FSMBehaviour. Those enums are expected to contain
+	 * multiple states which implement these two methods.
 	 * @author joaolopes
 	 *
 	 */

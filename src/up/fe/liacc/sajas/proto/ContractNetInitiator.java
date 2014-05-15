@@ -13,10 +13,8 @@ import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 
 
 @SuppressWarnings({ "rawtypes", "unchecked" }) // For compatibility with JADE. I'm so sorry.
-public class ContractNetInitiator extends Behaviour {
+public class ContractNetInitiator extends FSMBehaviour {
 
-	private MessageTemplate template;
-	private FSMBehaviour.State protocolState;
 	private String protocol = FIPANames.InteractionProtocol.FIPA_CONTRACT_NET;
 	
 	// This vector contains the agents who received the CFP
@@ -49,34 +47,10 @@ public class ContractNetInitiator extends Behaviour {
 	 * @param cfp The return value must be an array list containing just 
 	 * the CFP.
 	 */
-	private ArrayList<ACLMessage> prepareCfps(ACLMessage cfp) {
+	public ArrayList<ACLMessage> prepareCfps(ACLMessage cfp) {
 		ArrayList<ACLMessage> cfps = new ArrayList<ACLMessage>();
 		cfps.add(cfp);
-		return cfps;		
-	}
-
-	@Override
-	public void action() {
-		/*
-		 * This method is scheduled in Repast.
-		 * On each tick, do:
-		 *  1 - Get one message matching the template
-		 *  2 - Read the performative in the message
-		 *  3 - Call the appropriate handler
-		 *  4 - Remove the responding agent from the wait list
-		 *  5 - If wait list is empty, run the appropriate "handle all"
-		 *  6 - Update the protocol state 
-		 */
-
-		// Retrieve one message from the mailbox
-		ACLMessage nextMessage = this.getAgent().receive(template);
-		if (nextMessage != null) {
-			
-			// Update the state
-			protocolState = protocolState.nextState(nextMessage, this);
-			// Update the template
-			protocolState.setTemplate(template);
-		}
+		return cfps;
 	}
 	
 	
@@ -87,7 +61,7 @@ public class ContractNetInitiator extends Behaviour {
 	 * @return True if all agents responded.
 	 */
 	protected boolean isAllResponded() {
-		return responders.size() == 1; //TODO HACk. Fix the DF search method
+		return responders.size() == 1;
 	}
 
 	/**

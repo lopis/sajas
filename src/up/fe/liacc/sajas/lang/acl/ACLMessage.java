@@ -251,6 +251,10 @@ public class ACLMessage {
 	 * @return True if all fields (expected those ignored) match the template's. 
 	 */
 	public boolean match(MessageTemplate template) {
+		
+		if (template == null)
+			return false;
+		
 		try {
 			return template.matchesPerformative(this.getPerformative()) 
 				&& template.matchesProtocol(this.getProtocol())

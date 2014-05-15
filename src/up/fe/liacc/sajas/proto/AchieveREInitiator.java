@@ -34,7 +34,7 @@ import up.fe.liacc.sajas.lang.acl.MessageTemplate;
  *
  */
 @SuppressWarnings({ "rawtypes" })
-public class AchieveREInitiator extends Behaviour {
+public class AchieveREInitiator extends FSMBehaviour {
 
 	private MessageTemplate template;
 	private State protocolState;
@@ -60,8 +60,8 @@ public class AchieveREInitiator extends Behaviour {
 		
 		// Set the template that will filter the responses
 		template = new MessageTemplate();
-		protocol = FIPANames.InteractionProtocol.FIPA_REQUEST; //FIXME this shouldn't be fixed
-		protocolState = State.ARI;
+		protocol = FIPANames.InteractionProtocol.FIPA_REQUEST;
+		protocolState = State.RESPONSE;
 		protocolState.setTemplate(template);
 		
 		waitingList = new ArrayList<AID>();
@@ -83,7 +83,6 @@ public class AchieveREInitiator extends Behaviour {
 	/**
 	 * This method is called when all the responses have been collected or
 	 * when the timeout is expired.
-	 * TODO implement timeout for result
 	 */ 
 	protected void handleAllResponses(Vector responses) {}
 
@@ -121,42 +120,12 @@ public class AchieveREInitiator extends Behaviour {
 	 */
 	protected void handleNotUnderstood() {}
 
-	@Override
-	public void action() {
-		/*
-		 * This method is scheduled in Repast.
-		 * On each tick, do:
-		 *  1 - Get one message matching the template
-		 *  2 - Read the performative in the message
-		 *  3 - Call the appropriate handler
-		 *  4 - Remove the responding agent from the wait list TODO: implement wait list
-		 *  5 - If wait list is empty, run the appropriate "handle all"
-		 *  6 - Update the protocol state 
-		 */
-
-		// Retrieve one message from the mailbox
-		ACLMessage nextMessage = this.getAgent().receive(template);
-		if (nextMessage != null) {
-			if (nextMessage.getPerformative() == ACLMessage.INFORM
-				|| nextMessage.getPerformative() == ACLMessage.FAILURE) {
-				
-			}
-			// Update the state
-			protocolState = protocolState.nextState(nextMessage, this);
-			// Update the template
-			protocolState.setTemplate(template);
-		}
-		
-		
-	}
-	
 	/**
 	 * Verifies is all agents already responded with
 	 * AGREE/REJECT/NOT_UNDERSTOOD
 	 * @return
 	 */
 	protected boolean isAllResponded() {
-		// TODO implement wait list for AGREE/REFUSE
 		return true;
 	}
 
@@ -192,21 +161,22 @@ public class AchieveREInitiator extends Behaviour {
 	 * @author joaolopes
 	 *
 	 */
-	private enum State {
+	private enum State implements FSMBehaviour.State {
 
 		/**
-		 * Initially, Agree/Refuse/Inform are expected
+		 * Initially, a response of Agree/Refuse/Inform is expected
 		 */
-		ARI {
+		RESPONSE {
 			@Override
-			public State nextState(ACLMessage m, AchieveREInitiator re) {
+			public State nextState(ACLMessage m, Behaviour b) {
+				AchieveREInitiator re = (AchieveREInitiator) b;
 				if (re.isAllResponded()) {
 					return In;
 				} else if (re.isAllResulted()) {
-					return Dead;
+					return FINISHED;
 				}
 				else {
-					return ARI;
+					return RESPONSE;
 				}
 			}
 			
@@ -226,9 +196,10 @@ public class AchieveREInitiator extends Behaviour {
 		 */
 		In {
 			@Override
-			public State nextState(ACLMessage m, AchieveREInitiator re) {
+			public State nextState(ACLMessage m, Behaviour b) {
+				AchieveREInitiator re = (AchieveREInitiator) b;
 				if (re.isAllResulted()) {
-					return Dead;
+					return FINISHED;
 				}
 				else {
 					return In;
@@ -246,24 +217,20 @@ public class AchieveREInitiator extends Behaviour {
 		/**
 		 * Final state. 
 		 */
-		Dead
+		FINISHED {
+
+			@Override
+			public up.fe.liacc.sajas.proto.FSMBehaviour.State nextState(
+					ACLMessage message, Behaviour behaviour) {
+				return FINISHED;
+			}
+
+			@Override
+			public void setTemplate(MessageTemplate t) {}
+			
+		}
 		;
 
-		/**
-		 * Returns the next state, given a message and the behavior
-		 * @param m
-		 * @param re
-		 * @return
-		 */
-	    public State nextState(ACLMessage m, AchieveREInitiator re) {
-	        return null;
-	    }
-	    
-	    /**
-	     * 
-	     * @param t
-	     */
-	    public void setTemplate(MessageTemplate t) {}
 	}
 
 }

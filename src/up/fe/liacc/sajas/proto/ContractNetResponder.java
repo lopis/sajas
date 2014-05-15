@@ -31,24 +31,6 @@ public class ContractNetResponder extends FSMBehaviour {
 		this.template = template;
 	}
 
-	@Override
-	public void action() {
-		// Retrieve one message from the mailbox
-		if (template == null) {
-			template = new MessageTemplate();
-		}
-		
-		ACLMessage nextMessage = this.getAgent().receive(template);
-		
-		if (nextMessage != null) {
-
-			// Update the state
-			protocolState = protocolState.nextState(nextMessage, this);
-			// Update the template
-			protocolState.setTemplate(template);
-		}
-	}
-
 
 	/**
 	 * Called when a new Call for Proposals arrives. This default
