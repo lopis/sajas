@@ -113,5 +113,23 @@ public class MessageTemplate {
 			getProtocols().add(protocol);
 		}
 	}
+	
+	public void addPerformative(int performative) {
+		if (!getPerformatives().contains(performative)) {
+			getPerformatives().add(performative);
+		}
+	}
+
+	public static MessageTemplate MatchProtocol(String protocol) {
+		MessageTemplate mt = new MessageTemplate();
+		mt.addProtocol(protocol);
+		return mt;
+	}
+
+	public static Object MatchPerformative(int performative) {
+		MessageTemplate mt = new MessageTemplate();
+		mt.addPerformative(performative);
+		return mt;
+	}
 
 }
