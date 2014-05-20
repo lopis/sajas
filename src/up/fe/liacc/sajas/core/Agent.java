@@ -13,6 +13,8 @@ import up.fe.liacc.sajas.lang.acl.MessageTemplate;
  *
  */
 public abstract class Agent {
+	
+	private String name;
 
 	/**
 	 * Agent identifier
@@ -49,8 +51,20 @@ public abstract class Agent {
 		}
 		return mailBox;
 	}
+	
+	public void setLocalName(String name) {
+		this.name = name;
+	}
+	
+	public String getLocalName() {
+		return name;
+	}
 
 	
+	public String getName() {
+		return name;
+	}
+
 	/**
 	 * 
 	 * @param template The template to filter messages.
@@ -87,7 +101,7 @@ public abstract class Agent {
 	 * Adds a behavior to this agent's execution.
 	 * @param behavior
 	 */
-	protected abstract void addBehaviour(Behaviour behaviour);
+	public abstract void addBehaviour(Behaviour behaviour);
 
 	protected abstract void removeBehaviour(Behaviour behaviour);
 	
@@ -96,7 +110,7 @@ public abstract class Agent {
 	 * This default implementation is empty and should be extended
 	 * if needed.
 	 */
-	public void setup(){}
+	protected void setup(){}
 
 	public void doDelete() {
 		for (Behaviour behaviour : behaviours) {
@@ -119,5 +133,9 @@ public abstract class Agent {
 
 	public void setBehaviours(ArrayList<Behaviour> behaviours) {
 		this.behaviours = behaviours;
+	}
+
+	public void setupAgent() {
+		setup();
 	}
 }

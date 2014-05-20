@@ -11,7 +11,7 @@ public class AgentController {
 	}
 	
 	public void start() {
-		a.setup();
+		a.setupAgent();
 	}
 
 	

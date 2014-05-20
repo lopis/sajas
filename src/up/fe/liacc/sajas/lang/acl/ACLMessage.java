@@ -40,16 +40,19 @@ public class ACLMessage {
 	final static public int SUBSCRIBE = 22;
 	final static public int NO_PERFORMATIVE = -1;
 	
-	private int performative = NO_PERFORMATIVE;	// The intent of the message
+	private int performative = NO_PERFORMATIVE;			// The intent of the message
 	private String protocol = FIPANames.InteractionProtocol.FIPA_REQUEST;	// The intent of the message defaults to REQUEST
-	private Serializable contentObject; // Any object can be attached to the message
-	private AID sender; // The sender must be set so the receiver can reply
+	private Serializable contentObject; 				// Any object can be attached to the message
+	private AID sender; 								// The sender must be set so the receiver can reply
 	private ArrayList<AID> receivers;
-	private String replyWith; // Tag to identify a "thread" of communication
-	private String inReplyTo; // This value comes from "replyWith"
-	private long when = 0; // Deadline for the response.
-	private StringBuffer contentString;
-	public static final long NO_WHEN = 0;
+	private String replyWith; 							// Tag to identify a "thread" of communication
+	private String inReplyTo; 							// This value comes from "replyWith"
+	private long when = 0; 								// Deadline for the response.
+	private StringBuffer contentString;					// The content in string format
+	private String language;							// The langage of the message
+	private Object ontology;
+	private Object convId;
+
 	
 	/**
 	 * Creates a new ACL Message. The fields replyWith and inReplyTo are not
@@ -241,6 +244,38 @@ public class ACLMessage {
 		this.when = when;
 	}
 	
+	public StringBuffer getContentString() {
+		return contentString;
+	}
+
+	public void setContentString(StringBuffer contentString) {
+		this.contentString = contentString;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+	
+	public Object getOntology() {
+		return ontology;
+	}
+
+	public void setOntology(Object ontology) {
+		this.ontology = ontology;
+	}
+
+	public Object getConvId() {
+		return convId;
+	}
+
+	public void setConvId(Object convId) {
+		this.convId = convId;
+	}
+
 	/**
 	 * This methods expects a "template", which is basically an ACLMessage
 	 * with part or all of its fields set. All template's fields are compared
@@ -284,5 +319,27 @@ public class ACLMessage {
 		
 		return newMessage;
 	}
+
+	/**
+	 * Sreate a new ACLMessage that is a reply to this message.
+	 * In particular, it sets the following parameters of the
+	 * new message: receiver, language, ontology, protocol,
+	 * conversation-id, in-reply-to, reply-with. The programmer
+	 * needs to set the communicative-act and the content.
+	 * Of course, if he wishes to do that, he can reset any
+	 * of the fields.
+	 * @return
+	 */
+	public ACLMessage createReply() {
+		ACLMessage reply = new ACLMessage(performative);
+		reply.addReceiver(sender);
+		reply.setLanguage(language);
+		reply.setOntology(ontology);
+		reply.setProtocol(protocol);
+		reply.setConvId(convId);
+		return reply;
+	}
+	
+	
 
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import up.fe.liacc.sajas.core.Agent;
 import up.fe.liacc.sajas.core.behaviours.Behaviour;
-import up.fe.liacc.sajas.domain.FIPANames;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
 import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 
@@ -12,11 +11,13 @@ public class AchieveREResponder extends FSMBehaviour {
 
 	protected MessageTemplate template;
 
-	public AchieveREResponder(Agent agent) {
+	public AchieveREResponder(Agent agent, MessageTemplate template) {
 		super(agent);
 
-		template = createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
-		template.addProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+		//template = createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
+		//template.addProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+		
+		this.template = template;
 
 		protocolState = State.RESPONSE;
 		protocolState.setTemplate(template);
@@ -43,7 +44,7 @@ public class AchieveREResponder extends FSMBehaviour {
 	//		}
 	//	}
 
-	private MessageTemplate createMessageTemplate(String protocol) {
+	public static MessageTemplate createMessageTemplate(String protocol) {
 		MessageTemplate template = new MessageTemplate();
 		template.addProtocol(protocol);
 		return template;
@@ -63,8 +64,11 @@ public class AchieveREResponder extends FSMBehaviour {
 	 * This method is called every tick if there is a message to process.
 	 * This default implementation does nothing and should be overridden.
 	 * @param nextMessage
+	 * @return 
 	 */
-	public void handleRequest(ACLMessage nextMessage) {}
+	protected ACLMessage handleRequest(ACLMessage nextMessage) {
+		return null;
+	}
 
 	private enum State implements FSMBehaviour.State {
 

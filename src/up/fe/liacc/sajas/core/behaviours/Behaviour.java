@@ -23,6 +23,12 @@ public abstract class Behaviour {
 	}
 	
 	/**
+	 * Default constructor. It does not set
+	 * the owner agent for this behaviour.
+  	 */
+	public Behaviour() {}
+
+	/**
 	 * This is the body of the behavior and the
 	 * method that is executed when the behavior is executed.
 	 */
@@ -34,5 +40,19 @@ public abstract class Behaviour {
 
 	public void setAgent(Agent owner) {
 		this.myAgent = owner;
+	}
+
+	public void reset() {
+		// TODO Auto-generated method stub
+	}
+
+	public int onEnd() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public boolean done() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
