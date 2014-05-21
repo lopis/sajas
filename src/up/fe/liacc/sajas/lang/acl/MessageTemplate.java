@@ -33,6 +33,9 @@ public class MessageTemplate {
 	private ArrayList<String> conversationIds;
 
 	public ArrayList<Integer> getPerformatives() {
+		if (performatives == null) {
+			performatives = new ArrayList<Integer>();
+		}
 		return performatives;
 	}
 

@@ -1,18 +1,16 @@
 package up.fe.liacc.sajas.proto;
 
-import java.util.ArrayList;
-
 import up.fe.liacc.sajas.MTS;
 import up.fe.liacc.sajas.core.Agent;
-import up.fe.liacc.sajas.core.behaviours.Behaviour;
+import up.fe.liacc.sajas.core.behaviours.SimpleBehaviour;
 import up.fe.liacc.sajas.domain.FIPANames;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
 import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 
 public class ContractNetResponder extends FSMBehaviour {
-	
+
 	private String protocol = FIPANames.InteractionProtocol.FIPA_CONTRACT_NET;
-	
+
 	/**
 	 * The last CFP received. The protocol only handles one CFP at a time.
 	 */
@@ -21,14 +19,18 @@ public class ContractNetResponder extends FSMBehaviour {
 	 *  The response to the CFP. Should contain a PROPOSE, REFUSE or NOT_UNDERSTAND message.
 	 */
 	private ACLMessage proposal;
+	private MessageTemplate template;
 
 	public ContractNetResponder(Agent agent, MessageTemplate template) {
-		super(agent);
-		
-		template.addProtocol(protocol);
-		protocolState = State.CFP;
-		protocolState.setTemplate(template);
+		myAgent = agent;
 		this.template = template;
+
+		registerFirstState(new StateCFP(), StateCFP.name);
+		registerState(new StateNotification(), StateNotification.name);
+		registerLastState(new StateBusy(), StateBusy.name);
+		
+		registerTransition(StateCFP.name, StateNotification.name, 1);
+		registerTransition(StateNotification.name, StateBusy.name, 1);
 	}
 
 
@@ -46,13 +48,15 @@ public class ContractNetResponder extends FSMBehaviour {
 
 	protected void handleRejectProposal(ACLMessage cfp,
 			ACLMessage propose, ACLMessage accept) {}
-	
+
 	public static MessageTemplate createMessageTemplate(String protocol) {
-		State s = State.CFP;
 		MessageTemplate newMessageTemplate = new MessageTemplate();
 		newMessageTemplate.addProtocol(protocol);
-		s.setTemplate(newMessageTemplate);
 		return newMessageTemplate;
+	}
+	
+	public ACLMessage receive(MessageTemplate template) {
+		return myAgent.receive(template);
 	}
 
 	/**
@@ -74,75 +78,119 @@ public class ContractNetResponder extends FSMBehaviour {
 	 * @author joaolopes
 	 *
 	 */
-	private enum State implements FSMBehaviour.State {
+	private abstract class State extends SimpleBehaviour {
 
-		/**
-		 * Initially, Call for Proposals (CFP) is expected
-		 */
-		CFP {
-			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				ACLMessage prop = ((ContractNetResponder)b).proposal;
-				prop = ((ContractNetResponder)b).handleCfp(m);
-				MTS.send(prop); // Sends Proposal to CFP
-				return NOTIFICATION;
-			}
+		protected MessageTemplate t;
+		protected static final String name = "";
+		protected short isFinished = 0;
 
-			@Override
-			public void setTemplate(MessageTemplate t) {
-				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(ACLMessage.CFP);
-				t.setPerformatives(performatives);
-			}
-		}, 
+		public abstract String nextState(ACLMessage m);
+		public abstract void setTemplate(MessageTemplate t);
 
-		/**
-		 * After receiving a CFP, the agent replies with a proposal or
-		 * with reject. If the agent sent a proposal, the following state 
-		 * is to keep waiting for  an ACCEPT_ or REJECT_PROPOSAL
-		 */
-		NOTIFICATION {
-			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				ContractNetResponder cn = (ContractNetResponder)b;
-				if (m.getPerformative() == ACLMessage.REJECT_PROPOSAL) {
-					cn .handleRejectProposal(cn.cfp, cn.proposal, m);
-					return CFP;
-				} else if (m.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
-					cn.handleAcceptProposal(cn.cfp, cn.proposal, m);
-					return BUSY;
-				}
-				
-				return NOTIFICATION;
+		@Override
+		public void action() {
+			if (t == null) {
+				t = template;
 			}
+			setTemplate(template);
+			ACLMessage nextMessage = receive(template);
+			if (nextMessage != null) {
+				setCurrentState(nextState(nextMessage));
+			}
+			isFinished = 0;
+		}
 
-			@Override
-			public void setTemplate(MessageTemplate t) {
-				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(ACLMessage.INFORM);
-				t.setPerformatives(performatives);
-			}
-		},
+		@Override
+		public int onEnd() {
+			return isFinished;
+		}
 
-		/**
-		 * After the proposal is accepted, the agent can do some task
-		 * and get back to the CFP issuer later and send an INFORM when
-		 * that task is DONE. In this state, messages are ignored.
-		 */
-		BUSY {
-			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				return BUSY;
-			}
-
-			@Override
-			public void setTemplate(MessageTemplate t) {
-				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(ACLMessage.INFORM);
-				t.setPerformatives(performatives);
-			}
-		};
 	}
+
+	/**
+	 * Initially, Call for Proposals (CFP) is expected
+	 */
+	public class StateCFP extends State {
+		
+		protected static final String name = "cfp";
+		
+		@Override
+		public String nextState(ACLMessage m) {
+
+			ACLMessage prop = proposal;
+			prop = handleCfp(m);
+			MTS.send(prop); // Sends Proposal to CFP
+			isFinished = 1;
+			return StateNotification.name;
+		}
+
+		@Override
+		public void setTemplate(MessageTemplate t) {
+			if (t == null) {
+				t = template;
+			}
+			t.addPerformative(ACLMessage.CFP);
+			t.addProtocol(protocol);
+		}
+	}
+
+	/**
+	 * After receiving a CFP, the agent replies with a proposal or
+	 * with reject. If the agent sent a proposal, the following state 
+	 * is to keep waiting for  an ACCEPT_ or REJECT_PROPOSAL
+	 */
+	public class StateNotification extends State {
+		
+		protected static final String name = "notify";
+		
+		@Override
+		public String nextState(ACLMessage m) {
+
+			if (m.getPerformative() == ACLMessage.REJECT_PROPOSAL) {
+				handleRejectProposal(cfp, proposal, m);
+				isFinished = 1;
+				return StateCFP.name;
+			} else if (m.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
+				handleAcceptProposal(cfp, proposal, m);
+				isFinished = 1;
+				return StateBusy.name;
+			}
+
+			isFinished = 0;
+			return name;
+		}
+
+		@Override
+		public void setTemplate(MessageTemplate t) {
+			t = new MessageTemplate();
+			t.addPerformative(ACLMessage.INFORM);
+			t.addProtocol(protocol);
+		}
+	}
+
+	/**
+	 * After the proposal is accepted, the agent can do some task
+	 * and get back to the CFP issuer later and send an INFORM when
+	 * that task is DONE. In this state, messages are ignored.
+	 */
+	public class StateBusy extends State {
+		
+		protected static final String name = "busy";
+		
+		@Override
+		public String nextState(ACLMessage m) {
+			isFinished = 0;
+			return name;
+		}
+
+		@Override
+		public void setTemplate(MessageTemplate t) {
+			t = new MessageTemplate();
+			t.addPerformative(ACLMessage.INFORM);
+			t.addProtocol(protocol);
+		}
+	}
+
 
 
 }

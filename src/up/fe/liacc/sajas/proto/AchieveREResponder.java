@@ -12,15 +12,15 @@ public class AchieveREResponder extends FSMBehaviour {
 	protected MessageTemplate template;
 
 	public AchieveREResponder(Agent agent, MessageTemplate template) {
-		super(agent);
+		myAgent = agent;
 
 		//template = createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
 		//template.addProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 		
-		this.template = template;
-
-		protocolState = State.RESPONSE;
-		protocolState.setTemplate(template);
+//		this.template = template;
+//
+//		protocolState = State.RESPONSE;
+//		protocolState.setTemplate(template);
 	}
 
 	//	@Override
@@ -70,76 +70,76 @@ public class AchieveREResponder extends FSMBehaviour {
 		return null;
 	}
 
-	private enum State implements FSMBehaviour.State {
-
-		/**
-		 * Initially, a response of Agree/Refuse/Inform is expected
-		 */
-		RESPONSE {
-			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				AchieveREInitiator re = (AchieveREInitiator) b;
-				if (re.isAllResponded()) {
-					return In;
-				} else if (re.isAllResulted()) {
-					return FINISHED;
-				}
-				else {
-					return RESPONSE;
-				}
-			}
-
-			@Override
-			public void setTemplate(MessageTemplate t) {
-				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(ACLMessage.AGREE);
-				performatives.add(ACLMessage.REFUSE);
-				performatives.add(ACLMessage.INFORM);
-				t.setPerformatives(performatives);
-			}
-		}, 
-
-		/**
-		 * After receiving an Inform or all AGREEs/REFUSEs,
-		 * the protocol skips to this state;
-		 */
-		In {
-			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				AchieveREInitiator re = (AchieveREInitiator) b;
-				if (re.isAllResulted()) {
-					return FINISHED;
-				}
-				else {
-					return In;
-				}
-			}
-
-			@Override
-			public void setTemplate(MessageTemplate t) {
-				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(ACLMessage.INFORM);
-				t.setPerformatives(performatives);
-			}
-		},
-
-		/**
-		 * Final state. 
-		 */
-		FINISHED {
-
-			@Override
-			public up.fe.liacc.sajas.proto.FSMBehaviour.State nextState(
-					ACLMessage message, Behaviour behaviour) {
-				return FINISHED;
-			}
-
-			@Override
-			public void setTemplate(MessageTemplate t) {}
-
-		}
-		;
-
-	}
+//	private enum State implements FSMBehaviour.State {
+//
+//		/**
+//		 * Initially, a response of Agree/Refuse/Inform is expected
+//		 */
+//		RESPONSE {
+//			@Override
+//			public State nextState(ACLMessage m, Behaviour b) {
+//				AchieveREInitiator re = (AchieveREInitiator) b;
+//				if (re.isAllResponded()) {
+//					return In;
+//				} else if (re.isAllResulted()) {
+//					return FINISHED;
+//				}
+//				else {
+//					return RESPONSE;
+//				}
+//			}
+//
+//			@Override
+//			public void setTemplate(MessageTemplate t) {
+//				ArrayList<Integer> performatives = new ArrayList<Integer>();
+//				performatives.add(ACLMessage.AGREE);
+//				performatives.add(ACLMessage.REFUSE);
+//				performatives.add(ACLMessage.INFORM);
+//				t.setPerformatives(performatives);
+//			}
+//		}, 
+//
+//		/**
+//		 * After receiving an Inform or all AGREEs/REFUSEs,
+//		 * the protocol skips to this state;
+//		 */
+//		In {
+//			@Override
+//			public State nextState(ACLMessage m, Behaviour b) {
+//				AchieveREInitiator re = (AchieveREInitiator) b;
+//				if (re.isAllResulted()) {
+//					return FINISHED;
+//				}
+//				else {
+//					return In;
+//				}
+//			}
+//
+//			@Override
+//			public void setTemplate(MessageTemplate t) {
+//				ArrayList<Integer> performatives = new ArrayList<Integer>();
+//				performatives.add(ACLMessage.INFORM);
+//				t.setPerformatives(performatives);
+//			}
+//		},
+//
+//		/**
+//		 * Final state. 
+//		 */
+//		FINISHED {
+//
+//			@Override
+//			public State nextState(
+//					ACLMessage message, Behaviour behaviour) {
+//				return FINISHED;
+//			}
+//
+//			@Override
+//			public void setTemplate(MessageTemplate t) {}
+//
+//		}
+//		;
+//
+//	}
 
 }

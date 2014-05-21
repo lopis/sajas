@@ -6,7 +6,7 @@ import java.util.Vector;
 import up.fe.liacc.sajas.MTS;
 import up.fe.liacc.sajas.core.AID;
 import up.fe.liacc.sajas.core.Agent;
-import up.fe.liacc.sajas.core.behaviours.Behaviour;
+import up.fe.liacc.sajas.core.behaviours.SimpleBehaviour;
 import up.fe.liacc.sajas.domain.FIPANames;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
 import up.fe.liacc.sajas.lang.acl.MessageTemplate;
@@ -16,11 +16,13 @@ import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 public class ContractNetInitiator extends FSMBehaviour {
 
 	private String protocol = FIPANames.InteractionProtocol.FIPA_CONTRACT_NET;
-	
+
 	// This vector contains the agents who received the CFP
 	private ArrayList<AID> responders;
 	protected Vector responses = new Vector();
 	protected Vector acceptances = new Vector();
+
+	private ACLMessage cfp;
 
 	/**
 	 * Default super constructor.
@@ -29,13 +31,21 @@ public class ContractNetInitiator extends FSMBehaviour {
 	 * @param message
 	 */
 	public ContractNetInitiator(Agent agent, ACLMessage cfp) {
-		super(agent);
-		template = new MessageTemplate();
-		template.addProtocol(protocol);
-		protocolState = State.PROPOSAL;
-		protocolState.setTemplate(template);
-		responders = cfp.getReceivers();
-		MTS.send(prepareCfps(cfp).get(0)); // Send the CFP
+		myAgent = agent;
+		this.cfp = cfp;
+		
+		registerFirstState(new StateSendCFP(), StateSendCFP.name);
+		registerState(new StatePropose(), StatePropose.name);
+		registerState(new StateInform(), StateInform.name);
+		registerLastState(new StateFinished(), StateFinished.name);
+		
+		registerTransition(StateSendCFP.name, StatePropose.name, 1);
+		registerTransition(StatePropose.name, StateInform.name, 1);
+		registerTransition(StateInform.name, StateFinished.name, 1);
+	}
+	
+	public ACLMessage receive(MessageTemplate template) {
+		return myAgent.receive(template);
 	}
 
 	/**
@@ -52,8 +62,8 @@ public class ContractNetInitiator extends FSMBehaviour {
 		cfps.add(cfp);
 		return cfps;
 	}
-	
-	
+
+
 
 	/**
 	 * Verifies if all agents that received the call for proposals
@@ -71,7 +81,7 @@ public class ContractNetInitiator extends FSMBehaviour {
 	protected boolean isInformed() {
 		return false;
 	}
-	
+
 	/**
 	 * Called when all agents submitted their Proposals
 	 * or when the CFP timeout expires. This default implementation
@@ -81,121 +91,170 @@ public class ContractNetInitiator extends FSMBehaviour {
 	 * that replied to the CFP. This vector is a list of ACCEPT/REJECT PROPOSAL.
 	 */
 	protected void handleAllResponses(Vector responses, Vector acceptances) {}
-	
+
 
 
 	protected void handleRefuse(ACLMessage m) {}
-	
+
 	protected void handlePropose(ACLMessage m, Vector acceptances) {}
+
+	
+	private abstract class State extends SimpleBehaviour {
+
+		protected MessageTemplate template = new MessageTemplate();
+		protected static final String name = "";
+		protected short isFinished = 0;
+		
+		public abstract String nextState(ACLMessage m);
+		public abstract void setTemplate(MessageTemplate t);
+		
+		@Override
+		public void action() {
+			setTemplate(template);
+			ACLMessage nextMessage = receive(template);
+			if (nextMessage != null) {
+				setCurrentState(nextState(nextMessage));
+			} else {
+				setCurrentState(nextState());
+			}	
+		}
+		
+		protected String nextState() {
+			isFinished = 0;
+			return name;
+		}
+		
+		@Override
+		public int onEnd() {
+			return isFinished;
+		}
+		
+	}
 	
 	/**
-	 * This enum implements the FSMBehaviour.State interface and
-	 * represents the state machine of the Contract Net Initiator.
-	 * This protocol has three different states: PROPOSAL, INFORM,
-	 * and FINISHED.
-	 * <li> PROPOSAL: the CFP was sent and the initiator is waiting
-	 * for proposals. When a propose arrives, the initiator calls
-	 * the appropriate handler for REFUSE or PROPOSE. That responder
-	 * is removed from the repsonders list. Is there are no responders
-	 * left, change to INFORM state; otherwise, stay in PROPOSAL.</li>
-	 * <li> INFORM: all proposals were sent and the initiator expects
-	 * to receive "informs" from the other agents. Stay in this state
-	 * until all informs were received. Change state to the FINISHED
-	 * when that happens.
+	 * Initial state. State changes to StateProposal
+	 * after issuing the CFP.
 	 * @author joaolopes
 	 *
 	 */
-	private enum State implements FSMBehaviour.State {
-
-		/**
-		 * After sending a call for proposals, expect PROPOSAL
-		 * TODO: implement CFP timeout
-		 */
-		PROPOSAL {
-			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				ContractNetInitiator cn = (ContractNetInitiator) b;
-				
-				// Since we know the message matches the template,
-				// we can assume it's a valid propose or refuse.
-				cn.responses.add(m);
-				
-				// Remove the sender from the list	
-				// TODO: Should the protocol accept more messages from this sender?
-				// 		 Or should further "proposals" from this agent be ignored?
-				cn.responders.remove(m.getSender());		
-				
-				if (m.getPerformative() == ACLMessage.REFUSE) {
-					cn.handleRefuse(m);
-				} else if (m.getPerformative() == ACLMessage.PROPOSE) {
-					cn.handlePropose(m, cn.acceptances);
-				}
-				
-				if (cn.isAllResponded()) {
-					
-					// This vector will be populated by the "handle all" method
-					
-					cn.handleAllResponses(cn.responses, cn.acceptances);
-					for (Object aclMessage : cn.acceptances) {
-						// Send all "ACCEPT PROPOSE" or "REJECT PROPOSE"
-						MTS.send((ACLMessage) aclMessage);
-					}
-					
-					return INFORM;
-					
-				} else {
-					return PROPOSAL;
-				}
-			}
-			
-			@Override
-			public void setTemplate(MessageTemplate t) {
-				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(ACLMessage.PROPOSE);
-				performatives.add(ACLMessage.REFUSE);
-				t.setPerformatives(performatives);
-			}
-		}, 
+	public class StateSendCFP extends State {
 		
-		/**
-		 * After receiving an Inform or all AGREEs/REFUSEs,
-		 * the protocol skips to this state;
-		 */
-		INFORM {
-			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				if (((ContractNetInitiator) b).isInformed()) {
-					return FINISHED;
-				} else {
-					return INFORM;
-				}
-			}
-			
-			@Override
-			public void setTemplate(MessageTemplate t) {
-				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(ACLMessage.INFORM);
-				t.setPerformatives(performatives);
-			}
-		},
+		protected static final String name = "sendCFP";
+
+		@Override
+		public String nextState(ACLMessage m) {
+			responders = cfp.getReceivers();
+			MTS.send(prepareCfps(cfp).get(0)); // Send the CFP
+			isFinished = 1;
+			return StatePropose.name;
+		}
 		
-		/**
-		 * Final state. 
-		 */
-		FINISHED {
-			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				return FINISHED;
-			}
+		@Override
+		protected String nextState() {
+			return nextState(null);
+		}
 
-			@Override
-			public void setTemplate(MessageTemplate t) {}
-		};
-
-
+		@Override
+		public void setTemplate(MessageTemplate t) {}
+		
 	}
 
+	/**
+	 * After sending a call for proposals, expects PROPOSAL
+	 * TODO: implement CFP timeout
+	 */
+	public class StatePropose extends State {
 
-	
+		protected static final String name = "propose";
+
+		public String nextState(ACLMessage m) {
+
+			// Since we know the message matches the template,
+			// we can assume it's a valid propose or refuse.
+			responses.add(m);
+
+			// Remove the sender from the list	
+			// TODO: Should the protocol accept more messages from this sender?
+			// 		 Or should further "proposals" from this agent be ignored?
+			responders.remove(m.getSender());
+
+			if (m.getPerformative() == ACLMessage.REFUSE) {
+				handleRefuse(m);
+			} else if (m.getPerformative() == ACLMessage.PROPOSE) {
+				handlePropose(m, acceptances);
+			}
+
+			if (isAllResponded()) {
+
+				// This vector will be populated by the "handle all" method
+
+				handleAllResponses(responses, acceptances);
+				for (Object aclMessage : acceptances) {
+					// Send all "ACCEPT PROPOSE" or "REJECT PROPOSE"
+					MTS.send((ACLMessage) aclMessage);
+				}
+				isFinished = 1;
+				return StateInform.name;
+
+			} else {
+				isFinished = 0;
+				return name;
+			}
+		}
+		
+		protected String nextState() {
+			isFinished = 0;
+			return name;
+		}
+
+		public void setTemplate(MessageTemplate t) {
+			t.addPerformative(ACLMessage.PROPOSE);
+			t.addPerformative(ACLMessage.REFUSE);
+			t.addProtocol(protocol);
+		}
+	}
+
+	/**
+	 * After receiving an Inform or all AGREEs/REFUSEs,
+	 * the protocol skips to this state;
+	 */
+	public class StateInform extends State {
+		
+		protected static final String name = "inform";
+		
+		@Override
+		public String nextState(ACLMessage m) {
+			if (isInformed()) {
+				isFinished = 1;
+				return StateFinished.name;
+			} else {
+				isFinished = 0;
+				return name;
+			}
+		}
+
+		@Override
+		public void setTemplate(MessageTemplate t) {
+			t.addPerformative(ACLMessage.INFORM);
+			t.addProtocol(protocol);
+		}
+	}
+
+	public class StateFinished extends State {
+		
+		protected static final String name = "finished";
+
+		@Override
+		public String nextState(ACLMessage m) {
+			isFinished = 0; // the protocol is finished, but this state is technically never finished.
+			return name;
+		}
+
+		@Override
+		public void setTemplate(MessageTemplate t) {
+			t = null;
+		}
+
+	}
 
 }
