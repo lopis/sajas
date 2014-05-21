@@ -1,9 +1,7 @@
-package up.fe.liacc.sajas.proto;
+package up.fe.liacc.sajas.core.behaviours;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import up.fe.liacc.sajas.core.behaviours.Behaviour;
 
 /**
  * Common superclass of all state-machine-based protocols.
