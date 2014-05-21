@@ -56,8 +56,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 	 * @param agent The message to be sent by this behavior.
 	 */
 	public AchieveREInitiator(Agent agent, ACLMessage message) {
-		super(agent);
-		
+		myAgent = agent;
 		// Set the template that will filter the responses
 		template = new MessageTemplate();
 		protocol = FIPANames.InteractionProtocol.FIPA_REQUEST;
@@ -161,7 +160,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 	 * @author joaolopes
 	 *
 	 */
-	private enum State implements FSMBehaviour.State {
+	private enum State implements FSM {
 
 		/**
 		 * Initially, a response of Agree/Refuse/Inform is expected
@@ -220,7 +219,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 		FINISHED {
 
 			@Override
-			public up.fe.liacc.sajas.proto.FSMBehaviour.State nextState(
+			public up.fe.liacc.sajas.proto.FSM nextState(
 					ACLMessage message, Behaviour behaviour) {
 				return FINISHED;
 			}

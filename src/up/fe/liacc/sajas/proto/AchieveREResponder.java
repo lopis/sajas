@@ -10,9 +10,10 @@ import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 public class AchieveREResponder extends FSMBehaviour {
 
 	protected MessageTemplate template;
+	private State protocolState;
 
 	public AchieveREResponder(Agent agent, MessageTemplate template) {
-		super(agent);
+		myAgent = agent;
 
 		//template = createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
 		//template.addProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
@@ -70,7 +71,7 @@ public class AchieveREResponder extends FSMBehaviour {
 		return null;
 	}
 
-	private enum State implements FSMBehaviour.State {
+	private enum State implements FSM {
 
 		/**
 		 * Initially, a response of Agree/Refuse/Inform is expected
@@ -129,7 +130,7 @@ public class AchieveREResponder extends FSMBehaviour {
 		FINISHED {
 
 			@Override
-			public up.fe.liacc.sajas.proto.FSMBehaviour.State nextState(
+			public up.fe.liacc.sajas.proto.FSM nextState(
 					ACLMessage message, Behaviour behaviour) {
 				return FINISHED;
 			}

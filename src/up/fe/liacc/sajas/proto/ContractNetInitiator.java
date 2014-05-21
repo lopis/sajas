@@ -22,6 +22,10 @@ public class ContractNetInitiator extends FSMBehaviour {
 	protected Vector responses = new Vector();
 	protected Vector acceptances = new Vector();
 
+	private MessageTemplate template;
+
+	private FSM protocolState;
+
 	/**
 	 * Default super constructor.
 	 * Must be called for the behavior to work.
@@ -29,13 +33,37 @@ public class ContractNetInitiator extends FSMBehaviour {
 	 * @param message
 	 */
 	public ContractNetInitiator(Agent agent, ACLMessage cfp) {
-		super(agent);
+		myAgent = agent;
 		template = new MessageTemplate();
 		template.addProtocol(protocol);
 		protocolState = State.PROPOSAL;
 		protocolState.setTemplate(template);
 		responders = cfp.getReceivers();
+		
+		registerFirstState(new Behaviour() {
+
+			@Override
+			public void action() {
+				ACLMessage nextMessage = receive();
+				if (nextMessage != null) {
+					nextState(nextMessage);
+				}
+			}
+		}, "contractnetinit");
+		
 		MTS.send(prepareCfps(cfp).get(0)); // Send the CFP
+	}
+	
+	protected void nextState(ACLMessage nextMessage) {
+		// Update the state
+		protocolState = protocolState.nextState(nextMessage, this);
+		// Update the template
+		protocolState.setTemplate(template);
+	}
+
+
+	protected ACLMessage receive() {
+		return this.getAgent().receive(template);
 	}
 
 	/**
@@ -105,7 +133,7 @@ public class ContractNetInitiator extends FSMBehaviour {
 	 * @author joaolopes
 	 *
 	 */
-	private enum State implements FSMBehaviour.State {
+	private enum State implements FSM {
 
 		/**
 		 * After sending a call for proposals, expect PROPOSAL

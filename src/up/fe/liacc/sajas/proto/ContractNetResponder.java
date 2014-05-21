@@ -10,9 +10,9 @@ import up.fe.liacc.sajas.lang.acl.ACLMessage;
 import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 
 public class ContractNetResponder extends FSMBehaviour {
-	
+
 	private String protocol = FIPANames.InteractionProtocol.FIPA_CONTRACT_NET;
-	
+
 	/**
 	 * The last CFP received. The protocol only handles one CFP at a time.
 	 */
@@ -22,13 +22,41 @@ public class ContractNetResponder extends FSMBehaviour {
 	 */
 	private ACLMessage proposal;
 
+	private FSM protocolState;
+
+	private MessageTemplate template;
+
 	public ContractNetResponder(Agent agent, MessageTemplate template) {
-		super(agent);
-		
+		myAgent = agent;
+
 		template.addProtocol(protocol);
 		protocolState = State.CFP;
 		protocolState.setTemplate(template);
 		this.template = template;
+
+		registerFirstState(new Behaviour() {
+
+			@Override
+			public void action() {
+				ACLMessage nextMessage = receive();
+				if (nextMessage != null) {
+					nextState(nextMessage);
+				}
+			}
+		}, "contractnetresp");
+	}
+
+
+	protected void nextState(ACLMessage nextMessage) {
+		// Update the state
+		protocolState = protocolState.nextState(nextMessage, this);
+		// Update the template
+		protocolState.setTemplate(template);
+	}
+
+
+	protected ACLMessage receive() {
+		return this.getAgent().receive(template);
 	}
 
 
@@ -46,7 +74,7 @@ public class ContractNetResponder extends FSMBehaviour {
 
 	protected void handleRejectProposal(ACLMessage cfp,
 			ACLMessage propose, ACLMessage accept) {}
-	
+
 	public static MessageTemplate createMessageTemplate(String protocol) {
 		State s = State.CFP;
 		MessageTemplate newMessageTemplate = new MessageTemplate();
@@ -74,7 +102,7 @@ public class ContractNetResponder extends FSMBehaviour {
 	 * @author joaolopes
 	 *
 	 */
-	private enum State implements FSMBehaviour.State {
+	private enum State implements FSM {
 
 		/**
 		 * Initially, Call for Proposals (CFP) is expected
@@ -112,7 +140,7 @@ public class ContractNetResponder extends FSMBehaviour {
 					cn.handleAcceptProposal(cn.cfp, cn.proposal, m);
 					return BUSY;
 				}
-				
+
 				return NOTIFICATION;
 			}
 

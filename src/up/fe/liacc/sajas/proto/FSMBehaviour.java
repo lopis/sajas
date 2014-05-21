@@ -1,9 +1,9 @@
 package up.fe.liacc.sajas.proto;
 
-import up.fe.liacc.sajas.core.Agent;
+import java.util.HashMap;
+import java.util.Map;
+
 import up.fe.liacc.sajas.core.behaviours.Behaviour;
-import up.fe.liacc.sajas.lang.acl.ACLMessage;
-import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 
 /**
  * Common superclass of all state-machine-based protocols.
@@ -13,55 +13,89 @@ import up.fe.liacc.sajas.lang.acl.MessageTemplate;
  */
 public abstract class FSMBehaviour extends Behaviour {
 
-	protected State protocolState;
-	protected MessageTemplate template = new MessageTemplate();
-
-	/**
-	 * Default constructor for the FSMBehaviour. Sets the owner agent.
-	 * @param agent The agent this behaviour belongs to.
-	 */
-	public FSMBehaviour(Agent agent) {
-		super(agent);
+	Map<String, Behaviour> states = new HashMap<String, Behaviour>();
+	Map<String, Map<Integer, String>> transitions = new HashMap<String, Map<Integer,String>>();
+	Map<String, String> defaultTransitions = new HashMap<String, String>();
+	
+	protected String currentState;
+	protected int currentResult;
+	private String lastState;
+	
+	@Override
+	public void action() {
+		if (states.get(currentState) != null)
+			scheduleNext(currentResult); // Updates the current state
+		else return;
+			
+		if (states.get(currentState) != null)
+			currentResult = states.get(currentState).onEnd();
+		
+	}
+	
+	private void scheduleNext(int currentResult) {
+		states.get(currentState).action();
 	}
 
-	@Override
 	/**
-	 * This method handles the execution of the state-machine-based behaviours.
-	 * It shouldn't be needed to override this method. Each subclass of
-	 * FSMBehaviour contains the proper handlers that should be
-	 * overridden for each state.
+	 * Register a new state in the FSM.
+	 * @param state The behaviour representing the state
+	 * @param name The identifier of the state
 	 */
-	public void action() {
-		ACLMessage nextMessage = this.getAgent().receive(template);
-		if (nextMessage != null) {
-			
-			// Update the state
-			protocolState = protocolState.nextState(nextMessage, this);
-			// Update the template
-			protocolState.setTemplate(template);
+	public void registerState(Behaviour state, String name) {
+		states.put(name, state);
+	}
+	
+	/**
+	 * Remove a state from the FSM, as well as
+	 * all transitions from it. FIXME: remove 
+	 * transition from other states to this one.
+	 * @param name
+	 */
+	public void deregisterState(String name) {
+		states.remove(name);
+		transitions.remove(name);
+	}
+	
+	public void registerFirstState(Behaviour state, String name) {
+		states.put(name, state);
+		currentState = name;
+	}
+	
+	public void registerLastState(Behaviour state, String name) {
+		states.put(name, state);
+		lastState = name;
+	}
+	
+	/**
+	 * Register a new transition from `currentState` to `nextState` when the
+	 * result of returned by the `onEnd()` method of the last state was `event`.
+	 * @param currentState The name of the current state
+	 * @param nextState The name of the state this transition leads to
+	 * @param event The value returns by `onEnd()` that triggers this transition.
+	 */
+	public void registerTransition(String currentState, String nextState, int event) {
+		if (!transitions.containsKey(currentState)) {
+			transitions.put(currentState, new HashMap<Integer, String>());
+		}
+		transitions.get(currentState).put(event, nextState);
+	}
+	
+	public void registerDefaultTransition(String currentState, String nextState) {
+		defaultTransitions.put(currentState, nextState);
+	}
+	
+	/**
+	 * Removes a transition from this FSM.
+	 * @param source
+	 * @param event
+	 */
+	public void deregisterTransition(String source, int event) {
+		if (transitions.containsKey(source)) {
+			transitions.get(source).remove(event);
 		}
 	}
-
-	/**
-	 * Basic interface for the State Machine enums in the classes
-	 * that extend the FSMBehaviour. Those enums are expected to contain
-	 * multiple states which implement these two methods.
-	 * @author joaolopes
-	 *
-	 */
-	public interface State {
-		/**
-		 * Returns the next state, given a message and the behavior
-		 * @param message The message just received.
-		 * @param behaviour This behaviour. Use it to access the behavour state.
-		 * @return
-		 */
-	    public abstract State nextState(ACLMessage message, Behaviour behaviour);
-	    
-	    /**
-	     * Update the current ACL Message Template.
-	     * @param t The current template
-	     */
-	    public abstract void setTemplate(MessageTemplate t);
+	
+	public void setCurrentState(String nextState) {
+		currentState = nextState;
 	}
 }
