@@ -14,7 +14,7 @@ public class AchieveREResponder extends FSMBehaviour {
 	private State protocolState;
 
 	public AchieveREResponder(Agent agent, MessageTemplate template) {
-		myAgent = agent;
+		super(agent);
 
 		//template = createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
 		//template.addProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);

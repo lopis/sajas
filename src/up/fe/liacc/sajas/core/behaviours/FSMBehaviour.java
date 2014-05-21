@@ -3,6 +3,8 @@ package up.fe.liacc.sajas.core.behaviours;
 import java.util.HashMap;
 import java.util.Map;
 
+import up.fe.liacc.sajas.core.Agent;
+
 /**
  * Common superclass of all state-machine-based protocols.
  * The children of this behaviour are expected to 
@@ -18,6 +20,10 @@ public abstract class FSMBehaviour extends Behaviour {
 	protected String currentState;
 	protected int currentResult;
 	private String lastState;
+	
+	public FSMBehaviour(Agent a) {
+		super(a);
+	}
 	
 	@Override
 	public void action() {

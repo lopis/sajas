@@ -57,7 +57,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 	 * @param agent The message to be sent by this behavior.
 	 */
 	public AchieveREInitiator(Agent agent, ACLMessage message) {
-		myAgent = agent;
+		super(agent);
 		// Set the template that will filter the responses
 		template = new MessageTemplate();
 		protocol = FIPANames.InteractionProtocol.FIPA_REQUEST;

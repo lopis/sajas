@@ -34,7 +34,7 @@ public class ContractNetInitiator extends FSMBehaviour {
 	 * @param message
 	 */
 	public ContractNetInitiator(Agent agent, ACLMessage cfp) {
-		myAgent = agent;
+		super(agent);
 		template = new MessageTemplate();
 		template.addProtocol(protocol);
 		protocolState = State.PROPOSAL;

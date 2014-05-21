@@ -28,7 +28,7 @@ public class ContractNetResponder extends FSMBehaviour {
 	private MessageTemplate template;
 
 	public ContractNetResponder(Agent agent, MessageTemplate template) {
-		myAgent = agent;
+		super(agent);
 
 		template.addProtocol(protocol);
 		protocolState = State.CFP;
