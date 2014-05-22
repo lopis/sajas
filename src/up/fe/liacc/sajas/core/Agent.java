@@ -103,7 +103,7 @@ public abstract class Agent {
 	 */
 	public abstract void addBehaviour(Behaviour behaviour);
 
-	protected abstract void removeBehaviour(Behaviour behaviour);
+	public abstract void removeBehaviour(Behaviour behaviour);
 	
 	/**
 	 * Method executed after the agent is created.
