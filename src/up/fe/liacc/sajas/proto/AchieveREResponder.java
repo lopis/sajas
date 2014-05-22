@@ -3,7 +3,6 @@ package up.fe.liacc.sajas.proto;
 import java.util.ArrayList;
 
 import up.fe.liacc.sajas.core.Agent;
-import up.fe.liacc.sajas.core.behaviours.Behaviour;
 import up.fe.liacc.sajas.core.behaviours.FSMBehaviour;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
 import up.fe.liacc.sajas.lang.acl.MessageTemplate;
@@ -72,15 +71,14 @@ public class AchieveREResponder extends FSMBehaviour {
 		return null;
 	}
 
-	private enum State implements FSM {
+	private enum State implements FSM<AchieveREInitiator> {
 
 		/**
 		 * Initially, a response of Agree/Refuse/Inform is expected
 		 */
 		RESPONSE {
 			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				AchieveREInitiator re = (AchieveREInitiator) b;
+			public State nextState(ACLMessage m, AchieveREInitiator re) {
 				if (re.isAllResponded()) {
 					return In;
 				} else if (re.isAllResulted()) {
@@ -107,8 +105,7 @@ public class AchieveREResponder extends FSMBehaviour {
 		 */
 		In {
 			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				AchieveREInitiator re = (AchieveREInitiator) b;
+			public State nextState(ACLMessage m, AchieveREInitiator re) {
 				if (re.isAllResulted()) {
 					return FINISHED;
 				}
@@ -131,17 +128,19 @@ public class AchieveREResponder extends FSMBehaviour {
 		FINISHED {
 
 			@Override
-			public up.fe.liacc.sajas.proto.FSM nextState(
-					ACLMessage message, Behaviour behaviour) {
+			public State nextState(ACLMessage message, AchieveREInitiator behaviour) {
 				return FINISHED;
 			}
 
 			@Override
 			public void setTemplate(MessageTemplate t) {}
 
+		};
+		
+		@Override
+		public State nextState(AchieveREInitiator re) {
+			return this;
 		}
-		;
-
 	}
 
 }

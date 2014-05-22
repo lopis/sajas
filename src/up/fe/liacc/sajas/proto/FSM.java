@@ -1,6 +1,5 @@
 package up.fe.liacc.sajas.proto;
 
-import up.fe.liacc.sajas.core.behaviours.Behaviour;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
 import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 
@@ -11,18 +10,20 @@ import up.fe.liacc.sajas.lang.acl.MessageTemplate;
  * @author joaolopes
  *
  */
-public interface FSM {
+public interface FSM<T> {
 	/**
 	 * Returns the next state, given a message and the behavior
 	 * @param message The message just received.
 	 * @param behaviour This behaviour. Use it to access the behavour state.
 	 * @return
 	 */
-    public abstract FSM nextState(ACLMessage message, Behaviour behaviour);
+    public abstract FSM<T> nextState(ACLMessage message, T behaviour);
     
     /**
      * Update the current ACL Message Template.
      * @param t The current template
      */
     public abstract void setTemplate(MessageTemplate t);
+
+	public abstract FSM<T> nextState(T behaviour);
 }

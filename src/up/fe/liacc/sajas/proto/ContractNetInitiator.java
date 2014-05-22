@@ -6,7 +6,6 @@ import java.util.Vector;
 import up.fe.liacc.sajas.MTS;
 import up.fe.liacc.sajas.core.AID;
 import up.fe.liacc.sajas.core.Agent;
-import up.fe.liacc.sajas.core.behaviours.Behaviour;
 import up.fe.liacc.sajas.core.behaviours.FSMBehaviour;
 import up.fe.liacc.sajas.domain.FIPANames;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
@@ -16,16 +15,18 @@ import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 @SuppressWarnings({ "rawtypes", "unchecked" }) // For compatibility with JADE. I'm so sorry.
 public class ContractNetInitiator extends FSMBehaviour {
 
-	private String protocol = FIPANames.InteractionProtocol.FIPA_CONTRACT_NET;
+	private static String protocol = FIPANames.InteractionProtocol.FIPA_CONTRACT_NET;
 	
 	// This vector contains the agents who received the CFP
 	private ArrayList<AID> responders;
 	protected Vector responses = new Vector();
 	protected Vector acceptances = new Vector();
 
-	private MessageTemplate template;
+	private MessageTemplate template = new MessageTemplate();
 
 	private FSM protocolState;
+
+	protected ACLMessage cfp;
 
 	/**
 	 * Default super constructor.
@@ -35,24 +36,36 @@ public class ContractNetInitiator extends FSMBehaviour {
 	 */
 	public ContractNetInitiator(Agent agent, ACLMessage cfp) {
 		super(agent);
-		template = new MessageTemplate();
-		template.addProtocol(protocol);
-		protocolState = State.PROPOSAL;
+		
+		protocolState = State.SEND_CFP;
 		protocolState.setTemplate(template);
+		this.cfp = cfp;
 		responders = cfp.getReceivers();
 		
-		registerFirstState(new Behaviour() {
+//		registerFirstState(new Behaviour() {
+//
+//			@Override
+//			public void action() {
+//				ACLMessage nextMessage = receive();
+//				if (nextMessage != null) {
+//					nextState(nextMessage);
+//				}
+//			}
+//		}, "contractnetinit");
 
-			@Override
-			public void action() {
-				ACLMessage nextMessage = receive();
-				if (nextMessage != null) {
-					nextState(nextMessage);
-				}
-			}
-		}, "contractnetinit");
+	}
+	
+	public void action() {
+		ACLMessage nextMessage = this.getAgent().receive(template);
 		
-		MTS.send(prepareCfps(cfp).get(0)); // Send the CFP
+		// Update the state
+		if (nextMessage != null)
+			protocolState = protocolState.nextState(nextMessage, this);			
+		else
+			protocolState = protocolState.nextState(this);
+		
+		// Update the template
+		protocolState.setTemplate(template);
 	}
 	
 	protected void nextState(ACLMessage nextMessage) {
@@ -134,7 +147,28 @@ public class ContractNetInitiator extends FSMBehaviour {
 	 * @author joaolopes
 	 *
 	 */
-	private enum State implements FSM {
+	private enum State implements FSM<ContractNetInitiator> {
+		
+		SEND_CFP {
+
+			@Override
+			public State nextState(ACLMessage message, ContractNetInitiator cn) {
+				ArrayList<ACLMessage> c = cn.prepareCfps(cn.cfp);
+				MTS.send(c.get(0)); // Send the CFP;
+				return PROPOSAL;
+			}
+
+			@Override
+			public void setTemplate(MessageTemplate t) {
+				t.addProtocol(protocol);
+			}
+			
+			@Override
+			public State nextState(ContractNetInitiator cn) {
+				return nextState(null, cn);
+			}
+			
+		},
 
 		/**
 		 * After sending a call for proposals, expect PROPOSAL
@@ -142,8 +176,7 @@ public class ContractNetInitiator extends FSMBehaviour {
 		 */
 		PROPOSAL {
 			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				ContractNetInitiator cn = (ContractNetInitiator) b;
+			public State nextState(ACLMessage m, ContractNetInitiator cn) {
 				
 				// Since we know the message matches the template,
 				// we can assume it's a valid propose or refuse.
@@ -152,7 +185,7 @@ public class ContractNetInitiator extends FSMBehaviour {
 				// Remove the sender from the list	
 				// TODO: Should the protocol accept more messages from this sender?
 				// 		 Or should further "proposals" from this agent be ignored?
-				cn.responders.remove(m.getSender());		
+				cn.responders.remove(m.getSender());
 				
 				if (m.getPerformative() == ACLMessage.REFUSE) {
 					cn.handleRefuse(m);
@@ -192,8 +225,8 @@ public class ContractNetInitiator extends FSMBehaviour {
 		 */
 		INFORM {
 			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				if (((ContractNetInitiator) b).isInformed()) {
+			public State nextState(ACLMessage m, ContractNetInitiator cn) {
+				if (cn.isInformed()) {
 					return FINISHED;
 				} else {
 					return INFORM;
@@ -213,14 +246,18 @@ public class ContractNetInitiator extends FSMBehaviour {
 		 */
 		FINISHED {
 			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
+			public State nextState(ACLMessage m, ContractNetInitiator cn) {
+				cn.getAgent().removeBehaviour(cn);
 				return FINISHED;
 			}
 
 			@Override
 			public void setTemplate(MessageTemplate t) {}
 		};
-
+		
+		public State nextState(ContractNetInitiator cn) {
+			return this;
+		}
 
 	}
 

@@ -6,7 +6,6 @@ import java.util.Vector;
 import up.fe.liacc.sajas.MTS;
 import up.fe.liacc.sajas.core.AID;
 import up.fe.liacc.sajas.core.Agent;
-import up.fe.liacc.sajas.core.behaviours.Behaviour;
 import up.fe.liacc.sajas.core.behaviours.FSMBehaviour;
 import up.fe.liacc.sajas.domain.FIPANames;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
@@ -161,15 +160,14 @@ public class AchieveREInitiator extends FSMBehaviour {
 	 * @author joaolopes
 	 *
 	 */
-	private enum State implements FSM {
+	private enum State implements FSM<AchieveREInitiator> {
 
 		/**
 		 * Initially, a response of Agree/Refuse/Inform is expected
 		 */
 		RESPONSE {
 			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				AchieveREInitiator re = (AchieveREInitiator) b;
+			public State nextState(ACLMessage m, AchieveREInitiator re) {
 				if (re.isAllResponded()) {
 					return In;
 				} else if (re.isAllResulted()) {
@@ -196,8 +194,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 		 */
 		In {
 			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				AchieveREInitiator re = (AchieveREInitiator) b;
+			public State nextState(ACLMessage m, AchieveREInitiator re) {
 				if (re.isAllResulted()) {
 					return FINISHED;
 				}
@@ -220,17 +217,19 @@ public class AchieveREInitiator extends FSMBehaviour {
 		FINISHED {
 
 			@Override
-			public up.fe.liacc.sajas.proto.FSM nextState(
-					ACLMessage message, Behaviour behaviour) {
+			public State nextState(ACLMessage message, AchieveREInitiator behaviour) {
 				return FINISHED;
 			}
 
 			@Override
 			public void setTemplate(MessageTemplate t) {}
 			
+		};
+		
+		@Override
+		public State nextState(AchieveREInitiator re) {
+			return this;
 		}
-		;
-
 	}
 
 }

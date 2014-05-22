@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import up.fe.liacc.sajas.MTS;
 import up.fe.liacc.sajas.core.Agent;
-import up.fe.liacc.sajas.core.behaviours.Behaviour;
 import up.fe.liacc.sajas.core.behaviours.FSMBehaviour;
 import up.fe.liacc.sajas.domain.FIPANames;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
@@ -23,7 +22,7 @@ public class ContractNetResponder extends FSMBehaviour {
 	 */
 	private ACLMessage proposal;
 
-	private FSM protocolState;
+	private FSM<ContractNetResponder> protocolState;
 
 	private MessageTemplate template;
 
@@ -35,16 +34,29 @@ public class ContractNetResponder extends FSMBehaviour {
 		protocolState.setTemplate(template);
 		this.template = template;
 
-		registerFirstState(new Behaviour() {
+		//		registerFirstState(new Behaviour() {
+		//
+		//			@Override
+		//			public void action() {
+		//				ACLMessage nextMessage = receive();
+		//				if (nextMessage != null) {
+		//					nextState(nextMessage);
+		//				}
+		//			}
+		//		}, "contractnetresp");
+	}
 
-			@Override
-			public void action() {
-				ACLMessage nextMessage = receive();
-				if (nextMessage != null) {
-					nextState(nextMessage);
-				}
-			}
-		}, "contractnetresp");
+	public void action() {
+		ACLMessage nextMessage = this.getAgent().receive(template);
+		
+		// Update the state
+		if (nextMessage != null)
+			protocolState = protocolState.nextState(nextMessage, this);			
+		else
+			protocolState = protocolState.nextState(this);
+		
+		// Update the template
+		protocolState.setTemplate(template);
 	}
 
 
@@ -103,16 +115,16 @@ public class ContractNetResponder extends FSMBehaviour {
 	 * @author joaolopes
 	 *
 	 */
-	private enum State implements FSM {
+	private enum State implements FSM<ContractNetResponder> {
 
 		/**
 		 * Initially, Call for Proposals (CFP) is expected
 		 */
 		CFP {
 			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				ACLMessage prop = ((ContractNetResponder)b).proposal;
-				prop = ((ContractNetResponder)b).handleCfp(m);
+			public State nextState(ACLMessage m, ContractNetResponder b) {
+				ACLMessage prop = b.proposal;
+				prop = b.handleCfp(m);
 				MTS.send(prop); // Sends Proposal to CFP
 				return NOTIFICATION;
 			}
@@ -132,13 +144,12 @@ public class ContractNetResponder extends FSMBehaviour {
 		 */
 		NOTIFICATION {
 			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
-				ContractNetResponder cn = (ContractNetResponder)b;
+			public State nextState(ACLMessage m, ContractNetResponder b) {
 				if (m.getPerformative() == ACLMessage.REJECT_PROPOSAL) {
-					cn .handleRejectProposal(cn.cfp, cn.proposal, m);
+					b .handleRejectProposal(b.cfp, b.proposal, m);
 					return CFP;
 				} else if (m.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
-					cn.handleAcceptProposal(cn.cfp, cn.proposal, m);
+					b.handleAcceptProposal(b.cfp, b.proposal, m);
 					return BUSY;
 				}
 
@@ -160,7 +171,7 @@ public class ContractNetResponder extends FSMBehaviour {
 		 */
 		BUSY {
 			@Override
-			public State nextState(ACLMessage m, Behaviour b) {
+			public State nextState(ACLMessage m, ContractNetResponder b) {
 				return BUSY;
 			}
 
@@ -171,6 +182,10 @@ public class ContractNetResponder extends FSMBehaviour {
 				t.setPerformatives(performatives);
 			}
 		};
+		
+		public State nextState(ContractNetResponder behaviour) {
+			return this;
+		}
 	}
 
 
