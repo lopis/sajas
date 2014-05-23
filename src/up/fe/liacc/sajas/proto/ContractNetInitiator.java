@@ -125,9 +125,23 @@ public class ContractNetInitiator extends FSMBehaviour {
 	protected void handleAllResponses(Vector responses, Vector acceptances) {}
 	
 
-
+	/**
+	 * This method is called every time a refuse message is received.
+	 * This default implementation does nothing; programmers might wish
+	 * to override the method in case they need to react to this event.
+	 * @param m The received refuse message
+	 */
 	protected void handleRefuse(ACLMessage m) {}
 	
+	/**
+	 * This method is called every time a propose message is received.
+	 * This default implementation does nothing; programmers might wish
+	 * to override the method in case they need to react to this event.
+	 * @param m
+	 * @param acceptances the list of ACCEPT/REJECT_PROPOSAL to be sent back.
+	 * This list can be filled step by step redefining this method, or it can
+	 * be filled at once redefining the handleAllResponses method.
+	 */
 	protected void handlePropose(ACLMessage m, Vector acceptances) {}
 	
 	/**
