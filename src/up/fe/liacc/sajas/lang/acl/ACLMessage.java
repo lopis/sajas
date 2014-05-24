@@ -50,8 +50,8 @@ public class ACLMessage {
 	private long when = 0; 								// Deadline for the response.
 	private StringBuffer contentString;					// The content in string format
 	private String language;							// The langage of the message
-	private Object ontology;
-	private Object convId;
+	private String ontology;
+	private String convId;
 
 	
 	/**
@@ -260,19 +260,19 @@ public class ACLMessage {
 		this.language = language;
 	}
 	
-	public Object getOntology() {
+	public String getOntology() {
 		return ontology;
 	}
 
-	public void setOntology(Object ontology) {
+	public void setOntology(String ontology) {
 		this.ontology = ontology;
 	}
 
-	public Object getConvId() {
+	public String getConversationId() {
 		return convId;
 	}
 
-	public void setConvId(Object convId) {
+	public void setConversationId(String convId) {
 		this.convId = convId;
 	}
 
@@ -336,7 +336,7 @@ public class ACLMessage {
 		reply.setLanguage(language);
 		reply.setOntology(ontology);
 		reply.setProtocol(protocol);
-		reply.setConvId(convId);
+		reply.setConversationId(convId);
 		return reply;
 	}
 	
