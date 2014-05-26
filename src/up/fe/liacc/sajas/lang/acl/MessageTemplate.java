@@ -132,4 +132,8 @@ public class MessageTemplate {
 		return mt;
 	}
 
+	public void addConversationId(String conversationId) {
+		conversationIds.add(conversationId);
+	}
+
 }

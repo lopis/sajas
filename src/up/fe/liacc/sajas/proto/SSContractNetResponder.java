@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import up.fe.liacc.sajas.MTS;
 import up.fe.liacc.sajas.core.Agent;
 import up.fe.liacc.sajas.core.behaviours.FSMBehaviour;
-import up.fe.liacc.sajas.domain.FIPANames;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
 import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 
-public class ContractNetResponder extends FSMBehaviour {
-
-	private String protocol = FIPANames.InteractionProtocol.FIPA_CONTRACT_NET;
-
+public class SSContractNetResponder extends FSMBehaviour {
+	
+	private State protocolState;
+	private MessageTemplate template;
+	
 	/**
 	 * The last CFP received. The protocol only handles one CFP at a time.
 	 */
@@ -21,31 +21,15 @@ public class ContractNetResponder extends FSMBehaviour {
 	 *  The response to the CFP. Should contain a PROPOSE, REFUSE or NOT_UNDERSTAND message.
 	 */
 	private ACLMessage proposal;
-
-	private FSM<ContractNetResponder> protocolState;
-
-	private MessageTemplate template;
-
-	public ContractNetResponder(Agent agent, MessageTemplate template) {
-		super(agent);
-
-		template.addProtocol(protocol);
+	
+	public SSContractNetResponder(Agent a, ACLMessage cfp) {
+		super(a);
 		protocolState = State.CFP;
-		protocolState.setTemplate(template);
-		this.template = template;
-
-		//		registerFirstState(new Behaviour() {
-		//
-		//			@Override
-		//			public void action() {
-		//				ACLMessage nextMessage = receive();
-		//				if (nextMessage != null) {
-		//					nextState(nextMessage);
-		//				}
-		//			}
-		//		}, "contractnetresp");
+		this.template = createMessageTemplate(cfp);
+		this.cfp = cfp;
 	}
 
+	@Override
 	public void action() {
 		ACLMessage nextMessage = this.getAgent().receive(template);
 		
@@ -58,20 +42,25 @@ public class ContractNetResponder extends FSMBehaviour {
 		// Update the template
 		protocolState.setTemplate(template);
 	}
+	
+	protected void handleAcceptProposal(ACLMessage cfp,
+			ACLMessage propose, ACLMessage accept) {}
 
-
-	protected void nextState(ACLMessage nextMessage) {
-		// Update the state
-		protocolState = protocolState.nextState(nextMessage, this);
-		// Update the template
-		protocolState.setTemplate(template);
+	protected void handleRejectProposal(ACLMessage cfp,
+			ACLMessage propose, ACLMessage accept) {}
+	
+	/**
+	 * Creates the template and gives it the conversation id
+	 * of the CFP.
+	 * @param cfp
+	 * @return
+	 */
+	private MessageTemplate createMessageTemplate(ACLMessage cfp) {
+		MessageTemplate t = new MessageTemplate();
+		t.addPerformative(cfp.getPerformative());
+		t.addConversationId(cfp.getConversationId());
+		return t;
 	}
-
-
-	protected ACLMessage receive() {
-		return this.getAgent().receive(template);
-	}
-
 
 	/**
 	 * Called when a new Call for Proposals arrives. This default
@@ -79,50 +68,34 @@ public class ContractNetResponder extends FSMBehaviour {
 	 * @param m
 	 * @return The reply message to be sent back to the initiator. (PROPOSE)
 	 */
-	protected ACLMessage handleCfp(ACLMessage m) { return null; }
-
-
-	protected void handleAcceptProposal(ACLMessage cfp,
-			ACLMessage propose, ACLMessage accept) {}
-
-	protected void handleRejectProposal(ACLMessage cfp,
-			ACLMessage propose, ACLMessage accept) {}
-
-	public static MessageTemplate createMessageTemplate(String protocol) {
-		State s = State.CFP;
-		MessageTemplate newMessageTemplate = new MessageTemplate();
-		newMessageTemplate.addProtocol(protocol);
-		s.setTemplate(newMessageTemplate);
-		return newMessageTemplate;
-	}
+	protected ACLMessage handleCfp(ACLMessage m) { return m; }
 
 	/**
 	 * This enum implements the FSMBehaviour.State interface and
 	 * represents the state machine of the Contract Net Responder.
 	 * This protocol has three different states: CFP, NOTIFICATION
 	 * and BUSY.
-	 * <li> CFP: The responder is waiting for a CFP. When one arrives,
-	 * the responder prepares a proposal (which may contain a REFUSE,
-	 * ACCEPT or NOT_UNDERSTOOD), sends it back to the initiator and
-	 * the state changes to NOTIFICATION.</li>
+	 * <li> CFP: The first state, emidiately executed. when the
+	 * protocol starts. The state changes to NOTIFICATION</li>
 	 * <li> NOTIFICATION: The responder is waiting for the notification
 	 * of the initiator, containing ACCEPT or REJECT PROPOSAL. When it
 	 * arrives, the responder handles the message and the state changes
 	 * to BUSY </li>
-	 * <li> BUSY: The responder is performing some task requested by the
-	 * initiator and ignores further incoming mail. When it finishes, the
-	 * handle  </li>
+	 * <li> FINISH: The responder is performing some task requested by the
+	 * initiator and ignores further incoming mail. When it finishes, an
+	 * INFORM is sent to the initiator, the protocol ends and the behaviour
+	 * discarted. </li>
 	 * @author joaolopes
 	 *
 	 */
-	private enum State implements FSM<ContractNetResponder> {
+	private enum State implements FSM<SSContractNetResponder> {
 
 		/**
 		 * Initially, Call for Proposals (CFP) is expected
 		 */
 		CFP {
 			@Override
-			public State nextState(ACLMessage m, ContractNetResponder b) {
+			public State nextState(ACLMessage m, SSContractNetResponder b) {
 				ACLMessage prop = b.proposal;
 				prop = b.handleCfp(m);
 				MTS.send(prop); // Sends Proposal to CFP
@@ -144,13 +117,13 @@ public class ContractNetResponder extends FSMBehaviour {
 		 */
 		NOTIFICATION {
 			@Override
-			public State nextState(ACLMessage m, ContractNetResponder b) {
+			public State nextState(ACLMessage m, SSContractNetResponder cn) {
 				if (m.getPerformative() == ACLMessage.REJECT_PROPOSAL) {
-					b .handleRejectProposal(b.cfp, b.proposal, m);
+					cn.handleRejectProposal(cn.cfp, cn.proposal, m);
 					return CFP;
 				} else if (m.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
-					b.handleAcceptProposal(b.cfp, b.proposal, m);
-					return BUSY;
+					cn.handleAcceptProposal(cn.cfp, cn.proposal, m);
+					return FINISH;
 				}
 
 				return NOTIFICATION;
@@ -169,24 +142,25 @@ public class ContractNetResponder extends FSMBehaviour {
 		 * and get back to the CFP issuer later and send an INFORM when
 		 * that task is DONE. In this state, messages are ignored.
 		 */
-		BUSY {
+		FINISH {
 			@Override
-			public State nextState(ACLMessage m, ContractNetResponder b) {
-				return BUSY;
+			public State nextState(ACLMessage m, SSContractNetResponder b) {
+				return FINISH;
 			}
 
 			@Override
-			public void setTemplate(MessageTemplate t) {
-				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(ACLMessage.INFORM);
-				t.setPerformatives(performatives);
-			}
+			public void setTemplate(MessageTemplate t) {}
 		};
 		
-		public State nextState(ContractNetResponder behaviour) {
-			return this;
+		@Override
+		public State nextState(ACLMessage m, SSContractNetResponder b) {
+			return null;
+		}
+		
+		@Override
+		public State nextState(
+				SSContractNetResponder behaviour) {
+			return null;
 		}
 	}
-
-
 }

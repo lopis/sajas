@@ -84,4 +84,8 @@ public class DFAgentDescription {
 			((DFAgentDescription) obj).getServices().equals(this.getServices());
 	}
 	
+	@Override
+	public String toString() {
+		return "[DFD] " + getName() + ": services(" + getServices().size() + ")";
+	}
 }

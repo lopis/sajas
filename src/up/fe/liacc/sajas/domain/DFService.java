@@ -42,12 +42,17 @@ public class DFService {
 	//		}
 	//		return agents;
 	//	}
+	
+	public static DFAgentDescription[] search(Agent agent, DFAgentDescription dfd,
+			Object searchContraints) throws FIPAException {
+		return search(agent, dfd);
+	}
 
 	/**
 	 * Search an agent with this AID.
 	 * @param aid 
-	 * @return The agent mapped to this AID or null if
-	 * this AID is not registered to any agent in the DF.
+	 * @return An array of DFAgentDescriptions containing the AIDs of
+	 * the agents found in the DF that match the provided DFD.
 	 * @throws FIPAException Not implemented.
 	 */
 	public static DFAgentDescription[] search(Agent agent, DFAgentDescription dfd) 
