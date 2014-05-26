@@ -148,7 +148,8 @@ public class SSContractNetResponder extends FSMBehaviour {
 			@Override
 			public void setTemplate(MessageTemplate t) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(ACLMessage.INFORM);
+				performatives.add(ACLMessage.ACCEPT_PROPOSAL);
+				performatives.add(ACLMessage.REJECT_PROPOSAL);
 				t.setPerformatives(performatives);
 			}
 		},

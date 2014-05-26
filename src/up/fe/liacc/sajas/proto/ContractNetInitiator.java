@@ -68,12 +68,12 @@ public class ContractNetInitiator extends FSMBehaviour {
 		protocolState.setTemplate(template);
 	}
 	
-	protected void nextState(ACLMessage nextMessage) {
-		// Update the state
-		protocolState = protocolState.nextState(nextMessage, this);
-		// Update the template
-		protocolState.setTemplate(template);
-	}
+//	protected void nextState(ACLMessage nextMessage) {
+//		// Update the state
+//		protocolState = protocolState.nextState(nextMessage, this);
+//		// Update the template
+//		protocolState.setTemplate(template);
+//	}
 
 
 	protected ACLMessage receive() {
