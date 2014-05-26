@@ -43,11 +43,27 @@ public class SSContractNetResponder extends FSMBehaviour {
 		protocolState.setTemplate(template);
 	}
 	
+	/**
+	 * This method is called whenever an ACCEPT_PROPOSAL arrives
+	 * that is in sequence. This default implementation does nothing
+	 * and should be overridden.
+	 * @param cfp The original cfp
+	 * @param propose The reply to the original cfp
+	 * @param accept The ACLMessage containing the ACCEPT PROPOSAL
+	 */
 	protected void handleAcceptProposal(ACLMessage cfp,
 			ACLMessage propose, ACLMessage accept) {}
 
+	/**
+	 * This method is called whenever a REJECT_PROPOSAL arrives
+	 * that is in sequence. This default implementation does nothing
+	 * and should be overridden.
+	 * @param cfp The original cfp
+	 * @param propose The reply to the original cfp
+	 * @param reject The ACLMessage containing the REJECT PROPOSAL
+	 */
 	protected void handleRejectProposal(ACLMessage cfp,
-			ACLMessage propose, ACLMessage accept) {}
+			ACLMessage propose, ACLMessage reject) {}
 	
 	/**
 	 * Creates the template and gives it the conversation id
@@ -160,7 +176,7 @@ public class SSContractNetResponder extends FSMBehaviour {
 		@Override
 		public State nextState(
 				SSContractNetResponder behaviour) {
-			return null;
+			return this;
 		}
 	}
 }
