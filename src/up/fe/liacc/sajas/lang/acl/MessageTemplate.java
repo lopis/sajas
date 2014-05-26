@@ -25,12 +25,12 @@ public class MessageTemplate {
 	 * A message template allows each field to have more than
 	 * one possible value.
 	 */
-	private ArrayList<Integer> performatives;
-	private ArrayList<String> protocols;
-	private ArrayList<Object> contents;
-	private ArrayList<String> replyWiths;
-	private ArrayList<String> inReplyTos;
-	private ArrayList<String> conversationIds;
+	private ArrayList<Integer> performatives = new ArrayList<Integer>();
+	private ArrayList<String> protocols = new ArrayList<String>();
+	private ArrayList<Object> contents = new ArrayList<Object>();
+	private ArrayList<String> replyWiths = new ArrayList<String>();
+	private ArrayList<String> inReplyTos = new ArrayList<String>();
+	private ArrayList<String> conversationIds = new ArrayList<String>();
 
 	public ArrayList<Integer> getPerformatives() {
 		return performatives;
@@ -41,9 +41,6 @@ public class MessageTemplate {
 	}
 
 	public ArrayList<String> getProtocols() {
-		if (protocols == null) {
-			protocols = new ArrayList<String>();
-		}
 		return protocols;
 	}
 
@@ -52,6 +49,7 @@ public class MessageTemplate {
 	}
 
 	public ArrayList<Object> getContents() {
+		
 		return contents;
 	}
 
@@ -133,7 +131,7 @@ public class MessageTemplate {
 	}
 
 	public void addConversationId(String conversationId) {
-		conversationIds.add(conversationId);
+		getConversationIds().add(conversationId);
 	}
 
 }
