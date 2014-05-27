@@ -31,7 +31,7 @@ public class ContractNetResponder extends FSMBehaviour {
 
 		template.addProtocol(protocol);
 		protocolState = State.CFP;
-		protocolState.setTemplate(template);
+		protocolState.setTemplate(template, this);
 		this.template = template;
 
 		//		registerFirstState(new Behaviour() {
@@ -56,7 +56,7 @@ public class ContractNetResponder extends FSMBehaviour {
 			protocolState = protocolState.nextState(this);
 		
 		// Update the template
-		protocolState.setTemplate(template);
+		protocolState.setTemplate(template, this);
 	}
 
 
@@ -64,7 +64,7 @@ public class ContractNetResponder extends FSMBehaviour {
 		// Update the state
 		protocolState = protocolState.nextState(nextMessage, this);
 		// Update the template
-		protocolState.setTemplate(template);
+		protocolState.setTemplate(template, this);
 	}
 
 
@@ -92,7 +92,7 @@ public class ContractNetResponder extends FSMBehaviour {
 		State s = State.CFP;
 		MessageTemplate newMessageTemplate = new MessageTemplate();
 		newMessageTemplate.addProtocol(protocol);
-		s.setTemplate(newMessageTemplate);
+		s.setTemplate(newMessageTemplate, null);
 		return newMessageTemplate;
 	}
 
@@ -122,15 +122,15 @@ public class ContractNetResponder extends FSMBehaviour {
 		 */
 		CFP {
 			@Override
-			public State nextState(ACLMessage m, ContractNetResponder b) {
-				ACLMessage prop = b.proposal;
-				prop = b.handleCfp(m);
+			public State nextState(ACLMessage m, ContractNetResponder cn) {
+				ACLMessage prop = cn.proposal;
+				prop = cn.handleCfp(m);
 				MTS.send(prop); // Sends Proposal to CFP
 				return NOTIFICATION;
 			}
 
 			@Override
-			public void setTemplate(MessageTemplate t) {
+			public void setTemplate(MessageTemplate t, ContractNetResponder c) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
 				performatives.add(ACLMessage.CFP);
 				t.setPerformatives(performatives);
@@ -157,7 +157,7 @@ public class ContractNetResponder extends FSMBehaviour {
 			}
 
 			@Override
-			public void setTemplate(MessageTemplate t) {
+			public void setTemplate(MessageTemplate t, ContractNetResponder c) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
 				performatives.add(ACLMessage.ACCEPT_PROPOSAL);
 				performatives.add(ACLMessage.REJECT_PROPOSAL);
@@ -177,7 +177,7 @@ public class ContractNetResponder extends FSMBehaviour {
 			}
 
 			@Override
-			public void setTemplate(MessageTemplate t) {
+			public void setTemplate(MessageTemplate t, ContractNetResponder c) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
 				performatives.add(ACLMessage.INFORM);
 				t.setPerformatives(performatives);

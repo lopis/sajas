@@ -40,7 +40,7 @@ public class SSContractNetResponder extends FSMBehaviour {
 			protocolState = protocolState.nextState(this);
 		
 		// Update the template
-		protocolState.setTemplate(template);
+		protocolState.setTemplate(template, this);
 	}
 	
 	/**
@@ -50,9 +50,10 @@ public class SSContractNetResponder extends FSMBehaviour {
 	 * @param cfp The original cfp
 	 * @param propose The reply to the original cfp
 	 * @param accept The ACLMessage containing the ACCEPT PROPOSAL
+	 * @return The INFORM reply message to send back to the initiator.
 	 */
-	protected void handleAcceptProposal(ACLMessage cfp,
-			ACLMessage propose, ACLMessage accept) {}
+	protected ACLMessage handleAcceptProposal(ACLMessage cfp,
+			ACLMessage propose, ACLMessage accept) {return accept;}
 
 	/**
 	 * This method is called whenever a REJECT_PROPOSAL arrives
@@ -119,10 +120,11 @@ public class SSContractNetResponder extends FSMBehaviour {
 			}
 
 			@Override
-			public void setTemplate(MessageTemplate t) {
+			public void setTemplate(MessageTemplate t, SSContractNetResponder cn) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
 				performatives.add(ACLMessage.CFP);
 				t.setPerformatives(performatives);
+				t.addConversationId(cn.cfp.getConversationId());
 			}
 		}, 
 
@@ -138,35 +140,26 @@ public class SSContractNetResponder extends FSMBehaviour {
 					cn.handleRejectProposal(cn.cfp, cn.proposal, m);
 					return CFP;
 				} else if (m.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
-					cn.handleAcceptProposal(cn.cfp, cn.proposal, m);
-					return FINISH;
+					ACLMessage reply = cn.handleAcceptProposal(cn.cfp, cn.proposal, m);
+					
+					MTS.send(reply);
+					
+					// Finish Behaviour
+					cn.myAgent.removeBehaviour(cn);
+					cn.onEnd();
 				}
 
 				return NOTIFICATION;
 			}
 
 			@Override
-			public void setTemplate(MessageTemplate t) {
+			public void setTemplate(MessageTemplate t, SSContractNetResponder cn) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
 				performatives.add(ACLMessage.ACCEPT_PROPOSAL);
 				performatives.add(ACLMessage.REJECT_PROPOSAL);
 				t.setPerformatives(performatives);
+				t.addConversationId(cn.cfp.getConversationId());
 			}
-		},
-
-		/**
-		 * After the proposal is accepted, the agent can do some task
-		 * and get back to the CFP issuer later and send an INFORM when
-		 * that task is DONE. In this state, messages are ignored.
-		 */
-		FINISH {
-			@Override
-			public State nextState(ACLMessage m, SSContractNetResponder b) {
-				return FINISH;
-			}
-
-			@Override
-			public void setTemplate(MessageTemplate t) {}
 		};
 		
 		@Override

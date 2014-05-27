@@ -61,7 +61,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 		template = new MessageTemplate();
 		protocol = FIPANames.InteractionProtocol.FIPA_REQUEST;
 		protocolState = State.RESPONSE;
-		protocolState.setTemplate(template);
+		protocolState.setTemplate(template, this);
 		
 		waitingList = new ArrayList<AID>();
 		for (int i = 0; i < message.getReceivers().size(); i++) {
@@ -169,17 +169,17 @@ public class AchieveREInitiator extends FSMBehaviour {
 			@Override
 			public State nextState(ACLMessage m, AchieveREInitiator re) {
 				if (re.isAllResponded()) {
-					return In;
+					return INFORM;
 				} else if (re.isAllResulted()) {
-					return FINISHED;
+					re.myAgent.removeBehaviour(re);
+					re.onEnd();
 				}
-				else {
-					return RESPONSE;
-				}
+				
+				return RESPONSE;
 			}
 			
 			@Override
-			public void setTemplate(MessageTemplate t) {
+			public void setTemplate(MessageTemplate t, AchieveREInitiator re) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
 				performatives.add(ACLMessage.AGREE);
 				performatives.add(ACLMessage.REFUSE);
@@ -192,38 +192,23 @@ public class AchieveREInitiator extends FSMBehaviour {
 		 * After receiving an Inform or all AGREEs/REFUSEs,
 		 * the protocol skips to this state;
 		 */
-		In {
+		INFORM {
 			@Override
 			public State nextState(ACLMessage m, AchieveREInitiator re) {
 				if (re.isAllResulted()) {
-					return FINISHED;
+					re.myAgent.removeBehaviour(re);
+					re.onEnd();
 				}
-				else {
-					return In;
-				}
+				
+				return INFORM;
 			}
 			
 			@Override
-			public void setTemplate(MessageTemplate t) {
+			public void setTemplate(MessageTemplate t, AchieveREInitiator re) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
 				performatives.add(ACLMessage.INFORM);
 				t.setPerformatives(performatives);
 			}
-		},
-		
-		/**
-		 * Final state. 
-		 */
-		FINISHED {
-
-			@Override
-			public State nextState(ACLMessage message, AchieveREInitiator behaviour) {
-				return FINISHED;
-			}
-
-			@Override
-			public void setTemplate(MessageTemplate t) {}
-			
 		};
 		
 		@Override

@@ -138,4 +138,8 @@ public abstract class Agent {
 	public void setupAgent() {
 		setup();
 	}
+
+	public boolean hasMail() {
+		return !mailBox.isEmpty();
+	}
 }

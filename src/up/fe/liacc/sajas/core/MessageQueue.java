@@ -79,5 +79,9 @@ public class MessageQueue {
 			list.add(message.clone());
 		}
 	}
+
+	public boolean isEmpty() {
+		return messages.isEmpty();
+	}
 	
 }

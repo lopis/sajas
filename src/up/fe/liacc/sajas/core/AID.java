@@ -13,5 +13,8 @@ public class AID {
 		return localName;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return localName + "@";
+	}
 }

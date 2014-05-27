@@ -28,6 +28,8 @@ public class ContractNetInitiator extends FSMBehaviour {
 
 	protected ACLMessage cfp;
 
+	private long replyTimeout;
+
 	/**
 	 * Default super constructor.
 	 * Must be called for the behavior to work.
@@ -38,7 +40,7 @@ public class ContractNetInitiator extends FSMBehaviour {
 		super(agent);
 		
 		protocolState = State.SEND_CFP;
-		protocolState.setTemplate(template);
+		protocolState.setTemplate(template, this);
 		this.cfp = cfp;
 		responders = cfp.getReceivers();
 		
@@ -65,7 +67,7 @@ public class ContractNetInitiator extends FSMBehaviour {
 			protocolState = protocolState.nextState(this);
 		
 		// Update the template
-		protocolState.setTemplate(template);
+		protocolState.setTemplate(template, this);
 	}
 	
 //	protected void nextState(ACLMessage nextMessage) {
@@ -107,11 +109,11 @@ public class ContractNetInitiator extends FSMBehaviour {
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Returns wether the reply timeout was reached
+	 * @return True if 
 	 */
 	protected boolean isInformed() {
-		return false;
+		return replyTimeout > System.currentTimeMillis();
 	}
 	
 	/**
@@ -144,6 +146,11 @@ public class ContractNetInitiator extends FSMBehaviour {
 	 */
 	protected void handlePropose(ACLMessage m, Vector acceptances) {}
 	
+	private static long count = 0;
+	private static String createConversationId(String name) {
+		return "C-"+name+'-'+System.currentTimeMillis()+'-'+(count++);
+	}
+	
 	/**
 	 * This enum implements the FSMBehaviour.State interface and
 	 * represents the state machine of the Contract Net Initiator.
@@ -167,13 +174,19 @@ public class ContractNetInitiator extends FSMBehaviour {
 
 			@Override
 			public State nextState(ACLMessage message, ContractNetInitiator cn) {
-				ArrayList<ACLMessage> c = cn.prepareCfps(cn.cfp);
-				MTS.send(c.get(0)); // Send the CFP;
+				message = cn.prepareCfps(cn.cfp).get(0);
+				
+				// Be sure a conversation-id is set. If not create a suitable one
+				if (message.getConversationId() == null || message.getConversationId().equals("")) {
+					message.setConversationId(createConversationId(cn.myAgent.getLocalName()));
+				}
+				
+				MTS.send(message); // Send the CFP;
 				return PROPOSAL;
 			}
 
 			@Override
-			public void setTemplate(MessageTemplate t) {
+			public void setTemplate(MessageTemplate t, ContractNetInitiator b) {
 				t.addProtocol(protocol);
 			}
 			
@@ -217,6 +230,7 @@ public class ContractNetInitiator extends FSMBehaviour {
 						MTS.send((ACLMessage) aclMessage);
 					}
 					
+					cn.replyTimeout = System.currentTimeMillis();
 					return INFORM;
 					
 				} else {
@@ -225,10 +239,11 @@ public class ContractNetInitiator extends FSMBehaviour {
 			}
 			
 			@Override
-			public void setTemplate(MessageTemplate t) {
+			public void setTemplate(MessageTemplate t, ContractNetInitiator cn) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
 				performatives.add(ACLMessage.PROPOSE);
 				performatives.add(ACLMessage.REFUSE);
+				t.addConversationId(cn.cfp.getConversationId());
 				t.setPerformatives(performatives);
 			}
 		}, 
@@ -241,41 +256,23 @@ public class ContractNetInitiator extends FSMBehaviour {
 			@Override
 			public State nextState(ACLMessage m, ContractNetInitiator cn) {
 				if (cn.isInformed()) {
-					return FINISHED;
-				} else {
-					return INFORM;
+					cn.onEnd();
 				}
+				return INFORM;
 			}
 			
 			@Override
-			public void setTemplate(MessageTemplate t) {
+			public void setTemplate(MessageTemplate t, ContractNetInitiator cn) {
+				t = new MessageTemplate();
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
 				performatives.add(ACLMessage.INFORM);
+				t.addConversationId(cn.cfp.getConversationId());
 				t.setPerformatives(performatives);
 			}
-		},
-		
-		/**
-		 * Final state. 
-		 */
-		FINISHED {
-			@Override
-			public State nextState(ACLMessage m, ContractNetInitiator cn) {
-				cn.getAgent().removeBehaviour(cn);
-				return FINISHED;
-			}
-
-			@Override
-			public void setTemplate(MessageTemplate t) {}
 		};
 		
 		public State nextState(ContractNetInitiator cn) {
 			return this;
 		}
-
 	}
-
-
-	
-
 }

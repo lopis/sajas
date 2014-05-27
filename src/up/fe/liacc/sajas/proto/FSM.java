@@ -22,8 +22,9 @@ public interface FSM<T> {
     /**
      * Update the current ACL Message Template.
      * @param t The current template
+     * @param contractNetInitiator 
      */
-    public abstract void setTemplate(MessageTemplate t);
+    public abstract void setTemplate(MessageTemplate template, T behaviour);
 
 	public abstract FSM<T> nextState(T behaviour);
 }

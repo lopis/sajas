@@ -82,27 +82,27 @@ public class MessageTemplate {
 	}
 
 	public boolean matchesPerformative(int performative) {
-		return getPerformatives() == null
+		return getPerformatives().isEmpty()
 		|| getPerformatives().contains(performative);
 	}
 
 	public boolean matchesProtocol(String protocol) {
-		return getProtocols() == null
+		return getProtocols().isEmpty()
 		|| getProtocols().contains(protocol);
 	}
 
 	public boolean matchesInReplyTo(String inReplyTo) {
-		return getInReplyTos() == null
+		return getInReplyTos().isEmpty()
 		|| getInReplyTos().contains(inReplyTo);
 	}
 
 	public boolean matchesReplyWith(String replyWith) {
-		return getReplyWiths() == null
+		return getReplyWiths().isEmpty()
 		|| getReplyWiths().contains(replyWith);
 	}
 
 	public boolean matchesContent(Object content) {
-		return getContents() == null
+		return getContents().isEmpty()
 		|| getContents().contains(content);
 	}
 
@@ -131,7 +131,8 @@ public class MessageTemplate {
 	}
 
 	public void addConversationId(String conversationId) {
-		getConversationIds().add(conversationId);
+		if (!getConversationIds().contains(conversationId))
+			getConversationIds().add(conversationId);
 	}
 
 }

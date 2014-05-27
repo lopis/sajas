@@ -3,6 +3,7 @@ package up.fe.liacc.sajas.lang.acl;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import up.fe.liacc.sajas.core.AID;
 import up.fe.liacc.sajas.domain.FIPANames;
@@ -15,32 +16,56 @@ import up.fe.liacc.sajas.domain.FIPANames;
  *
  */
 public class ACLMessage {
+
+	final static public int ACCEPT_PROPOSAL = 0;
+	final static public int AGREE = 1;
+	final static public int CANCEL = 2;
+	final static public int CFP = 3;
+	final static public int CONFIRM = 4;
+	final static public int DISCONFIRM = 5;
+	final static public int FAILURE = 6;
+	final static public int INFORM = 7;
+	final static public int INFORM_IF = 8;
+	final static public int INFORM_REF = 9;
+	final static public int NOT_UNDERSTOOD = 10;
+	final static public int PROPAGATE = 11;
+	final static public int PROPOSE = 12;
+	final static public int PROXY = 13;
+	final static public int QUERY_IF = 14;
+	final static public int QUERY_REF = 15;
+	final static public int REFUSE = 16;
+	final static public int REJECT_PROPOSAL = 17;
+	final static public int REQUEST = 18;
+	final static public int REQUEST_WHEN = 19;
+	final static public int REQUEST_WHENEVER = 20;
+	final static public int SUBSCRIBE = 21;
 	
-	final static public int ACCEPT_PROPOSAL = 1;
-	final static public int AGREE = 2;
-	final static public int CANCEL = 3;
-	final static public int CFP = 4;
-	final static public int CONFIRM = 5;
-	final static public int DISCONFIRM = 6;
-	final static public int FAILURE = 7;
-	final static public int INFORM = 8;
-	final static public int INFORM_IF = 9;
-	final static public int INFORM_REF = 10;
-	final static public int NOT_UNDERSTOOD = 11;
-	final static public int PROPAGATE = 12;
-	final static public int PROPOSE = 13;
-	final static public int PROXY = 14;
-	final static public int QUERY_IF = 15;
-	final static public int QUERY_REF = 16;
-	final static public int REFUSE = 17;
-	final static public int REJECT_PROPOSAL = 18;
-	final static public int REQUEST = 19;
-	final static public int REQUEST_WHEN = 20;
-	final static public int REQUEST_WHENEVER = 21;
-	final static public int SUBSCRIBE = 22;
-	final static public int NO_PERFORMATIVE = -1;
-	
-	private int performative = NO_PERFORMATIVE;			// The intent of the message
+	private static final String[] performatives =  { // initialization of the Vector of performatives
+		"ACCEPT_PROPOSAL",
+		"AGREE",
+		"CANCEL",
+		"CFP",
+		"CONFIRM",
+		"DISCONFIRM",
+		"FAILURE",
+		"INFORM",
+		"INFORM_IF",
+		"INFORM_REF",
+		"NOT_UNDERSTOOD",
+		"PROPAGATE",
+		"PROPOSE",
+		"PROXY",
+		"QUERY_IF",
+		"QUERY_REF",
+		"REFUSE",
+		"REJECT_PROPOSAL",
+		"REQUEST",
+		"REQUEST_WHEN",
+		"REQUEST_WHENEVER",
+		"SUBSCRIBE",
+	};
+
+	private int performative = REQUEST;			// The intent of the message
 	private String protocol = FIPANames.InteractionProtocol.FIPA_REQUEST;	// The intent of the message defaults to REQUEST
 	private Serializable contentObject; 				// Any object can be attached to the message
 	private AID sender; 								// The sender must be set so the receiver can reply
@@ -51,9 +76,9 @@ public class ACLMessage {
 	private StringBuffer contentString;					// The content in string format
 	private String language;							// The langage of the message
 	private String ontology;
-	private String convId;
+	private String conversationId;
 
-	
+
 	/**
 	 * Creates a new ACL Message. The fields replyWith and inReplyTo are not
 	 * needed, but all other should be not null.
@@ -61,8 +86,11 @@ public class ACLMessage {
 	 */
 	public ACLMessage(int performative) {
 		this.setPerformative(performative);
+		if (performative == 18) {
+			System.out.println("18??");
+		}
 	}
-	
+
 	/**
 	 * Communication performative represents the intent of the message.
 	 * The value of this field is one of the following:
@@ -93,19 +121,16 @@ public class ACLMessage {
 	public int getPerformative() {
 		return performative;
 	}
-	
+
 	/**
 	 * Sets the performative of this message. The value defaults to 
 	 * ACL_NO_PERFORMATIVE if the param "performative" is not valid.
 	 * @param performative
 	 */
 	public void setPerformative(int performative) {
-		this.performative = 
-				(performative > 0 && performative <= SUBSCRIBE)
-				? performative
-				: NO_PERFORMATIVE;
+		this.performative = (performative <= performatives.length) ? performative : REQUEST;
 	}
-	
+
 	/**
 	 * Returns the protocol to which this message belongs.
 	 * @return The protocol is represented 
@@ -117,7 +142,7 @@ public class ACLMessage {
 	public void setProtocol(String protocol) {
 		this.protocol = protocol;
 	}
-	
+
 
 	/**
 	 * @return Returns the content of this message. This object can be null.
@@ -125,7 +150,7 @@ public class ACLMessage {
 	public Serializable getContentObject() throws UnreadableException {
 		return contentObject;
 	}
-	
+
 	/**
 	 * Attaches an object to this message. This message's content
 	 * can be left null.
@@ -135,7 +160,7 @@ public class ACLMessage {
 	public void setContentObject(Serializable content) throws IOException {
 		this.contentObject = content;
 	}
-	
+
 	public void setContent(String message) {
 		contentString = new StringBuffer(message);
 	}
@@ -152,14 +177,14 @@ public class ACLMessage {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * @return Reference to the issuer of this message.
 	 */
 	public AID getSender() {
 		return sender;
 	}
-	
+
 	/**
 	 * Sets the issuer if this message.
 	 * @param sender
@@ -167,7 +192,7 @@ public class ACLMessage {
 	public void setSender(AID sender) {
 		this.sender = sender;
 	}
-	
+
 	/**
 	 * @return Reference to the receiver of this message.
 	 */
@@ -181,7 +206,7 @@ public class ACLMessage {
 	protected void setReceivers(ArrayList<AID> receivers) {
 		this.receivers = receivers;
 	}
-	
+
 	/**
 	 * Sets the receiver of this message.
 	 * @param receiver
@@ -227,7 +252,7 @@ public class ACLMessage {
 	}
 
 	/**
-	 
+
 	 * @return Deadline for the response.
 	 * The time is formatted as unix time, in seconds. //FIXME: confirm if seconds or millis
 	 */
@@ -243,7 +268,7 @@ public class ACLMessage {
 	public void setWhen(long when) {
 		this.when = when;
 	}
-	
+
 	public StringBuffer getContentString() {
 		return contentString;
 	}
@@ -259,7 +284,7 @@ public class ACLMessage {
 	public void setLanguage(String language) {
 		this.language = language;
 	}
-	
+
 	public String getOntology() {
 		return ontology;
 	}
@@ -269,11 +294,11 @@ public class ACLMessage {
 	}
 
 	public String getConversationId() {
-		return convId;
+		return conversationId;
 	}
 
 	public void setConversationId(String convId) {
-		this.convId = convId;
+		this.conversationId = convId;
 	}
 
 	/**
@@ -286,22 +311,22 @@ public class ACLMessage {
 	 * @return True if all fields (expected those ignored) match the template's. 
 	 */
 	public boolean match(MessageTemplate template) {
-		
+
 		if (template == null)
 			return false;
-		
+
 		try {
 			return template.matchesPerformative(this.getPerformative()) 
-				&& template.matchesProtocol(this.getProtocol())
-				&& template.matchesInReplyTo(this.getInReplyTo())
-				&& template.matchesReplyWith(this.getReplyWith())
-				&& template.matchesContent(this.getContentObject());
+					&& template.matchesProtocol(this.getProtocol())
+					&& template.matchesInReplyTo(this.getInReplyTo())
+					&& template.matchesReplyWith(this.getReplyWith())
+					&& template.matchesContent(this.getContentObject());
 		} catch (UnreadableException e) {
 			System.err.println(e.getMessage());
 			return false;
 		}
 	}
-	
+
 	public ACLMessage clone() {
 		ACLMessage newMessage = new ACLMessage(this.performative);
 		try {
@@ -313,10 +338,10 @@ public class ACLMessage {
 		newMessage.setReplyWith(this.replyWith);
 		newMessage.setSender(this.sender);
 		newMessage.setWhen(this.when);
-		
+
 		newMessage.setReceivers(this.receivers);
 		newMessage.setSender(this.sender);
-		
+
 		return newMessage;
 	}
 
@@ -336,10 +361,43 @@ public class ACLMessage {
 		reply.setLanguage(language);
 		reply.setOntology(ontology);
 		reply.setProtocol(protocol);
-		reply.setConversationId(convId);
+		reply.setConversationId(conversationId);
 		return reply;
 	}
-	
-	
+
+
+	private static final String SENDER          = " :sender ";
+	private static final String RECEIVER        = " :receiver ";
+	private static final String CONTENT         = " :content "; 
+//	private static final String REPLY_WITH      = " :reply-with ";
+//	private static final String IN_REPLY_TO     = " :in-reply-to ";
+//	private static final String REPLY_TO        = " :reply-to ";
+//	private static final String LANGUAGE        = " :language ";
+//	private static final String ENCODING        = " :encoding ";
+//	private static final String ONTOLOGY        = " :ontology ";
+//	private static final String REPLY_BY        = " :reply-by ";
+	private static final String PROTOCOL        = " :protocol ";
+	private static final String CONVERSATION_ID = " :conversation-id ";
+
+	@Override
+	public String toString() {
+		StringBuffer str = new StringBuffer("(");
+			str.append(performatives[performative] + "(" + performative + ")\n");
+			str.append(PROTOCOL + protocol + "\n");
+			str.append(SENDER + sender + "\n");
+			if (receivers == null) {
+				str.append(RECEIVER + "null\n");
+			} else if (receivers.size()==1) {
+				str.append(RECEIVER + receivers.get(0) + "\n");
+			} else {
+				for (Iterator<AID> iterator = receivers.iterator(); iterator.hasNext();) {
+					str.append(RECEIVER + iterator.next() + "\n");		
+				}
+			}
+			str.append(CONTENT + (contentObject!= null ? contentObject : contentString) + "\n");
+			str.append(CONVERSATION_ID + conversationId + "\n");
+		str.append(")");
+		return str.toString();
+	}
 
 }

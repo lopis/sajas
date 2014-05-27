@@ -42,17 +42,34 @@ public abstract class Behaviour {
 		this.myAgent = owner;
 	}
 
-	public void reset() {
-		// TODO Auto-generated method stub
-	}
+	/**
+	 * Empty placeholder fot the method that resets the
+	 * behaviour. This method should be overridden.
+	 */
+	public void reset() {}
 
+	/**
+	 * This method is just an empty placeholder for subclasses.
+	 * It is invoked just once after this behaviour has ended.
+	 * Therefore, it acts as an epilog for the task represented
+	 * by this Behaviour. Note that onEnd is called after the
+	 * behaviour has been removed from the pool of behaviours
+	 * to be executed by an agent. Therefore calling reset()
+	 * is not sufficient to cyclically repeat the task represented
+	 * by this Behaviour. In order to achieve that, this Behaviour
+	 * must be added again to the agent (using myAgent.addBehaviour(this)).
+	 * @return
+	 */
 	public int onEnd() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
+	/**
+	 * Returns whether this behaviour is done. This default
+	 * implementation does nothing and the method should be overridden.
+	 * @return
+	 */
 	public boolean done() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 }

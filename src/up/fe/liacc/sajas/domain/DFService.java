@@ -70,8 +70,10 @@ public class DFService {
 			} 
 			results.add(dfd.getName());
 		} else {
-			results = agents;
+			results = new ArrayList<>(agents);
 		}
+		
+		results.remove(agent.getAID()); // Don't return the agent itself
 
 		if (!dfd.getLanguages().isEmpty()) 
 			results = filterAgents(languages, dfd.getLanguages(), results);
@@ -179,7 +181,7 @@ public class DFService {
 				ServiceDescription service = iterator.next();
 				if (service.getName() == null || service.getName().length() == 0 ||
 					service.getType() == null || service.getType().length() == 0) {
-					
+					throw new FIPAException("[DF] Register: Undefined field(s) in the service description");
 				}
 			}
 		}
