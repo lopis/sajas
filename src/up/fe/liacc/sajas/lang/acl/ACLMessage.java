@@ -338,7 +338,7 @@ public class ACLMessage {
 		newMessage.setReplyWith(this.replyWith);
 		newMessage.setSender(this.sender);
 		newMessage.setWhen(this.when);
-
+		newMessage.setConversationId(this.conversationId);
 		newMessage.setReceivers(this.receivers);
 		newMessage.setSender(this.sender);
 

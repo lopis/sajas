@@ -10,7 +10,7 @@ import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 
 public class SSContractNetResponder extends FSMBehaviour {
 	
-	private State protocolState;
+	private FSM<SSContractNetResponder> protocolState;
 	private MessageTemplate template;
 	
 	/**
@@ -35,7 +35,7 @@ public class SSContractNetResponder extends FSMBehaviour {
 		
 		// Update the state
 		if (nextMessage != null)
-			protocolState = protocolState.nextState(nextMessage, this);			
+			protocolState = protocolState.nextState(nextMessage, this);
 		else
 			protocolState = protocolState.nextState(this);
 		
@@ -126,6 +126,11 @@ public class SSContractNetResponder extends FSMBehaviour {
 				t.setPerformatives(performatives);
 				t.addConversationId(cn.cfp.getConversationId());
 			}
+
+			@Override
+			public State nextState(SSContractNetResponder cn) {
+				return nextState(cn.cfp, cn);
+			}
 		}, 
 
 		/**
@@ -160,17 +165,13 @@ public class SSContractNetResponder extends FSMBehaviour {
 				t.setPerformatives(performatives);
 				t.addConversationId(cn.cfp.getConversationId());
 			}
+
+			@Override
+			public State nextState(SSContractNetResponder behaviour) {
+				return NOTIFICATION;
+			}
 		};
 		
-		@Override
-		public State nextState(ACLMessage m, SSContractNetResponder b) {
-			return null;
-		}
-		
-		@Override
-		public State nextState(
-				SSContractNetResponder behaviour) {
-			return this;
-		}
+
 	}
 }

@@ -17,7 +17,6 @@ import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 public abstract class SSResponderDispatcher extends Behaviour {
 	
 	private MessageTemplate template;
-	private int numResponders = 0;
 
 	public SSResponderDispatcher(Agent a, MessageTemplate template) {
 		super(a);
@@ -33,10 +32,8 @@ public abstract class SSResponderDispatcher extends Behaviour {
 			if (message.getConversationId() == null || message.getConversationId().equals("")) {
 				message.setConversationId(createConversationId(myAgent.getLocalName()));
 			}
-//			final String convId = message.getConversationId();
 			Behaviour ssResponder = createResponder(message);
 			addBehaviour(ssResponder);
-			System.err.println("\t\t\t\t\t" + myAgent.getLocalName() + "\t" + (numResponders++));
 		}
 	}
 
