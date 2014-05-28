@@ -1,6 +1,6 @@
 SAJaS
-https://zenodo.org/badge/4051/lopis/sajas.png
 
+http://dx.doi.org/10.5281/zenodo.10180
 
 
 SAJaS, the Simple API for JADE-based Simulations, implements a
