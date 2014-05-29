@@ -67,8 +67,10 @@ public abstract class Agent {
 	}
 	
 	public void send(ACLMessage message) {
-		message.setSender(getAID());
-		MTS.send(message);
+		if (message != null) {
+			message.setSender(getAID());
+			MTS.send(message);
+		}
 	}
 
 	/**

@@ -398,7 +398,7 @@ public class ACLMessage {
 	}
 
 	public void clearAllReceiver() {
-		receivers.clear();
+		receivers = new ArrayList<AID>();
 	}
 
 }

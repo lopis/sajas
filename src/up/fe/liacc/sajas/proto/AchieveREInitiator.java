@@ -46,6 +46,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 	protected ArrayList<AID> waitingList;
 	protected ArrayList<AID> responders = new ArrayList<AID>();
 	protected Vector responses = new Vector(); //This is a vector for compatibility with JADE
+	protected ACLMessage request;
 
 
 	/**
@@ -59,19 +60,15 @@ public class AchieveREInitiator extends FSMBehaviour {
 	public AchieveREInitiator(Agent agent, ACLMessage message) {
 		super(agent);
 		// Set the template that will filter the responses
-		template = new MessageTemplate();
 		protocol = FIPANames.InteractionProtocol.FIPA_REQUEST;
-		protocolState = State.RESPONSE;
+		protocolState = State.SEND_REQUEST;
+		template = new MessageTemplate();
 		protocolState.setTemplate(template, this);
-
+		request = message;
 		waitingList = new ArrayList<AID>();
 		for (int i = 0; i < message.getReceivers().size(); i++) {
 			waitingList.add(message.getReceivers().get(i));
 		}
-
-		responders = new ArrayList<AID>();
-		responders.addAll(message.getReceivers());
-		myAgent.send(message);
 	}
 	
 	public void action() {
@@ -169,6 +166,28 @@ public class AchieveREInitiator extends FSMBehaviour {
 	 *
 	 */
 	private enum State implements FSM<AchieveREInitiator> {
+		
+		SEND_REQUEST {
+
+			@Override
+			public FSM<AchieveREInitiator> nextState(ACLMessage message, AchieveREInitiator re) {
+				return nextState(re);
+			}
+
+			@Override
+			public void setTemplate(MessageTemplate template, AchieveREInitiator re) {
+				template.addProtocol(re.protocol);
+			}
+
+			@Override
+			public FSM<AchieveREInitiator> nextState(AchieveREInitiator re) {
+				re.responders = new ArrayList<AID>();
+				re.responders.addAll(re.request.getReceivers());
+				re.myAgent.send(re.request);
+				return RESPONSE;
+			}
+			
+		},
 
 		/**
 		 * Initially, a response of Agree/Refuse/Inform is expected
@@ -179,6 +198,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 			public State nextState(ACLMessage m, AchieveREInitiator re) {
 				
 				re.responses.add(m);
+				re.responders.remove(m.getSender());
 				
 				switch (m.getPerformative()) {
 				case ACLMessage.AGREE:
@@ -194,15 +214,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 					break;
 				}
 				
-				if (re.isAllResponded()) {
-					re.handleAllResponses(re.responses);
-					return INFORM;
-				} else if (re.isAllResulted()) {
-					re.myAgent.removeBehaviour(re);
-					re.onEnd();
-				}
-
-				return RESPONSE;
+				return nextState(re);
 			}
 
 			@Override
@@ -212,6 +224,20 @@ public class AchieveREInitiator extends FSMBehaviour {
 				performatives.add(ACLMessage.REFUSE);
 				performatives.add(ACLMessage.INFORM);
 				t.setPerformatives(performatives);
+			}
+			
+			@Override
+			public State nextState(AchieveREInitiator re) {
+
+				if (re.isAllResponded()) {
+					re.handleAllResponses(re.responses);
+					return INFORM;
+				} else if (re.isAllResulted()) {
+					re.myAgent.removeBehaviour(re);
+					re.onEnd();
+				}
+
+				return RESPONSE;
 			}
 		}, 
 
@@ -226,12 +252,8 @@ public class AchieveREInitiator extends FSMBehaviour {
 					re.handleInform(m);
 				}
 				
-				if (re.isAllResulted()) {
-					re.myAgent.removeBehaviour(re);
-					re.onEnd();
-				}
-
-				return INFORM;
+				re.onEnd(); //FIXME 
+				return nextState(re);
 			}
 
 			@Override
@@ -240,12 +262,17 @@ public class AchieveREInitiator extends FSMBehaviour {
 				performatives.add(ACLMessage.INFORM);
 				t.setPerformatives(performatives);
 			}
-		};
 
-		@Override
-		public State nextState(AchieveREInitiator re) {
-			return this;
-		}
+			@Override
+			public State nextState(AchieveREInitiator re) {
+				if (re.isAllResulted()) {
+					re.myAgent.removeBehaviour(re);
+					re.onEnd();
+				}
+
+				return INFORM;
+			}
+		};
 	}
 
 }
