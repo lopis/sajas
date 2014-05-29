@@ -14,8 +14,6 @@ import up.fe.liacc.sajas.lang.acl.ACLMessage;
  *
  */
 public class MTS {
-	
-	
 
 	/**
 	 * Sends a message to another agent.
@@ -29,9 +27,8 @@ public class MTS {
 			// The message is cloned to prevent modifications of the original one.
 			ACLMessage newmessage = message.clone();
 			ArrayList<AID> receivers = newmessage.getReceivers();
-			System.out.println(message);
+			System.out.println(message); //FIXME: debug
 			for (AID aid: receivers) {
-				
 				if (aid != null) {
 					resolve(aid).addMail(newmessage);
 				}

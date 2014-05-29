@@ -2,7 +2,6 @@ package up.fe.liacc.sajas.proto;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.sajas.MTS;
 import up.fe.liacc.sajas.core.Agent;
 import up.fe.liacc.sajas.core.behaviours.FSMBehaviour;
 import up.fe.liacc.sajas.domain.FIPANames;
@@ -125,7 +124,7 @@ public class ContractNetResponder extends FSMBehaviour {
 			public State nextState(ACLMessage m, ContractNetResponder cn) {
 				ACLMessage prop = cn.proposal;
 				prop = cn.handleCfp(m);
-				MTS.send(prop); // Sends Proposal to CFP
+				cn.myAgent.send(prop); // Sends Proposal to CFP
 				return NOTIFICATION;
 			}
 

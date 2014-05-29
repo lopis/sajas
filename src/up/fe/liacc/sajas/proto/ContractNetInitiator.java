@@ -3,7 +3,6 @@ package up.fe.liacc.sajas.proto;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import up.fe.liacc.sajas.MTS;
 import up.fe.liacc.sajas.core.AID;
 import up.fe.liacc.sajas.core.Agent;
 import up.fe.liacc.sajas.core.behaviours.FSMBehaviour;
@@ -24,7 +23,7 @@ public class ContractNetInitiator extends FSMBehaviour {
 
 	private MessageTemplate template = new MessageTemplate();
 
-	private FSM protocolState;
+	private FSM<ContractNetInitiator> protocolState;
 
 	protected ACLMessage cfp;
 
@@ -181,7 +180,7 @@ public class ContractNetInitiator extends FSMBehaviour {
 					message.setConversationId(createConversationId(cn.myAgent.getLocalName()));
 				}
 				
-				MTS.send(message); // Send the CFP;
+				cn.myAgent.send(message); // Send the CFP;
 				return PROPOSAL;
 			}
 
@@ -228,7 +227,7 @@ public class ContractNetInitiator extends FSMBehaviour {
 					cn.handleAllResponses(cn.responses, cn.acceptances);
 					for (Object aclMessage : cn.acceptances) {
 						// Send all "ACCEPT PROPOSE" or "REJECT PROPOSE"
-						MTS.send((ACLMessage) aclMessage);
+						cn.myAgent.send((ACLMessage) aclMessage);
 					}
 					
 					cn.replyTimeout = System.currentTimeMillis();

@@ -3,7 +3,6 @@ package up.fe.liacc.sajas.proto;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import up.fe.liacc.sajas.MTS;
 import up.fe.liacc.sajas.core.AID;
 import up.fe.liacc.sajas.core.Agent;
 import up.fe.liacc.sajas.core.behaviours.FSMBehaviour;
@@ -37,14 +36,16 @@ import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 public class AchieveREInitiator extends FSMBehaviour {
 
 	private MessageTemplate template;
-	private State protocolState;
+	private FSM<AchieveREInitiator> protocolState;
 	private String protocol;
-	
+
 	/**
 	 * List of agents that didn't send the result
 	 * of the request yet. 
 	 */
-	ArrayList<AID> waitingList;
+	protected ArrayList<AID> waitingList;
+	protected ArrayList<AID> responders = new ArrayList<AID>();
+	protected Vector responses = new Vector(); //This is a vector for compatibility with JADE
 
 
 	/**
@@ -62,13 +63,28 @@ public class AchieveREInitiator extends FSMBehaviour {
 		protocol = FIPANames.InteractionProtocol.FIPA_REQUEST;
 		protocolState = State.RESPONSE;
 		protocolState.setTemplate(template, this);
-		
+
 		waitingList = new ArrayList<AID>();
 		for (int i = 0; i < message.getReceivers().size(); i++) {
 			waitingList.add(message.getReceivers().get(i));
 		}
 
-		send(message);
+		responders = new ArrayList<AID>();
+		responders.addAll(message.getReceivers());
+		myAgent.send(message);
+	}
+	
+	public void action() {
+		ACLMessage nextMessage = this.getAgent().receive(template);
+		
+		// Update the state
+		if (nextMessage != null)
+			protocolState = protocolState.nextState(nextMessage, this);			
+		else
+			protocolState = protocolState.nextState(this);
+		
+		// Update the template
+		protocolState.setTemplate(template, this);
 	}
 
 	public String getProtocol() {
@@ -94,24 +110,24 @@ public class AchieveREInitiator extends FSMBehaviour {
 	/**
 	 * Handle 'agree' response from one of the receivers of the request.
 	 */
-	protected void handleAgree(ACLMessage agree) {}
+	protected void handleAgree(ACLMessage inform) {}
 
 	/**
 	 * Handle 'refuse' response from one of the receivers of the request.
 	 */
-	protected void handleRefuse(ACLMessage agree) {}
+	protected void handleRefuse(ACLMessage inform) {}
 
 	/**
 	 * Handle 'inform' result notification from one of
 	 * the receivers of the request.
 	 */
-	protected void handleInform(ACLMessage agree) {}
+	protected void handleInform(ACLMessage inform) {}
 
 	/**
 	 * Handle 'failure' result notification from one of
 	 * the receivers of the request.
 	 */
-	protected void handleFailure(ACLMessage agree) {}
+	protected void handleFailure(ACLMessage inform) {}
 
 	/**
 	 * Handle 'no-understood' response from one of
@@ -136,15 +152,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 	protected boolean isAllResulted() {
 		return waitingList.isEmpty();
 	}
-	
-	/**
-	 * 
-	 * @param message
-	 */
-	public void send(ACLMessage message) {
-		MTS.send(message);
-	}
-	
+
 	/**
 	 * The state machine for this protocol.
 	 * Each state implements "nextState(ACLMessage, AchieveREInitiator re)"
@@ -166,18 +174,37 @@ public class AchieveREInitiator extends FSMBehaviour {
 		 * Initially, a response of Agree/Refuse/Inform is expected
 		 */
 		RESPONSE {
+			@SuppressWarnings("unchecked")
 			@Override
 			public State nextState(ACLMessage m, AchieveREInitiator re) {
+				
+				re.responses.add(m);
+				
+				switch (m.getPerformative()) {
+				case ACLMessage.AGREE:
+					re.handleAgree(m);
+					break;
+				case ACLMessage.REFUSE:
+					re.handleRefuse(m);
+					break;
+				case ACLMessage.INFORM:
+					re.handleInform(m);
+					break;
+				default:
+					break;
+				}
+				
 				if (re.isAllResponded()) {
+					re.handleAllResponses(re.responses);
 					return INFORM;
 				} else if (re.isAllResulted()) {
 					re.myAgent.removeBehaviour(re);
 					re.onEnd();
 				}
-				
+
 				return RESPONSE;
 			}
-			
+
 			@Override
 			public void setTemplate(MessageTemplate t, AchieveREInitiator re) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
@@ -187,7 +214,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 				t.setPerformatives(performatives);
 			}
 		}, 
-		
+
 		/**
 		 * After receiving an Inform or all AGREEs/REFUSEs,
 		 * the protocol skips to this state;
@@ -195,14 +222,18 @@ public class AchieveREInitiator extends FSMBehaviour {
 		INFORM {
 			@Override
 			public State nextState(ACLMessage m, AchieveREInitiator re) {
+				if (m.getPerformative() == ACLMessage.INFORM) {
+					re.handleInform(m);
+				}
+				
 				if (re.isAllResulted()) {
 					re.myAgent.removeBehaviour(re);
 					re.onEnd();
 				}
-				
+
 				return INFORM;
 			}
-			
+
 			@Override
 			public void setTemplate(MessageTemplate t, AchieveREInitiator re) {
 				ArrayList<Integer> performatives = new ArrayList<Integer>();
@@ -210,7 +241,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 				t.setPerformatives(performatives);
 			}
 		};
-		
+
 		@Override
 		public State nextState(AchieveREInitiator re) {
 			return this;

@@ -2,6 +2,7 @@ package up.fe.liacc.sajas.core;
 
 import java.util.ArrayList;
 
+import up.fe.liacc.sajas.MTS;
 import up.fe.liacc.sajas.core.behaviours.Behaviour;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
 import up.fe.liacc.sajas.lang.acl.MessageTemplate;
@@ -63,6 +64,11 @@ public abstract class Agent {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public void send(ACLMessage message) {
+		message.setSender(getAID());
+		MTS.send(message);
 	}
 
 	/**

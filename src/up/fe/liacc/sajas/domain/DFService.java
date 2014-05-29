@@ -52,7 +52,8 @@ public class DFService {
 	 * Search an agent with this AID.
 	 * @param aid 
 	 * @return An array of DFAgentDescriptions containing the AIDs of
-	 * the agents found in the DF that match the provided DFD.
+	 * the agents found in the DF that match the provided DFD. Returns 
+	 * an empty array if no results are found.
 	 * @throws FIPAException Not implemented.
 	 */
 	public static DFAgentDescription[] search(Agent agent, DFAgentDescription dfd) 

@@ -86,9 +86,6 @@ public class ACLMessage {
 	 */
 	public ACLMessage(int performative) {
 		this.setPerformative(performative);
-		if (performative == 18) {
-			System.out.println("18??");
-		}
 	}
 
 	/**
@@ -398,6 +395,10 @@ public class ACLMessage {
 			str.append(CONVERSATION_ID + conversationId + "\n");
 		str.append(")");
 		return str.toString();
+	}
+
+	public void clearAllReceiver() {
+		receivers.clear();
 	}
 
 }

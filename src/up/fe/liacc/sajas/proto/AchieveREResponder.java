@@ -2,7 +2,6 @@ package up.fe.liacc.sajas.proto;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.sajas.MTS;
 import up.fe.liacc.sajas.core.Agent;
 import up.fe.liacc.sajas.core.behaviours.FSMBehaviour;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
@@ -11,7 +10,7 @@ import up.fe.liacc.sajas.lang.acl.MessageTemplate;
 public class AchieveREResponder extends FSMBehaviour {
 
 	protected MessageTemplate template;
-	private State protocolState;
+	private FSM<AchieveREResponder> protocolState;
 	protected ACLMessage request;
 	protected ACLMessage response;
 
@@ -47,6 +46,19 @@ public class AchieveREResponder extends FSMBehaviour {
 	//			handleRequest(nextMessage);
 	//		}
 	//	}
+	
+	public void action() {
+		ACLMessage nextMessage = this.getAgent().receive(template);
+		
+		// Update the state
+		if (nextMessage != null)
+			protocolState = protocolState.nextState(nextMessage, this);			
+		else
+			protocolState = protocolState.nextState(this);
+		
+		// Update the template
+		protocolState.setTemplate(template, this);
+	}
 
 	public static MessageTemplate createMessageTemplate(String protocol) {
 		MessageTemplate template = new MessageTemplate();
@@ -101,7 +113,7 @@ public class AchieveREResponder extends FSMBehaviour {
 				if (m != null) {
 					re.request = m;
 					ACLMessage response = re.handleRequest(m);
-					MTS.send(response);
+					re.myAgent.send(response);
 					return REPLY;
 				}
 
@@ -127,7 +139,7 @@ public class AchieveREResponder extends FSMBehaviour {
 			@Override
 			public State nextState(ACLMessage m, AchieveREResponder re) {
 				ACLMessage result = re.prepareResultNotification(re.request, re.response);
-				MTS.send(result);
+				re.myAgent.send(result);
 
 				// Reset the responder0
 				return RESPONSE;

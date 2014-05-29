@@ -2,7 +2,6 @@ package up.fe.liacc.sajas.proto;
 
 import java.util.ArrayList;
 
-import up.fe.liacc.sajas.MTS;
 import up.fe.liacc.sajas.core.Agent;
 import up.fe.liacc.sajas.core.behaviours.FSMBehaviour;
 import up.fe.liacc.sajas.lang.acl.ACLMessage;
@@ -112,10 +111,10 @@ public class SSContractNetResponder extends FSMBehaviour {
 		 */
 		CFP {
 			@Override
-			public State nextState(ACLMessage m, SSContractNetResponder b) {
-				ACLMessage prop = b.proposal;
-				prop = b.handleCfp(m);
-				MTS.send(prop); // Sends Proposal to CFP
+			public State nextState(ACLMessage m, SSContractNetResponder cn) {
+				ACLMessage prop = cn.proposal;
+				prop = cn.handleCfp(m);
+				cn.myAgent.send(prop); // Sends Proposal to CFP
 				return NOTIFICATION;
 			}
 
@@ -147,7 +146,7 @@ public class SSContractNetResponder extends FSMBehaviour {
 				} else if (m.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
 					ACLMessage reply = cn.handleAcceptProposal(cn.cfp, cn.proposal, m);
 					
-					MTS.send(reply);
+					cn.myAgent.send(reply);
 					
 					// Finish Behaviour
 					cn.myAgent.removeBehaviour(cn);
