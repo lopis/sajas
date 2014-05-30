@@ -379,7 +379,7 @@ public class ACLMessage {
 	@Override
 	public String toString() {
 		StringBuffer str = new StringBuffer("(");
-			str.append(performatives[performative] + "(" + performative + ")\n");
+			str.append(performatives[performative] + "\n");
 			str.append(PROTOCOL + protocol + "\n");
 			str.append(SENDER + sender + "\n");
 			if (receivers == null) {

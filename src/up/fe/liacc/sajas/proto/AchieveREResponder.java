@@ -17,35 +17,11 @@ public class AchieveREResponder extends FSMBehaviour {
 	public AchieveREResponder(Agent agent, MessageTemplate template) {
 		super(agent);
 
-		//template = createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
-		//template.addProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-
 		this.template = template;
 
 		protocolState = State.RESPONSE;
 		protocolState.setTemplate(template, this);
 	}
-
-	//	@Override
-	//	/**
-	//	 * Schedule this method and call super(). This method
-	//	 * must be overridden.
-	//	 */
-	//	public void action() {
-	//		/*
-	//		 * This method is scheduled in Repast.
-	//		 * On each tick, do:
-	//		 *  1 - Get one message matching the template
-	//		 *  2 - Read the performative in the message
-	//		 *  3 - Call the appropriate handler
-	//		 *  5 - If wait list is empty, run the appropriate "handle all"
-	//		 *  6 - Update the protocol state 
-	//		 */
-	//		ACLMessage nextMessage = this.getAgent().receive(template);
-	//		if (nextMessage != null) {
-	//			handleRequest(nextMessage);
-	//		}
-	//	}
 	
 	public void action() {
 		ACLMessage nextMessage = this.getAgent().receive(template);
@@ -64,16 +40,6 @@ public class AchieveREResponder extends FSMBehaviour {
 		MessageTemplate template = new MessageTemplate();
 		template.addProtocol(protocol);
 		return template;
-
-		//		if(protocol.equals(FIPANames.InteractionProtocol.FIPA_REQUEST)) {
-		//			return MessageTemplate.and(MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST),
-		//					MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
-		//		
-		//		} else
-		//			if(CaseInsensitiveString.equalsIgnoreCase(FIPA_QUERY,iprotocol))
-		//				return MessageTemplate.and(MessageTemplate.MatchProtocol(FIPA_QUERY),MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.QUERY_IF),MessageTemplate.MatchPerformative(ACLMessage.QUERY_REF)));
-		//			else
-		//				return MessageTemplate.MatchProtocol(iprotocol);
 	}
 
 	/**
@@ -110,14 +76,10 @@ public class AchieveREResponder extends FSMBehaviour {
 		RESPONSE {
 			@Override
 			public State nextState(ACLMessage m, AchieveREResponder re) {
-				if (m != null) {
-					re.request = m;
-					ACLMessage response = re.handleRequest(m);
-					re.myAgent.send(response);
-					return REPLY;
-				}
-
-				return RESPONSE;
+				re.request = m;
+				ACLMessage response = re.handleRequest(m);
+				re.myAgent.send(response);
+				return REPLY;
 			}
 
 			@Override
@@ -130,6 +92,11 @@ public class AchieveREResponder extends FSMBehaviour {
 				performatives.add(ACLMessage.QUERY_REF);
 				t.setPerformatives(performatives);
 			}
+
+			@Override
+			public State nextState(AchieveREResponder behaviour) {
+				return RESPONSE;
+			}
 		}, 
 
 		/**
@@ -138,23 +105,25 @@ public class AchieveREResponder extends FSMBehaviour {
 		REPLY {
 			@Override
 			public State nextState(ACLMessage m, AchieveREResponder re) {
+				re.myAgent.addMail(m); // This message was not parsed. Back to the mail box.
+				return nextState(re);
+			}
+
+			@Override
+			public void setTemplate(MessageTemplate t, AchieveREResponder re) {
+				t = new MessageTemplate();
+				t.addPerformative(-1);
+			}
+
+			@Override
+			public State nextState(AchieveREResponder re) {
 				ACLMessage result = re.prepareResultNotification(re.request, re.response);
 				re.myAgent.send(result);
 
 				// Reset the responder0
 				return RESPONSE;
 			}
-
-			@Override
-			public void setTemplate(MessageTemplate t, AchieveREResponder re) {
-				t = null; // No message is expected
-			}
 		};
-
-		@Override
-		public State nextState(AchieveREResponder re) {
-			return this;
-		}
 	}
 
 }

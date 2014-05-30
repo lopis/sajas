@@ -46,7 +46,7 @@ public abstract class Agent {
 	/**
 	 * @return The mail box
 	 */
-	private MessageQueue getMailBox() {
+	protected MessageQueue getMailBox() {
 		if (mailBox == null) {
 			mailBox = new MessageQueue();
 		}
