@@ -329,6 +329,8 @@ public class ACLMessage {
 		try {
 			newMessage.setContentObject(this.contentObject);
 		} catch (IOException e) { /*Never fails*/ }
+		if(this.contentString != null)
+			newMessage.setContent(this.getContent());
 		newMessage.setInReplyTo(this.inReplyTo);
 		newMessage.setPerformative(this.performative);
 		newMessage.setProtocol(this.protocol);

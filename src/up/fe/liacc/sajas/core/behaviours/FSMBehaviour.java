@@ -19,7 +19,7 @@ public abstract class FSMBehaviour extends Behaviour {
 	
 	protected String currentState;
 	protected int currentResult;
-	private String lastState;
+	protected String lastState;
 	
 	public FSMBehaviour(Agent a) {
 		super(a);
