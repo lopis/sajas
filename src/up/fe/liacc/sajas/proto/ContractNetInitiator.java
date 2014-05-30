@@ -277,16 +277,15 @@ public class ContractNetInitiator extends FSMBehaviour {
 			
 			@Override
 			public void setTemplate(MessageTemplate t, ContractNetInitiator cn) {
-				t = new MessageTemplate();
-				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(ACLMessage.INFORM);
-				t.addConversationId(cn.cfp.getConversationId());
-				t.setPerformatives(performatives);
+				cn.template = new MessageTemplate();
+				cn.template.setPerformatives(new ArrayList<Integer>());
+				cn.template.addPerformative(ACLMessage.INFORM);
+				cn.template.addProtocol(protocol);
+				cn.template.addConversationId(cn.cfp.getConversationId());
 			}
 
 			@Override
-			public FSM<ContractNetInitiator> nextState(
-					ContractNetInitiator behaviour) {
+			public FSM<ContractNetInitiator> nextState(ContractNetInitiator behaviour) {
 				return INFORM;
 			}
 		};
