@@ -145,6 +145,13 @@ public class ContractNetInitiator extends FSMBehaviour {
 	 */
 	protected void handlePropose(ACLMessage m, Vector acceptances) {}
 	
+	/**
+	 * The handler for the final message of the protocol.
+	 * This default implementation does nothing and should be
+	 * overridden if needed.
+	 */
+	protected void handleInform(ACLMessage inform) {}
+	
 	private static long count = 0;
 	private static String createConversationId(String name) {
 		return "C-"+name+'-'+System.currentTimeMillis()+'-'+(count++);
@@ -261,6 +268,7 @@ public class ContractNetInitiator extends FSMBehaviour {
 		INFORM {
 			@Override
 			public State nextState(ACLMessage m, ContractNetInitiator cn) {
+				cn.handleInform(m);
 				if (cn.isInformed()) {
 					cn.onEnd();
 				}
