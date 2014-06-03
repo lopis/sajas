@@ -1,6 +1,8 @@
 package up.fe.liacc.sajas.core;
 
-public class AID {
+import java.io.Serializable;
+
+public class AID implements Serializable{
 	
 	private String localName;
 	
