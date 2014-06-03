@@ -34,6 +34,9 @@ public abstract class SimpleBehaviour extends Behaviour {
 	public void reset() {
 		super.reset();
 	}
+	
+	@Override
+	public abstract boolean done();
 }
 
 
