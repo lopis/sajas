@@ -13,6 +13,8 @@ import up.fe.liacc.sajas.core.Agent;
 public abstract class Behaviour {
 
 	protected Agent myAgent;
+	private long behaviourID = 0;
+	private static long lastID = 0;
 
 	/**
 	 * Behavior default constructor. Always call this constructor.
@@ -20,6 +22,7 @@ public abstract class Behaviour {
 	 */
 	public Behaviour(Agent agent) {
 		this.setAgent(agent);
+		this.behaviourID = lastID++;
 	}
 	
 	/**
@@ -40,6 +43,13 @@ public abstract class Behaviour {
 
 	public void setAgent(Agent owner) {
 		this.myAgent = owner;
+	}
+	
+	/**
+	 * For INTERNAL use only
+	 */
+	public final long getID(){
+		return behaviourID;
 	}
 
 	/**
@@ -71,5 +81,14 @@ public abstract class Behaviour {
 	 */
 	public boolean done() {
 		return false;
+	}
+	
+	protected void removeBehaviour() {
+		myAgent.removeBehaviour(this);
+	}
+	
+	@Override
+	public String toString() {
+		return "[" + behaviourID + "]" + this.getClass().getSimpleName();
 	}
 }

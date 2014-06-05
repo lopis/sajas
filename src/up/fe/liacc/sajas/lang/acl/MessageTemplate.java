@@ -124,7 +124,7 @@ public class MessageTemplate {
 		return mt;
 	}
 
-	public static Object MatchPerformative(int performative) {
+	public static MessageTemplate MatchPerformative(int performative) {
 		MessageTemplate mt = new MessageTemplate();
 		mt.addPerformative(performative);
 		return mt;
@@ -135,4 +135,26 @@ public class MessageTemplate {
 			getConversationIds().add(conversationId);
 	}
 
+	public static MessageTemplate MatchConversationId(String conversationId) {
+		MessageTemplate mt = new MessageTemplate();
+		mt.addConversationId(conversationId);
+		return mt;
+	}
+
+	public static MessageTemplate or(MessageTemplate mt1, MessageTemplate mt2) {
+		MessageTemplate mt3 = new MessageTemplate();
+		
+		mt3.getPerformatives().addAll(mt1.getPerformatives());
+		mt3.getPerformatives().addAll(mt2.getPerformatives());
+
+		mt3.getProtocols().addAll(mt1.getProtocols());
+		mt3.getProtocols().addAll(mt2.getProtocols());
+
+		mt3.getConversationIds().addAll(mt1.getConversationIds());
+		mt3.getConversationIds().addAll(mt2.getConversationIds());
+		
+		//TODO: copy the rest of the things.
+		
+		return mt3;
+	}
 }

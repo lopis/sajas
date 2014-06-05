@@ -53,14 +53,9 @@ public abstract class Agent {
 		return mailBox;
 	}
 	
-	public void setLocalName(String name) {
-		this.name = name;
-	}
-	
 	public String getLocalName() {
 		return name;
 	}
-
 	
 	public String getName() {
 		return name;
@@ -92,6 +87,7 @@ public abstract class Agent {
 	 */
 	public void setAID(AID aid) {
 		this.aid = aid;
+		this.name = aid.getLocalName();
 	}
 	
 	/**
