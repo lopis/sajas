@@ -78,6 +78,9 @@ public class AchieveREResponder extends FSMBehaviour {
 			public State nextState(ACLMessage m, AchieveREResponder re) {
 				re.request = m;
 				ACLMessage response = re.handleRequest(m);
+				if (response != null && m.getConversationId() != null) {
+					response.setConversationId(m.getConversationId());
+				}
 				re.myAgent.send(response);
 				return REPLY;
 			}
@@ -118,6 +121,9 @@ public class AchieveREResponder extends FSMBehaviour {
 			@Override
 			public State nextState(AchieveREResponder re) {
 				ACLMessage result = re.prepareResultNotification(re.request, re.response);
+				if (result != null && re.request.getConversationId() != null) {
+					result.setConversationId(re.request.getConversationId());
+				}
 				re.myAgent.send(result);
 
 				// Reset the responder0

@@ -17,17 +17,15 @@ public class ContractNetInitiator extends FSMBehaviour {
 	private static String protocol = FIPANames.InteractionProtocol.FIPA_CONTRACT_NET;
 	
 	// This vector contains the agents who received the CFP
-	private ArrayList<AID> responders;
+	private ArrayList<AID> responders = new ArrayList<AID>();
 	protected Vector responses = new Vector();
 	protected Vector acceptances = new Vector();
 
-	private MessageTemplate template = new MessageTemplate();
-
-	private FSM<ContractNetInitiator> protocolState;
-
-	protected ACLMessage cfp;
-
+	private State protocolState;
+	private ACLMessage cfp;
 	private long replyTimeout;
+
+	protected ArrayList<AID> respondersToInform = new ArrayList<AID>();
 
 	/**
 	 * Default super constructor.
@@ -39,7 +37,6 @@ public class ContractNetInitiator extends FSMBehaviour {
 		super(agent);
 		
 		protocolState = State.SEND_CFP;
-		protocolState.setTemplate(template, this);
 		this.cfp = cfp;
 		responders = cfp.getReceivers();
 		
@@ -57,27 +54,11 @@ public class ContractNetInitiator extends FSMBehaviour {
 	}
 	
 	public void action() {
-		ACLMessage nextMessage = this.getAgent().receive(template);
-		
-		// Update the state
-		if (nextMessage != null)
-			protocolState = protocolState.nextState(nextMessage, this);			
-		else
-			protocolState = protocolState.nextState(this);
-		
-		// Update the template
-		protocolState.setTemplate(template, this);
+		protocolState = protocolState.action(this);
 	}
-	
-//	protected void nextState(ACLMessage nextMessage) {
-//		// Update the state
-//		protocolState = protocolState.nextState(nextMessage, this);
-//		// Update the template
-//		protocolState.setTemplate(template);
-//	}
 
 
-	protected ACLMessage receive() {
+	protected ACLMessage receive(MessageTemplate template) {
 		return this.getAgent().receive(template);
 	}
 
@@ -90,8 +71,8 @@ public class ContractNetInitiator extends FSMBehaviour {
 	 * @param cfp The return value must be an array list containing just 
 	 * the CFP.
 	 */
-	public ArrayList<ACLMessage> prepareCfps(ACLMessage cfp) {
-		ArrayList<ACLMessage> cfps = new ArrayList<ACLMessage>();
+	public Vector prepareCfps(ACLMessage cfp) {
+		Vector cfps = new Vector();
 		cfps.add(cfp);
 		return cfps;
 	}
@@ -104,16 +85,9 @@ public class ContractNetInitiator extends FSMBehaviour {
 	 * @return True if all agents responded.
 	 */
 	protected boolean isAllResponded() {
-		return responders.size() == 1;
+		return responders.isEmpty();
 	}
 
-	/**
-	 * Returns wether the reply timeout was reached
-	 * @return True if 
-	 */
-	protected boolean isInformed() {
-		return replyTimeout > System.currentTimeMillis();
-	}
 	
 	/**
 	 * Called when all agents submitted their Proposals
@@ -174,32 +148,18 @@ public class ContractNetInitiator extends FSMBehaviour {
 	 * @author joaolopes
 	 *
 	 */
-	private enum State implements FSM<ContractNetInitiator> {
+	private enum State{
 		
 		SEND_CFP {
 
-			@Override
-			public State nextState(ACLMessage message, ContractNetInitiator cn) {
-				message = cn.prepareCfps(cn.cfp).get(0);
+			public State action(ContractNetInitiator cn) {
 				
-				// Be sure a conversation-id is set. If not create a suitable one
-				if (message.getConversationId() == null || message.getConversationId().equals("")) {
-					message.setConversationId(createConversationId(cn.myAgent.getLocalName()));
+				ACLMessage cfps = (ACLMessage) cn.prepareCfps(cn.cfp).get(0);
+				if (cfps.getConversationId() == null || cfps.getConversationId().equals("")) {
+					cfps.setConversationId(createConversationId(cn.myAgent.getLocalName()));
 				}
-				
-				cn.myAgent.send(message); // Send the CFP;
+				cn.myAgent.send(cfps); // Send the CFP;
 				return PROPOSAL;
-			}
-
-			@Override
-			public void setTemplate(MessageTemplate t, ContractNetInitiator b) {
-				t.addProtocol(protocol);
-				t.addPerformative(-1);
-			}
-			
-			@Override
-			public State nextState(ContractNetInitiator cn) {
-				return nextState(null, cn);
 			}
 			
 		},
@@ -210,7 +170,12 @@ public class ContractNetInitiator extends FSMBehaviour {
 		 */
 		PROPOSAL {
 			@Override
-			public State nextState(ACLMessage m, ContractNetInitiator cn) {
+			public State action(ContractNetInitiator cn) {
+				
+				ACLMessage m = cn.receive(getTemplate(cn));
+				if (m == null) {
+					return PROPOSAL;
+				}
 				
 				// Since we know the message matches the template,
 				// we can assume it's a valid propose or refuse.
@@ -220,6 +185,7 @@ public class ContractNetInitiator extends FSMBehaviour {
 				// TODO: Should the protocol accept more messages from this sender?
 				// 		 Or should further "proposals" from this agent be ignored?
 				cn.responders.remove(m.getSender());
+				System.err.println("\t\t#" + cn.responders.size());
 				
 				if (m.getPerformative() == ACLMessage.REFUSE) {
 					cn.handleRefuse(m);
@@ -235,9 +201,12 @@ public class ContractNetInitiator extends FSMBehaviour {
 					for (Object aclMessage : cn.acceptances) {
 						// Send all "ACCEPT PROPOSE" or "REJECT PROPOSE"
 						cn.myAgent.send((ACLMessage) aclMessage);
+						cn.respondersToInform .addAll(((ACLMessage) aclMessage).getReceivers());
 					}
 					
 					cn.replyTimeout = System.currentTimeMillis();
+					
+					
 					return INFORM;
 					
 				} else {
@@ -245,19 +214,13 @@ public class ContractNetInitiator extends FSMBehaviour {
 				}
 			}
 			
-			@Override
-			public void setTemplate(MessageTemplate t, ContractNetInitiator cn) {
-				ArrayList<Integer> performatives = new ArrayList<Integer>();
-				performatives.add(ACLMessage.PROPOSE);
-				performatives.add(ACLMessage.REFUSE);
-				t.addConversationId(cn.cfp.getConversationId());
-				t.setPerformatives(performatives);
-			}
-
-			@Override
-			public FSM<ContractNetInitiator> nextState(
-					ContractNetInitiator behaviour) {
-				return PROPOSAL;
+			public MessageTemplate getTemplate(ContractNetInitiator cn) {
+				MessageTemplate template = MessageTemplate.or(
+						MessageTemplate.MatchPerformative(ACLMessage.PROPOSE),
+						MessageTemplate.MatchPerformative(ACLMessage.REFUSE));
+				template = MessageTemplate.or(template, 
+						MessageTemplate.MatchConversationId(cn.cfp.getConversationId()));
+				return template;
 			}
 		}, 
 		
@@ -266,28 +229,46 @@ public class ContractNetInitiator extends FSMBehaviour {
 		 * the protocol skips to this state;
 		 */
 		INFORM {
-			@Override
-			public State nextState(ACLMessage m, ContractNetInitiator cn) {
-				cn.handleInform(m);
-				if (cn.isInformed()) {
-					cn.onEnd();
-				}
-				return INFORM;
-			}
-			
-			@Override
-			public void setTemplate(MessageTemplate t, ContractNetInitiator cn) {
-				cn.template = new MessageTemplate();
-				cn.template.setPerformatives(new ArrayList<Integer>());
-				cn.template.addPerformative(ACLMessage.INFORM);
-				cn.template.addProtocol(protocol);
-				cn.template.addConversationId(cn.cfp.getConversationId());
+			private MessageTemplate getTemplate(ContractNetInitiator cn) {
+				MessageTemplate template = MessageTemplate.or(
+						MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+						MessageTemplate.MatchConversationId(cn.cfp.getConversationId()));
+				return template;
 			}
 
 			@Override
-			public FSM<ContractNetInitiator> nextState(ContractNetInitiator behaviour) {
-				return INFORM;
+			public State action(ContractNetInitiator cn) {
+				ACLMessage m = cn.receive(getTemplate(cn));
+				if (m == null) {
+					return INFORM;
+				}
+				
+				cn.handleInform(m);
+				cn.respondersToInform.remove(m.getSender());
+				
+				if (cn.respondersToInform.isEmpty()) {
+					return FINISHED;
+				} else {
+					return INFORM;
+				}
 			}
+		},
+		
+		FINISHED {
+
+			@Override
+			public State action(ContractNetInitiator behaviour) {
+				return FINISHED;
+			}
+			
 		};
+		
+		public abstract State action(ContractNetInitiator behaviour);
 	}
+	
+	@Override
+	public boolean done() {
+		return protocolState == State.FINISHED;
+	}
+	
 }
