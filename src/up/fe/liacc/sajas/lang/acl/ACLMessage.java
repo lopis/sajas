@@ -317,7 +317,8 @@ public class ACLMessage {
 					&& template.matchesProtocol(this.getProtocol())
 					&& template.matchesInReplyTo(this.getInReplyTo())
 					&& template.matchesReplyWith(this.getReplyWith())
-					&& template.matchesContent(this.getContentObject());
+					&& template.matchesContent(this.getContentObject())
+					&& template.matchesConversationIds(this.getConversationId());
 		} catch (UnreadableException e) {
 			System.err.println(e.getMessage());
 			return false;

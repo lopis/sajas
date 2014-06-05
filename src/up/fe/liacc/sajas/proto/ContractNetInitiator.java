@@ -246,6 +246,7 @@ public class ContractNetInitiator extends FSMBehaviour {
 				cn.handleInform(m);
 				cn.respondersToInform.remove(m.getSender());
 				
+				MessageTemplate template = getTemplate(cn);
 				if (cn.respondersToInform.isEmpty()) {
 					return FINISHED;
 				} else {

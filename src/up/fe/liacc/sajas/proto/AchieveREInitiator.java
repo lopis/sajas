@@ -36,8 +36,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 
 	private State protocolState;
 
-	protected ArrayList<AID> responders;
-//	protected ArrayList<AID> responders = new ArrayList<AID>();
+	protected ArrayList<AID> responders = new ArrayList<AID>();
 	protected Vector responses = new Vector(); //This is a vector for compatibility with JADE
 	protected ACLMessage request;
 
@@ -59,7 +58,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 	}
 	
 	public void action() {
-		protocolState.action(this);	
+		protocolState = protocolState.action(this);	
 //		ACLMessage nextMessage = this.getAgent().receive(template);
 //		
 //		// Update the state
@@ -156,6 +155,9 @@ public class AchieveREInitiator extends FSMBehaviour {
 
 			@Override
 			public State action(AchieveREInitiator re) {
+				if (re.request.getConversationId() == null) {
+					re.request.setConversationId(re.myAgent.getName() + System.nanoTime());
+				}
 				re.responders = new ArrayList<AID>();
 				re.responders.addAll(re.request.getReceivers());
 				re.myAgent.send(re.request);
@@ -172,6 +174,9 @@ public class AchieveREInitiator extends FSMBehaviour {
 			public State action(AchieveREInitiator re) {
 				
 				ACLMessage m = re.receive(getTemplate(re));
+				if (m == null) {
+					return RESPONSE;
+				}
 				
 				re.responses.add(m);
 				re.responders.remove(m.getSender());
@@ -218,9 +223,10 @@ public class AchieveREInitiator extends FSMBehaviour {
 				if (m.getPerformative() == ACLMessage.INFORM) {
 					re.handleInform(m);
 				}
-				
-				re.onEnd(); //FIXME 
-				return nextState(re);
+				if (re.isAllResulted()) {
+					return FINISHED;
+				}
+				return INFORM;
 			}
 
 			public MessageTemplate getTemplate(AchieveREInitiator re) {
@@ -228,17 +234,22 @@ public class AchieveREInitiator extends FSMBehaviour {
 				template.addPerformative(ACLMessage.INFORM);
 				return template;
 			}
+		},
+		
+		FINISHED {
 
-			public State nextState(AchieveREInitiator re) {
-				if (re.isAllResulted()) {
-					re.myAgent.removeBehaviour(re);
-					re.onEnd();
-				}
-
-				return INFORM;
+			@Override
+			protected State action(AchieveREInitiator re) {
+				return FINISHED;
 			}
+			
 		};
 		
 		protected abstract State action(AchieveREInitiator re);
+	}
+	
+	@Override
+	public boolean done() {
+		return this.protocolState == State.FINISHED;
 	}
 }

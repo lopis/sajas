@@ -105,6 +105,11 @@ public class MessageTemplate {
 		return getContents().isEmpty()
 		|| getContents().contains(content);
 	}
+	
+	public boolean matchesConversationIds(String conversationId) {
+		return getConversationIds().isEmpty()
+		|| getConversationIds().contains(conversationId);
+	}
 
 	public void addProtocol(String protocol) {
 		if (!getProtocols().contains(protocol)) {

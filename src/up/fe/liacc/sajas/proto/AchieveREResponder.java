@@ -114,8 +114,7 @@ public class AchieveREResponder extends FSMBehaviour {
 
 			@Override
 			public void setTemplate(MessageTemplate t, AchieveREResponder re) {
-				t = new MessageTemplate();
-				t.addPerformative(-1);
+				t= null;
 			}
 
 			@Override
