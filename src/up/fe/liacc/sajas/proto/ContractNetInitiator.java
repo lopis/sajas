@@ -27,6 +27,7 @@ public class ContractNetInitiator extends FSMBehaviour {
 
 	protected ArrayList<AID> respondersToInform = new ArrayList<AID>();
 
+	protected Vector resultNotifications;
 	/**
 	 * Default super constructor.
 	 * Must be called for the behavior to work.
@@ -126,6 +127,16 @@ public class ContractNetInitiator extends FSMBehaviour {
 	 */
 	protected void handleInform(ACLMessage inform) {}
 	
+	/**
+	 * This method is called when all the result notification
+	 * messages have been collected. By result notification
+	 * message we intend here all the inform, failure received messages.
+	 * This default implementation does nothing and should be
+	 * overridden if needed.
+	 * @param resultNotifications2
+	 */
+	protected void handleAllResultNotifications(Vector resultNotifications2) {}
+	
 	private static long count = 0;
 	private static String createConversationId(String name) {
 		return "C-"+name+'-'+System.currentTimeMillis()+'-'+(count++);
@@ -185,7 +196,6 @@ public class ContractNetInitiator extends FSMBehaviour {
 				// TODO: Should the protocol accept more messages from this sender?
 				// 		 Or should further "proposals" from this agent be ignored?
 				cn.responders.remove(m.getSender());
-				System.err.println("\t\t#" + cn.responders.size());
 				
 				if (m.getPerformative() == ACLMessage.REFUSE) {
 					cn.handleRefuse(m);
@@ -201,7 +211,11 @@ public class ContractNetInitiator extends FSMBehaviour {
 					for (Object aclMessage : cn.acceptances) {
 						// Send all "ACCEPT PROPOSE" or "REJECT PROPOSE"
 						cn.myAgent.send((ACLMessage) aclMessage);
-						cn.respondersToInform .addAll(((ACLMessage) aclMessage).getReceivers());
+						
+						// Only agents whose proposal was accepted are expected to reply
+						if (((ACLMessage) aclMessage).getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
+							cn.respondersToInform.addAll(((ACLMessage) aclMessage).getReceivers()); 
+						}
 					}
 					
 					cn.replyTimeout = System.currentTimeMillis();
@@ -246,8 +260,8 @@ public class ContractNetInitiator extends FSMBehaviour {
 				cn.handleInform(m);
 				cn.respondersToInform.remove(m.getSender());
 				
-				MessageTemplate template = getTemplate(cn);
 				if (cn.respondersToInform.isEmpty()) {
+				 	cn.handleAllResultNotifications(cn.resultNotifications);
 					return FINISHED;
 				} else {
 					return INFORM;
@@ -256,7 +270,6 @@ public class ContractNetInitiator extends FSMBehaviour {
 		},
 		
 		FINISHED {
-
 			@Override
 			public State action(ContractNetInitiator behaviour) {
 				return FINISHED;
