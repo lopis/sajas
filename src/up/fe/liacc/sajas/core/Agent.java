@@ -40,7 +40,7 @@ public abstract class Agent {
 	 * @param message
 	 */
 	public void addMail(ACLMessage message) {
-		getMailBox().addFirst(message);
+		getMailBox().add(message);
 	}
 	
 	/**

@@ -26,7 +26,7 @@ public class MTS {
 		// The message is cloned to prevent modifications of the original one.
 		ACLMessage newmessage = message.clone();
 		ArrayList<AID> receivers = newmessage.getReceivers();
-		System.out.println(message); //DEBUG
+//		System.out.println(message); //DEBUG
 		for (AID aid: receivers) {
 			if (aid != null) {
 				resolve(aid).addMail(newmessage);

@@ -1,6 +1,7 @@
 package up.fe.liacc.sajas.core;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -24,8 +25,9 @@ public class MessageQueue {
 	 * Adds a new message to the mail box. 
 	 * @param message
 	 */
-	public void addFirst(ACLMessage message) {
+	public void add(ACLMessage message) {
 		messages.add(message);
+		Collections.shuffle(messages);
 	}
 
 	
