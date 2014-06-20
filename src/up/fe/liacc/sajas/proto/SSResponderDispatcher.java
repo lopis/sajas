@@ -60,4 +60,8 @@ public abstract class SSResponderDispatcher extends Behaviour {
 		return "C-"+name+'-'+System.currentTimeMillis()+'-'+(count++);
 	}
 
+	@Override
+	public boolean done() {
+		return false;
+	}
 }

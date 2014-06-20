@@ -131,4 +131,9 @@ public class AchieveREResponder extends FSMBehaviour {
 		};
 	}
 
+	
+	@Override
+	public boolean done() {
+		return false;
+	}
 }

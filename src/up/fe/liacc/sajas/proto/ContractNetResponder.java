@@ -166,5 +166,8 @@ public class ContractNetResponder extends FSMBehaviour {
 		public abstract State action(ContractNetResponder cn);
 	}
 
-
+	@Override
+	public boolean done() {
+		return false;
+	}
 }
