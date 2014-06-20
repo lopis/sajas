@@ -37,7 +37,9 @@ public class AchieveREInitiator extends FSMBehaviour {
 	private State protocolState;
 
 	protected ArrayList<AID> responders = new ArrayList<AID>();
+	protected ArrayList<AID> informers = new ArrayList<AID>();
 	protected Vector responses = new Vector(); //This is a vector for compatibility with JADE
+	
 	protected ACLMessage request;
 
 
@@ -51,7 +53,9 @@ public class AchieveREInitiator extends FSMBehaviour {
 	 */
 	public AchieveREInitiator(Agent agent, ACLMessage request) {
 		super(agent);
-		
+//		if (request.getConversationId() == null) {
+//			request.setConversationId(System.currentTimeMillis() + "_" + myAgent);
+//		}
 		this.request = request;
 		this.responders = new ArrayList<AID>(request.getReceivers());
 		this.protocolState = State.SEND_REQUEST;
@@ -117,7 +121,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 	 * @return
 	 */
 	protected boolean isAllResponded() {
-		return true;
+		return responders.isEmpty();
 	}
 
 	/**
@@ -126,7 +130,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 	 * @return
 	 */
 	protected boolean isAllResulted() {
-		return responders.isEmpty();
+		return informers.isEmpty();
 	}
 
 
@@ -197,6 +201,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 				
 				if (re.isAllResponded()) {
 					re.handleAllResponses(re.responses);
+					
 					return INFORM;
 				}
 				
@@ -220,7 +225,7 @@ public class AchieveREInitiator extends FSMBehaviour {
 			@Override
 			public State action(AchieveREInitiator re) {
 				ACLMessage m = re.receive(getTemplate(re));
-				if (m.getPerformative() == ACLMessage.INFORM) {
+				if (m!=null &&m.getPerformative() == ACLMessage.INFORM) {
 					re.handleInform(m);
 				}
 				if (re.isAllResulted()) {

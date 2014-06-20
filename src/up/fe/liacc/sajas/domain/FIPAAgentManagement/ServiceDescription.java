@@ -68,12 +68,13 @@ public class ServiceDescription {
 
 	@Override
 	public boolean equals(Object obj) {
-		return this.hashCode() == obj.hashCode();
+		return obj instanceof ServiceDescription &&
+				((ServiceDescription) obj).type.equals(this.type);
 	}
 	
 	@Override
 	public int hashCode() {
-		return (name + type).hashCode();
+		return (type).hashCode();
 	}
 	
 }

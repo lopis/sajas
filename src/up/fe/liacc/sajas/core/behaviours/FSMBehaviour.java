@@ -3,6 +3,8 @@ package up.fe.liacc.sajas.core.behaviours;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sun.org.apache.bcel.internal.generic.IREM;
+
 import up.fe.liacc.sajas.core.Agent;
 
 /**
@@ -18,7 +20,7 @@ public abstract class FSMBehaviour extends Behaviour {
 	Map<String, String> defaultTransitions = new HashMap<String, String>();
 	
 	protected String currentState;
-	protected int currentResult;
+//	protected int currentResult;
 	protected String lastState;
 	
 	public FSMBehaviour(Agent a) {
@@ -28,16 +30,43 @@ public abstract class FSMBehaviour extends Behaviour {
 	@Override
 	public void action() {
 		if (states.get(currentState) != null)
-			scheduleNext(currentResult); // Updates the current state
+			scheduleNext(); // Updates the current state
 		else return;
 			
-		if (states.get(currentState) != null)
-			currentResult = states.get(currentState).onEnd();
+//		if (states.get(currentState) != null)
+//			currentResult = states.get(currentState).onEnd();
 		
 	}
 	
-	private void scheduleNext(int currentResult) {
-		states.get(currentState).action();
+	private void scheduleNext() {
+		if (currentState==null || !states.containsKey(currentState)) {
+			return;
+		}
+		Behaviour state = states.get(currentState);
+		state.action();
+		if (state.done()) {
+			
+			int result = state.onEnd();
+			Map<Integer, String> nextTransitions = transitions.get(currentState);
+			if (nextTransitions != null) {
+				currentState = nextTransitions.get(result);
+			} else {
+				String defaultNextState = defaultTransitions.get(currentState);
+				if (defaultNextState == null) {
+					System.err.println("FSMB: can't find transition from state " + currentState);
+					currentState = null;
+				} else {
+					currentState = defaultNextState;
+				}
+			}
+		}
+	}
+	
+	@Override
+	public boolean done() {
+		return currentState!= null
+			&& currentState.equals(lastState)
+			&& states.get(currentState).done();
 	}
 
 	/**
