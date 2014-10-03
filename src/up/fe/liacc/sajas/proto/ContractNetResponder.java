@@ -26,20 +26,9 @@ public class ContractNetResponder extends FSMBehaviour {
 	public ContractNetResponder(Agent agent, MessageTemplate template) {
 		super(agent);
 
-		template.addProtocol(protocol);
+		template = MessageTemplate.or(template, MessageTemplate.MatchProtocol(protocol));
 		protocolState = State.CFP;
 		this.template = template;
-
-		//		registerFirstState(new Behaviour() {
-		//
-		//			@Override
-		//			public void action() {
-		//				ACLMessage nextMessage = receive();
-		//				if (nextMessage != null) {
-		//					nextState(nextMessage);
-		//				}
-		//			}
-		//		}, "contractnetresp");
 	}
 
 	public void action() {
@@ -107,8 +96,10 @@ public class ContractNetResponder extends FSMBehaviour {
 				if (m == null) {
 					return CFP;
 				}
+				cn.cfp = m;
 				ACLMessage prop = cn.proposal;
 				prop = cn.handleCfp(m);
+				prop.setConversationId(cn.cfp.getConversationId());
 				cn.myAgent.send(prop); // Sends Proposal to CFP
 				return NOTIFICATION;
 			}
@@ -116,7 +107,7 @@ public class ContractNetResponder extends FSMBehaviour {
 			public MessageTemplate getTemplate(ContractNetResponder cn) {
 				MessageTemplate template = MessageTemplate.or(
 						MessageTemplate.MatchPerformative(ACLMessage.CFP),
-						MessageTemplate.MatchConversationId(cn.cfp.getConversationId()));
+						cn.template);
 				return template;
 			}
 		}, 
@@ -130,6 +121,9 @@ public class ContractNetResponder extends FSMBehaviour {
 			@Override
 			public State action(ContractNetResponder cn) {
 				ACLMessage m = cn.receive(getTemplate(cn));
+				if (m == null) {
+					return NOTIFICATION;
+				}
 				if (m.getPerformative() == ACLMessage.REJECT_PROPOSAL) {
 					cn.handleRejectProposal(cn.cfp, cn.proposal, m);
 				} else if (m.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
