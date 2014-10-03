@@ -148,6 +148,9 @@ public class MessageTemplate {
 
 	public static MessageTemplate or(MessageTemplate mt1, MessageTemplate mt2) {
 		MessageTemplate mt3 = new MessageTemplate();
+		if (mt1 == null) {
+			return mt3;
+		}
 		
 		mt3.getPerformatives().addAll(mt1.getPerformatives());
 		mt3.getPerformatives().addAll(mt2.getPerformatives());
